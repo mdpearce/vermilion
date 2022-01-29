@@ -3,7 +3,7 @@ package com.airtasker.vermilion.domain.entities
 import java.net.URL
 import java.time.Instant
 
-data class PostDetails(
+data class Post(
     val title: PostTitle,
     val summary: PostSummary,
     val communityName: CommunityName,
