@@ -1,4 +1,4 @@
-package com.airtasker.vermilion.posts.domain.entities
+package com.airtasker.vermilion.domain.entities
 
 import java.net.URL
 import java.time.Instant

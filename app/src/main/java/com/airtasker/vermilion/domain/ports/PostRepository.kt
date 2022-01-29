@@ -1,7 +1,7 @@
-package com.airtasker.vermilion.posts.domain.ports
+package com.airtasker.vermilion.domain.ports
 
-import com.airtasker.vermilion.posts.domain.entities.CommunityName
-import com.airtasker.vermilion.posts.domain.entities.Post
+import com.airtasker.vermilion.domain.entities.CommunityName
+import com.airtasker.vermilion.domain.entities.Post
 import kotlinx.coroutines.flow.Flow
 
 interface PostRepository {
