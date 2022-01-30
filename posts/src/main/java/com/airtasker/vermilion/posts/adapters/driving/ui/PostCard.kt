@@ -1,0 +1,73 @@
+package com.airtasker.vermilion.posts.adapters.driving.ui
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.airtasker.vermilion.posts.domain.entities.*
+import com.airtasker.vermilion.ui.theme.VermilionTheme
+import java.net.URL
+import java.time.Instant
+
+@Composable
+fun PostCard(post: Post) {
+    Card {
+        Column(modifier = Modifier.padding(16.dp)) {
+            when (val summary = post.summary) {
+                is TextPostSummary -> {
+                    TextSummary(content = summary.previewText.value)
+                }
+                is ImagePostSummary -> TODO()
+            }
+
+            Row(
+                verticalAlignment = Alignment.Bottom,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = post.title.value,
+                    style = MaterialTheme.typography.h4,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+                Text(text = post.communityName.value, style = MaterialTheme.typography.caption)
+            }
+        }
+    }
+}
+
+@Composable
+fun TextSummary(content: String) {
+    Text(
+        text = content,
+        style = MaterialTheme.typography.body1
+    )
+}
+
+@Composable
+fun ImageSummary(imageUrl: URL) {
+}
+
+@Preview(name = "Text Post card light")
+@Composable
+fun PostCardPreview() {
+    VermilionTheme {
+        PostCard(post = DUMMY_TEXT_POST)
+    }
+}
+
+private val DUMMY_TEXT_POST = Post(
+    PostTitle("Some post"),
+    TextPostSummary(PreviewText("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")),
+    CommunityName("Subreddit"),
+    URL("https://some.url/someicon.png"),
+    AuthorName("/u/SomeDude"),
+    postedAt = Instant.now(),
+    CommentCount(123),
+    PostScore(1024)
+)

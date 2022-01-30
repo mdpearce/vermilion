@@ -2,7 +2,7 @@ android {
     compileSdk 31
 
     defaultConfig {
-        minSdk 24
+        minSdk 26
         targetSdk 31
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -26,6 +26,14 @@ android {
     }
     kotlinOptions {
         jvmTarget = '1.8'
+    }
+}
+
+kotlin {
+    sourceSets.all {
+        languageSettings {
+            progressiveMode = true // false by default
+        }
     }
 }
 
