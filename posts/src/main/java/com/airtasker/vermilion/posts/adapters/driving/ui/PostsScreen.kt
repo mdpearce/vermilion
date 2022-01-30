@@ -18,7 +18,7 @@ fun PostsScreen(title: String) {
             })
         },
         bottomBar = {
-            BottomAppBar() {
+            BottomAppBar {
 
             }
         }
