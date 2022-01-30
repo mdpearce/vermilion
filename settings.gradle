@@ -8,3 +8,4 @@ dependencyResolutionManagement {
 rootProject.name = "Vermilion"
 include ':app'
 include ':posts'
+include ':ui'
