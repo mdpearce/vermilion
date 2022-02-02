@@ -9,3 +9,4 @@ rootProject.name = "Vermilion"
 include ':app'
 include ':posts'
 include ':ui'
+include ':api'

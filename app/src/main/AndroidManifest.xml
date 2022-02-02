@@ -3,6 +3,7 @@
     package="com.neaniesoft.vermilion.app">
 
     <application
+        android:name=".VermilionApplication"
         android:allowBackup="true"
         android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"

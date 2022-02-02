@@ -1,6 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
 }
 
 android {
@@ -47,7 +49,14 @@ android {
 }
 
 dependencies {
-
+    // Dagger Hilt (for dependency injection)
+    implementation "com.google.dagger:hilt-android:$dagger_hilt_version"
+    kapt "com.google.dagger:hilt-compiler:$dagger_hilt_version"
+    androidTestImplementation "com.google.dagger:hilt-android-testing:$dagger_hilt_version"
+    kaptAndroidTest "com.google.dagger:hilt-compiler:$dagger_hilt_version"
+    testImplementation "com.google.dagger:hilt-android-testing:$dagger_hilt_version"
+    kaptTest "com.google.dagger:hilt-compiler:$dagger_hilt_version"
+    
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'com.google.android.material:material:1.5.0'

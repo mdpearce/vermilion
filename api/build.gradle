@@ -1,0 +1,4 @@
+apply from: '../appmodule.gradle'
+
+dependencies {
+}
