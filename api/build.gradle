@@ -10,3 +10,22 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.14.9'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.14.9'
 }
+
+Properties getLocalProperties() {
+    Properties props = new Properties()
+    if (file('local.properties').exists()) {
+        props.load(new FileInputStream(file('local.properties')))
+    }
+    return props
+}
+
+android {
+    buildTypes {
+        debug {
+            resValue("string", "reddit_api_client_id", getLocalProperties().getProperty("REDDIT_API_CLIENT_ID"))
+        }
+        release {
+            resValue("string", "reddit_api_client_id", getLocalProperties().getProperty("REDDIT_API_CLIENT_ID"))
+        }
+    }
+}

@@ -1,5 +1,6 @@
 package com.vermilion.api
 
+import android.content.Context
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
@@ -24,6 +25,7 @@ class RedditApiClientModule {
 
         private const val UNAUTHENTICATED_BASE_URL = "https://www.reddit.com/api/v1/"
         private const val AUTHENTICATED_BASE_URL = "https://oauth.reddit.com/"
+        private const val REDDIT_API_CLIENT_ID = "reddit_api_client_id"
     }
 
     @Provides
@@ -60,6 +62,10 @@ class RedditApiClientModule {
 
     @Provides
     fun provideAccessTokenService(@Named(UNAUTHENTICATED) retrofit: Retrofit): AccessTokenService = retrofit.create()
+
+    @Provides
+    @Named(REDDIT_API_CLIENT_ID)
+    fun provideRedditApiClientId(context: Context) = context.getString(R.string.reddit_api_client_id)
 }
 
 data class ListingResponse(
