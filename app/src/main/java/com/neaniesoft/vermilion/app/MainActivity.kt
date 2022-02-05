@@ -14,8 +14,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.neaniesoft.vermilion.posts.adapters.driving.ui.PostsScreen
+import com.neaniesoft.vermilion.ui.theme.Vermilion700
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

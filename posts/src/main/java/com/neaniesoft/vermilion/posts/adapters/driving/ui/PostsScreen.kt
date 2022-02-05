@@ -2,20 +2,20 @@ package com.neaniesoft.vermilion.posts.adapters.driving.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 
 @Composable
 fun PostsScreen(
-    viewModel: PostsViewModel = viewModel()
+    viewModel: PostsViewModel = hiltViewModel()
 ) {
     val state = viewModel.state.collectAsState()
 
@@ -50,9 +50,10 @@ fun PostsList(
     posts: List<Post>
 ) {
     LazyColumn {
-        itemsIndexed(posts) { index, post ->
+        items(posts) { post ->
+            Spacer(Modifier.height(12.dp))
             PostCard(post = post)
-            if (index != posts.size - 1) Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(12.dp))
         }
     }
 }

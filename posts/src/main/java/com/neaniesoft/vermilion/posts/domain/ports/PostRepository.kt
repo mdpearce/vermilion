@@ -5,7 +5,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.Post
 import kotlinx.coroutines.flow.Flow
 
 interface PostRepository {
-    suspend fun postsForCommunity(community: Community): Flow<ResultSet<Post>>
+    suspend fun postsForCommunity(community: Community): ResultSet<Post>
 }
 
 sealed class Community
@@ -17,5 +17,4 @@ object FrontPage : Community()
 
 data class ResultSet<out T>(
     val results: List<T>,
-    val nextResultSet: () -> Unit
 )
