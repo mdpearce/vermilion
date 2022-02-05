@@ -13,7 +13,6 @@ import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
 import retrofit2.create
-import retrofit2.http.GET
 import javax.inject.Named
 
 @Module
@@ -61,21 +60,7 @@ class RedditApiClientModule {
 
     @Provides
     fun provideAccessTokenService(@Named(UNAUTHENTICATED) retrofit: Retrofit): AccessTokenService = retrofit.create()
-
-    @Provides
-    fun providePostsService(@Named(AUTHENTICATED) retrofit: Retrofit): PostsService = retrofit.create()
 }
-
-
-interface PostsService {
-    @GET("best")
-    suspend fun frontPageBest(): PostsResponse
-}
-
-data class PostsResponse(
-    @JsonProperty("kind") val kind: String,
-    @JsonProperty("data") val data: ListingResponse
-)
 
 data class ListingResponse(
     @JsonProperty("after") val after: String?,
