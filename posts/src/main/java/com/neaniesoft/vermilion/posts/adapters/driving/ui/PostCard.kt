@@ -15,9 +15,9 @@ import java.net.URL
 import java.time.Instant
 
 @Composable
-fun PostCard(post: Post) {
+fun PostCard(post: Post, modifier: Modifier = Modifier) {
     Card(elevation = 8.dp) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = modifier.padding(16.dp)) {
             when (val summary = post.summary) {
                 is TextPostSummary -> {
                     TextSummary(content = summary.previewText.value)
