@@ -1,13 +1,10 @@
 package com.neaniesoft.vermilion.posts.adapters.driven
 
+import com.neaniesoft.vermilion.posts.adapters.driven.http.PostsService
 import com.neaniesoft.vermilion.posts.domain.entities.*
 import com.neaniesoft.vermilion.posts.domain.ports.*
 import com.vermilion.api.Link
 import com.vermilion.api.LinkThing
-import dagger.Binds
-import dagger.Module
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
 import java.net.URL
 import java.time.Instant
 import javax.inject.Inject
@@ -45,14 +42,7 @@ internal fun Link.toPost(): Post {
         AuthorName(author),
         Instant.ofEpochMilli((created * 1000.0).roundToLong()),
         CommentCount(numComments),
-        PostScore(score),
+        Score(score),
         URL(url)
     )
-}
-
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class PostRepositoryModule {
-    @Binds
-    abstract fun postRepository(postRepository: PostRepositoryImpl): PostRepository
 }

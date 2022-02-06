@@ -64,6 +64,6 @@ internal val DUMMY_TEXT_POST = Post(
     AuthorName("/u/SomeDude"),
     postedAt = Instant.now(),
     CommentCount(123),
-    PostScore(1024),
+    Score(1024),
     URL("http://reddit.com/")
 )

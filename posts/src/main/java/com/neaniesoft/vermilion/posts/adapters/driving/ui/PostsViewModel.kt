@@ -2,7 +2,7 @@ package com.neaniesoft.vermilion.posts.adapters.driving.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.neaniesoft.vermilion.posts.domain.ports.FrontPage
+import com.neaniesoft.vermilion.posts.domain.entities.FrontPage
 import com.neaniesoft.vermilion.posts.domain.ports.PostRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
