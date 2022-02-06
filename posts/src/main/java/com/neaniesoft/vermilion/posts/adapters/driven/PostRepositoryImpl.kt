@@ -3,8 +3,8 @@ package com.neaniesoft.vermilion.posts.adapters.driven
 import com.neaniesoft.vermilion.posts.adapters.driven.http.PostsService
 import com.neaniesoft.vermilion.posts.domain.entities.*
 import com.neaniesoft.vermilion.posts.domain.ports.*
-import com.vermilion.api.Link
-import com.vermilion.api.LinkThing
+import com.vermilion.api.entities.Link
+import com.vermilion.api.entities.LinkThing
 import java.net.URL
 import java.time.Instant
 import javax.inject.Inject

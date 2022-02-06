@@ -2,12 +2,11 @@ package com.vermilion.api
 
 import android.content.Context
 import android.content.pm.PackageManager
-import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.fasterxml.jackson.annotation.JsonTypeName
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.vermilion.api.interceptors.AuthorizationInterceptor
+import com.vermilion.api.interceptors.BasicAuthorizationInterceptor
 import com.vermilion.auth.http.AccessTokenService
 import com.vermilion.auth.AuthorizationStore
 import dagger.Module
@@ -162,31 +161,4 @@ class RedditApiClientModule {
     fun provideDeveloperName(): String = "NeaniesoftMichael"
 }
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "kind")
-sealed class Thing(open val data: ThingData)
 
-@JsonTypeName("t3")
-data class LinkThing(
-    override val data: Link
-) : Thing(data)
-
-
-sealed class ThingData
-
-data class Link(
-    @JsonProperty("author") val author: String,
-    @JsonProperty("domain") val domain: String,
-    @JsonProperty("hidden") val hidden: Boolean,
-    @JsonProperty("is_self") val isSelf: Boolean,
-    @JsonProperty("created") val created: Double,
-    @JsonProperty("num_comments") val numComments: Int,
-    @JsonProperty("permalink") val permalink: String,
-    @JsonProperty("score") val score: Int,
-    @JsonProperty("selftext") val selfText: String,
-    @JsonProperty("selftext_html") val selfTextHtml: String?,
-    @JsonProperty("subreddit") val subreddit: String,
-    @JsonProperty("thumbnail") val thumbnail: String,
-    @JsonProperty("title") val title: String,
-    @JsonProperty("url") val url: String,
-    @JsonProperty("stickied") val stickied: Boolean
-) : ThingData()
