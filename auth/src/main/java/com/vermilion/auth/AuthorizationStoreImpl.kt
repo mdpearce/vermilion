@@ -1,11 +1,10 @@
 package com.vermilion.auth
 
 import android.content.SharedPreferences
-import com.fasterxml.jackson.annotation.JsonProperty
-import retrofit2.Call
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
-import retrofit2.http.POST
+import com.vermilion.auth.entities.*
+import com.vermilion.auth.errors.InvalidDeviceIdError
+import com.vermilion.auth.errors.UnsuccessfulTokenRequestError
+import com.vermilion.auth.http.AccessTokenService
 import java.time.Clock
 import java.time.Instant
 import java.util.*
@@ -133,22 +132,3 @@ class AuthorizationStoreImpl @Inject constructor(
     }
 }
 
-class InvalidDeviceIdError(message: String) : Error(message)
-class UnsuccessfulTokenRequestError(message: String) : Error(message)
-
-interface AccessTokenService {
-    @FormUrlEncoded
-    @POST("access_token")
-    fun deviceAccessToken(
-        @Field("grant_type") grantType: String,
-        @Field("device_id") deviceId: String
-    ): Call<DeviceAccessTokenResponse>
-}
-
-data class DeviceAccessTokenResponse(
-    @JsonProperty("access_token") val accessToken: String,
-    @JsonProperty("token_type") val tokenType: String,
-    @JsonProperty("device_id") val deviceId: String,
-    @JsonProperty("expires_in") val expiresInSeconds: Long,
-    @JsonProperty("scope") val scope: String
-)

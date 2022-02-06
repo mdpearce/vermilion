@@ -1,9 +1,9 @@
 package com.vermilion.api
 
-import com.vermilion.auth.AccessTokenService
+import com.vermilion.auth.http.AccessTokenService
 import com.vermilion.auth.AuthorizationStore
-import com.vermilion.auth.DeviceAuthToken
-import com.vermilion.auth.UserAuthToken
+import com.vermilion.auth.entities.DeviceAuthToken
+import com.vermilion.auth.entities.UserAuthToken
 import okhttp3.Credentials
 import okhttp3.Interceptor
 import okhttp3.Response
