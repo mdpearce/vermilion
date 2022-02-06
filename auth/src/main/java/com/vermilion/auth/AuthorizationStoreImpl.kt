@@ -48,17 +48,17 @@ class AuthorizationStoreImpl @Inject constructor(
         }
     }
 
-    override fun getToken(accessTokenService: AccessTokenService): TokenResponse {
+    override fun getToken(accessTokenService: AccessTokenService): AuthToken {
         val tokenValue = prefs.getString(TOKEN_KEY, null)
         val expiryTime = Instant.ofEpochMilli(prefs.getLong(EXPIRY_TIME_KEY, 0L)) ?: Instant.EPOCH
         val currentToken = when (val tokenType = prefs.getString(TOKEN_TYPE_KEY, TOKEN_TYPE_DEVICE)) {
             TOKEN_TYPE_DEVICE -> {
                 val deviceId = getOrCreateDeviceId()
-                DeviceAuthorizationToken(Token(tokenValue ?: ""), expiryTime, deviceId)
+                DeviceAuthToken(Token(tokenValue ?: ""), expiryTime, deviceId)
             }
             TOKEN_TYPE_USER -> {
                 val refreshToken = prefs.getString(REFRESH_TOKEN_KEY, null)
-                UserAuthorizationToken(
+                UserAuthToken(
                     Token(tokenValue ?: ""),
                     expiryTime,
                     refreshToken = refreshToken?.let { Token(it) })
@@ -66,7 +66,7 @@ class AuthorizationStoreImpl @Inject constructor(
             else -> throw IllegalStateException("Invalid token type: $tokenType")
         }
         return when (currentToken) {
-            is DeviceAuthorizationToken -> {
+            is DeviceAuthToken -> {
                 if (currentToken.token.value.isBlank() || isTokenExpired(currentToken.expiryTime)) {
                     val token = currentToken.fetchNewToken(accessTokenService)
                     token.save()
@@ -74,7 +74,7 @@ class AuthorizationStoreImpl @Inject constructor(
                     currentToken
                 }
             }
-            is UserAuthorizationToken -> TODO()
+            is UserAuthToken -> TODO()
         }
     }
 
@@ -82,14 +82,14 @@ class AuthorizationStoreImpl @Inject constructor(
         return clock.millis() >= expiryTime.toEpochMilli()
     }
 
-    private fun DeviceAuthorizationToken.fetchNewToken(accessTokenService: AccessTokenService): DeviceAuthorizationToken {
+    private fun DeviceAuthToken.fetchNewToken(accessTokenService: AccessTokenService): DeviceAuthToken {
         val response =
             accessTokenService.deviceAccessToken("https://oauth.reddit.com/grants/installed_client", deviceId.value)
                 .execute()
         val body = response.body()
         if (response.isSuccessful && body != null) {
             if (body.deviceId == deviceId.value) {
-                return DeviceAuthorizationToken(
+                return DeviceAuthToken(
                     Token(body.accessToken),
                     clock.instant().plusSeconds(body.expiresInSeconds),
                     deviceId
@@ -102,7 +102,7 @@ class AuthorizationStoreImpl @Inject constructor(
         }
     }
 
-    private fun DeviceAuthorizationToken.save(): DeviceAuthorizationToken {
+    private fun DeviceAuthToken.save(): DeviceAuthToken {
         saveToken(this.token, this.expiryTime, TokenType.DEVICE)
         return this
     }

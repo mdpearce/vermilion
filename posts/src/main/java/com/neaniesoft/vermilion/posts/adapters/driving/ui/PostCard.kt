@@ -23,6 +23,7 @@ fun PostCard(post: Post, modifier: Modifier = Modifier) {
                     TextSummary(content = summary.previewText.value)
                 }
                 is ImagePostSummary -> TODO()
+                is LinkPostSummary -> TODO()
             }
 
             Row(
@@ -69,5 +70,6 @@ internal val DUMMY_TEXT_POST = Post(
     AuthorName("/u/SomeDude"),
     postedAt = Instant.now(),
     CommentCount(123),
-    PostScore(1024)
+    PostScore(1024),
+    URL("http://reddit.com/")
 )

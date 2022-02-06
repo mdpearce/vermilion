@@ -1,15 +1,22 @@
 package com.vermilion.api
 
 import android.content.Context
+import android.content.pm.PackageManager
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.fasterxml.jackson.annotation.JsonTypeName
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.vermilion.auth.AccessTokenService
+import com.vermilion.auth.AuthorizationStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import okhttp3.OkHttpClient
+import okhttp3.*
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
@@ -22,15 +29,27 @@ class RedditApiClientModule {
     companion object {
         const val UNAUTHENTICATED = "unauthenticated"
         const val AUTHENTICATED = "authenticated"
+        const val BASIC_AUTH = "basic_auth"
+        const val BEARER_AUTH = "bearer_auth"
 
         private const val UNAUTHENTICATED_BASE_URL = "https://www.reddit.com/api/v1/"
         private const val AUTHENTICATED_BASE_URL = "https://oauth.reddit.com/"
-        private const val REDDIT_API_CLIENT_ID = "reddit_api_client_id"
+        const val REDDIT_API_CLIENT_ID = "reddit_api_client_id"
+        private const val USER_AGENT = "user_agent"
+        private const val PLATFORM = "platform"
+        private const val APP_ID = "app_id"
+        private const val VERSION = "version"
+        private const val DEVELOPER = "developer"
+
     }
 
     @Provides
     @Named(UNAUTHENTICATED)
-    fun provideUnauthenticatedRetrofit(converterFactory: Converter.Factory): Retrofit = Retrofit.Builder()
+    fun provideUnauthenticatedRetrofit(
+        @Named(BASIC_AUTH) okHttpClient: OkHttpClient,
+        converterFactory: Converter.Factory
+    ): Retrofit = Retrofit.Builder()
+        .client(okHttpClient)
         .baseUrl(UNAUTHENTICATED_BASE_URL)
         .addConverterFactory(converterFactory)
         .build()
@@ -47,14 +66,59 @@ class RedditApiClientModule {
         .build()
 
     @Provides
-    @Named(AUTHENTICATED)
-    fun provideAuthenticatedOkhttpClient(authorizationInterceptor: AuthorizationInterceptor): OkHttpClient =
+    @Named(USER_AGENT)
+    fun provideUserAgentInterceptor(@Named(USER_AGENT) userAgent: String): Interceptor = object : Interceptor {
+        override fun intercept(chain: Interceptor.Chain): Response {
+            return chain.proceed(chain.request().newBuilder().header("User-Agent", userAgent).build())
+        }
+    }
+
+    @Provides
+    @Named(BASIC_AUTH)
+    fun provideUnauthenticatedOkHttpClient(
+        @Named(USER_AGENT) userAgentInterceptor: Interceptor,
+        basicAuthInterceptor: BasicAuthorizationInterceptor
+    ): OkHttpClient =
         OkHttpClient.Builder()
-            .addInterceptor(authorizationInterceptor)
+            .addInterceptor(userAgentInterceptor)
+            .addInterceptor(basicAuthInterceptor)
+            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS))
+            .build()
+
+    @Provides
+    @Named(BASIC_AUTH)
+    fun provideBasicAuthenticator(@Named(REDDIT_API_CLIENT_ID) clientId: String): Authenticator =
+        Authenticator { _, response ->
+            val credential = Credentials.basic(clientId, "")
+            response.request().newBuilder().header("Authorization", credential).build()
+        }
+
+    @Provides
+    @Named(BEARER_AUTH)
+    fun provideBearerTokenAuthenticator(
+        authorizationStore: AuthorizationStore,
+        accessTokenService: AccessTokenService
+    ): Authenticator = Authenticator { _, response ->
+        val token = authorizationStore.getToken(accessTokenService).token
+        val credential = "Bearer ${token.value}"
+
+        response.request().newBuilder().header("Authorization", credential).build()
+    }
+
+    @Provides
+    @Named(AUTHENTICATED)
+    fun provideAuthenticatedOkhttpClient(
+        @Named(BEARER_AUTH) bearerTokenAuthenticator: Authenticator,
+        authInterceptor: AuthorizationInterceptor
+    ): OkHttpClient =
+        OkHttpClient.Builder()
+            .addInterceptor(authInterceptor)
+            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS))
             .build()
 
     @Provides
     fun provideJacksonObjectMapper(): ObjectMapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
     @Provides
     fun provideJacksonConverterFactory(objectMapper: ObjectMapper): Converter.Factory =
@@ -65,11 +129,64 @@ class RedditApiClientModule {
 
     @Provides
     @Named(REDDIT_API_CLIENT_ID)
-    fun provideRedditApiClientId(context: Context) = context.getString(R.string.reddit_api_client_id)
+    fun provideRedditApiClientId(@ApplicationContext context: Context): String =
+        context.getString(R.string.reddit_api_client_id)
+
+    @Provides
+    @Named(USER_AGENT)
+    fun provideUserAgent(
+        @Named(PLATFORM) platform: String,
+        @Named(APP_ID) appId: String,
+        @Named(VERSION) version: String,
+        @Named(DEVELOPER) developer: String
+    ): String = "$platform:$appId:$version (by /u/$developer)"
+
+    @Provides
+    @Named(PLATFORM)
+    fun providePlatform(): String = "android"
+
+    @Provides
+    @Named(APP_ID)
+    fun provideAppId(@ApplicationContext context: Context): String = context.packageName
+
+    @Provides
+    @Named(VERSION)
+    fun provideAppVersion(@ApplicationContext context: Context): String = try {
+        context.packageManager.getPackageInfo(context.packageName, 0).versionName
+    } catch (e: PackageManager.NameNotFoundException) {
+        "vUnknown"
+    }
+
+    @Provides
+    @Named(DEVELOPER)
+    fun provideDeveloperName(): String = "NeaniesoftMichael"
 }
 
-data class ListingResponse(
-    @JsonProperty("after") val after: String?,
-    @JsonProperty("dist") val dist: Int,
-    @JsonProperty("before") val before: String?
-)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "kind")
+sealed class Thing(open val data: ThingData)
+
+@JsonTypeName("t3")
+data class LinkThing(
+    override val data: Link
+) : Thing(data)
+
+
+sealed class ThingData
+
+data class Link(
+    @JsonProperty("author") val author: String,
+    @JsonProperty("domain") val domain: String,
+    @JsonProperty("hidden") val hidden: Boolean,
+    @JsonProperty("is_self") val isSelf: Boolean,
+    @JsonProperty("created") val created: Double,
+    @JsonProperty("num_comments") val numComments: Int,
+    @JsonProperty("permalink") val permalink: String,
+    @JsonProperty("score") val score: Int,
+    @JsonProperty("selftext") val selfText: String,
+    @JsonProperty("selftext_html") val selfTextHtml: String?,
+    @JsonProperty("subreddit") val subreddit: String,
+    @JsonProperty("thumbnail") val thumbnail: String,
+    @JsonProperty("title") val title: String,
+    @JsonProperty("url") val url: String,
+    @JsonProperty("stickied") val stickied: Boolean
+) : ThingData()
