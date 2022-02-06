@@ -28,43 +28,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun VermilionApp() {
-    VermilionTheme {
-        val navController = rememberNavController()
-        val backStackEntry = navController.currentBackStackEntryAsState()
-        val currentScreen = VermilionScreen.fromRoute(backStackEntry.value?.destination?.route)
-
-        val scaffoldState = rememberScaffoldState()
-
-        Scaffold(
-            scaffoldState = scaffoldState,
-            snackbarHost = { scaffoldState.snackbarHostState },
-            topBar = {
-                TopAppBar(title = {
-                    Text(currentScreen.name)
-                })
-            },
-            bottomBar = {
-                BottomAppBar {
-
-                }
-            }
-        ) { innerPadding ->
-            VermilionNavHost(navController, Modifier.padding(innerPadding))
-        }
-    }
-}
-
-@Composable
-fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
-    NavHost(navController = navController, startDestination = VermilionScreen.Posts.name, modifier = modifier) {
-        composable(VermilionScreen.Posts.name) {
-            PostsScreen()
-        }
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 fun VermilionAppPreview() {
