@@ -8,7 +8,7 @@ jobs:
     executor:
       name: android/android-machine
       resource-class: large
-      tag: 2022.02.07
+      tag: 2022.1.1
     steps:
       - checkout
       - android/restore-gradle-cache
@@ -36,7 +36,7 @@ jobs:
     executor:
       name: android/android-machine
       resource-class: large
-      tag: 2022.02.07
+      tag: 2022.1.1
     steps:
       - checkout
       - android/start-emulator-and-run-tests:
@@ -57,7 +57,7 @@ jobs:
     executor:
       name: android/android-machine
       resource-class: large
-      tag: 2022.02.07
+      tag: 2022.1.1
     steps:
       - checkout
       - android/restore-gradle-cache
@@ -80,7 +80,7 @@ workflows:
           executor:
             name: android/android-machine
             resource-class: large
-            tag: 2022.02.07
+            tag: 2022.1.1
       - android-test:
           matrix:
             alias: android-test-all
