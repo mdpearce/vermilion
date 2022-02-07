@@ -19,13 +19,21 @@ Properties getLocalProperties() {
     return props
 }
 
+def getEnvVarOrLocalProperty(String propertyName) {
+    String envVar = System.getenv(propertyName)
+    if (envVar == null || envVar.isEmpty()) {
+        return getLocalProperties().getProperty(propertyName)
+    }
+    return envVar
+}
+
 android {
     buildTypes {
         debug {
-            resValue("string", "reddit_api_client_id", getLocalProperties().getProperty("REDDIT_API_CLIENT_ID"))
+            resValue("string", "reddit_api_client_id", getEnvVarOrLocalProperty("REDDIT_API_CLIENT_ID"))
         }
         release {
-            resValue("string", "reddit_api_client_id", getLocalProperties().getProperty("REDDIT_API_CLIENT_ID"))
+            resValue("string", "reddit_api_client_id", getEnvVarOrLocalProperty("REDDIT_API_CLIENT_ID"))
         }
     }
 }
