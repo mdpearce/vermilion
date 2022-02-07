@@ -7,7 +7,8 @@ jobs:
   unit-test:
     executor:
       name: android/android-machine
-      resource-class: medium
+      resource-class: large
+      tag: 2022.02.07
     steps:
       - checkout
       - android/restore-gradle-cache
@@ -34,7 +35,8 @@ jobs:
         default: system-images;android-30;google_apis;x86
     executor:
       name: android/android-machine
-      resource-class: medium
+      resource-class: large
+      tag: 2022.02.07
     steps:
       - checkout
       - android/start-emulator-and-run-tests:
@@ -54,7 +56,8 @@ jobs:
   release-build:
     executor:
       name: android/android-machine
-      resource-class: medium
+      resource-class: large
+      tag: 2022.02.07
     steps:
       - checkout
       - android/restore-gradle-cache
@@ -74,6 +77,10 @@ workflows:
           filters:
             branches:
               ignore: main # regular commits
+          executor:
+            name: android/android-machine
+            resource-class: large
+            tag: 2022.02.07
       - android-test:
           matrix:
             alias: android-test-all
