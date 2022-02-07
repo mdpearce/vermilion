@@ -7,7 +7,7 @@ jobs:
   unit-test:
     executor:
       name: android/android-machine
-      resource-class: small
+      resource-class: medium
     steps:
       - checkout
       - android/restore-gradle-cache
@@ -34,7 +34,7 @@ jobs:
         default: system-images;android-30;google_apis;x86
     executor:
       name: android/android-machine
-      resource-class: small
+      resource-class: medium
     steps:
       - checkout
       - android/start-emulator-and-run-tests:
@@ -54,7 +54,7 @@ jobs:
   release-build:
     executor:
       name: android/android-machine
-      resource-class: small
+      resource-class: medium
     steps:
       - checkout
       - android/restore-gradle-cache
