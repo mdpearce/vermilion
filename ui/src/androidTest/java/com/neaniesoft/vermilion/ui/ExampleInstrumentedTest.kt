@@ -17,6 +17,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.neaniesoft.vermilion.ui", appContext.packageName)
+        assertEquals("com.neaniesoft.vermilion.ui.test", appContext.packageName)
     }
 }
