@@ -14,8 +14,8 @@ import com.neaniesoft.vermilion.posts.domain.entities.ResultSet
 import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.posts.domain.entities.TextPostSummary
 import com.neaniesoft.vermilion.posts.domain.ports.PostRepository
-import com.vermilion.api.entities.Link
-import com.vermilion.api.entities.LinkThing
+import com.neaniesoft.vermilion.api.entities.Link
+import com.neaniesoft.vermilion.api.entities.LinkThing
 import java.net.URL
 import java.time.Instant
 import javax.inject.Inject

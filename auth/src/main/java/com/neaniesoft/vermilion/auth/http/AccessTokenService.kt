@@ -1,4 +1,4 @@
-package com.vermilion.auth.http
+package com.neaniesoft.vermilion.auth.http
 
 import retrofit2.Call
 import retrofit2.http.Field

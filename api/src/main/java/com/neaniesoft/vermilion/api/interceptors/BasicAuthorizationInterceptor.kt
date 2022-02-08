@@ -1,6 +1,6 @@
-package com.vermilion.api.interceptors
+package com.neaniesoft.vermilion.api.interceptors
 
-import com.vermilion.api.RedditApiClientModule
+import com.neaniesoft.vermilion.api.RedditApiClientModule
 import okhttp3.Credentials
 import okhttp3.Interceptor
 import okhttp3.Response

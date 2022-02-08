@@ -1,14 +1,14 @@
-package com.vermilion.auth
+package com.neaniesoft.vermilion.auth
 
 import android.content.SharedPreferences
-import com.vermilion.auth.entities.AuthToken
-import com.vermilion.auth.entities.DeviceAuthToken
-import com.vermilion.auth.entities.DeviceId
-import com.vermilion.auth.entities.Token
-import com.vermilion.auth.entities.UserAuthToken
-import com.vermilion.auth.errors.InvalidDeviceIdError
-import com.vermilion.auth.errors.UnsuccessfulTokenRequestError
-import com.vermilion.auth.http.AccessTokenService
+import com.neaniesoft.vermilion.auth.entities.AuthToken
+import com.neaniesoft.vermilion.auth.entities.DeviceAuthToken
+import com.neaniesoft.vermilion.auth.entities.DeviceId
+import com.neaniesoft.vermilion.auth.entities.Token
+import com.neaniesoft.vermilion.auth.entities.UserAuthToken
+import com.neaniesoft.vermilion.auth.errors.InvalidDeviceIdError
+import com.neaniesoft.vermilion.auth.errors.UnsuccessfulTokenRequestError
+import com.neaniesoft.vermilion.auth.http.AccessTokenService
 import java.time.Clock
 import java.time.Instant
 import java.util.UUID

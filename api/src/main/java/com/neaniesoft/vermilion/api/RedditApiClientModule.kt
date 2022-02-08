@@ -1,14 +1,15 @@
-package com.vermilion.api
+package com.neaniesoft.vermilion.api
 
 import android.content.Context
 import android.content.pm.PackageManager
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.vermilion.api.interceptors.AuthorizationInterceptor
-import com.vermilion.api.interceptors.BasicAuthorizationInterceptor
-import com.vermilion.auth.AuthorizationStore
-import com.vermilion.auth.http.AccessTokenService
+import com.neaniesoft.vermilion.api.interceptors.AuthorizationInterceptor
+import com.neaniesoft.vermilion.api.interceptors.BasicAuthorizationInterceptor
+import com.neaniesoft.vermilion.auth.AuthorizationStore
+import com.neaniesoft.vermilion.auth.http.AccessTokenService
+import com.vermilion.api.R
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

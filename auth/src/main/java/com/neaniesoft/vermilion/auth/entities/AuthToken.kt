@@ -1,4 +1,4 @@
-package com.vermilion.auth.entities
+package com.neaniesoft.vermilion.auth.entities
 
 import java.time.Instant
 

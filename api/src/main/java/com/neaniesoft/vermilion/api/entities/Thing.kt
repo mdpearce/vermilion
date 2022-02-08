@@ -1,4 +1,4 @@
-package com.vermilion.api.entities
+package com.neaniesoft.vermilion.api.entities
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeName

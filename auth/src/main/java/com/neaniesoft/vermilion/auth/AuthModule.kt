@@ -1,4 +1,4 @@
-package com.vermilion.auth
+package com.neaniesoft.vermilion.auth
 
 import android.content.Context
 import android.content.SharedPreferences
