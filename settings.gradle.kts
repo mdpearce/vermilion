@@ -1,5 +1,8 @@
 @file:Suppress("UnstableApiUsage")
 
+include(":utils")
+
+
 enableFeaturePreview("VERSION_CATALOGS")
 
 dependencyResolutionManagement {
