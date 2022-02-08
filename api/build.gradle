@@ -3,7 +3,7 @@ apply from: '../appmodule.gradle'
 dependencies {
     implementation project(':auth')
 
-    implementation "androidx.compose.ui:ui:$compose_version"
+    implementation "androidx.compose.ui:ui:1.1.0-rc03"
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-jackson:2.9.0'
     implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1'
