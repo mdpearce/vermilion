@@ -53,6 +53,19 @@ jobs:
       - store_artifacts:
           path: ~/test-results/junit
 
+  lint-kotlin:
+    executor:
+      name: android/android-machine
+      resource-class: large
+      tag: 2021.12.1
+    steps:
+      - checkout
+      - android/restore-gradle-cache
+      - android/restore-build-cache
+      - run:
+          name: Lint Kotlin files
+          command: |
+            ./gradlew lintKotlin
   release-build:
     executor:
       name: android/android-machine
@@ -72,6 +85,7 @@ jobs:
 workflows:
   test-and-build:
     jobs:
+      - lint-kotlin
       - unit-test
       - android/run-ui-tests:
           filters:
