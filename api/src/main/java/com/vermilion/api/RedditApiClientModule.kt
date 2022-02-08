@@ -7,8 +7,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.vermilion.api.interceptors.AuthorizationInterceptor
 import com.vermilion.api.interceptors.BasicAuthorizationInterceptor
-import com.vermilion.auth.http.AccessTokenService
 import com.vermilion.auth.AuthorizationStore
+import com.vermilion.auth.http.AccessTokenService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,7 +39,6 @@ class RedditApiClientModule {
         private const val APP_ID = "app_id"
         private const val VERSION = "version"
         private const val DEVELOPER = "developer"
-
     }
 
     @Provides
@@ -160,5 +159,3 @@ class RedditApiClientModule {
     @Named(DEVELOPER)
     fun provideDeveloperName(): String = "NeaniesoftMichael"
 }
-
-

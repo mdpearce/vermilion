@@ -1,9 +1,9 @@
 package com.vermilion.api.interceptors
 
-import com.vermilion.auth.http.AccessTokenService
 import com.vermilion.auth.AuthorizationStore
 import com.vermilion.auth.entities.DeviceAuthToken
 import com.vermilion.auth.entities.UserAuthToken
+import com.vermilion.auth.http.AccessTokenService
 import okhttp3.Interceptor
 import okhttp3.Response
 import javax.inject.Inject
@@ -31,4 +31,3 @@ class AuthorizationInterceptor @Inject constructor(
         }
     }
 }
-

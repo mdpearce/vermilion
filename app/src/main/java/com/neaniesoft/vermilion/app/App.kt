@@ -27,7 +27,6 @@ fun VermilionApp() {
             },
             bottomBar = {
                 BottomAppBar {
-
                 }
             }
         ) { innerPadding ->

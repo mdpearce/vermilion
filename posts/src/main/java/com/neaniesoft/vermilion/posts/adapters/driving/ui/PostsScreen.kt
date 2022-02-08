@@ -41,7 +41,6 @@ fun EmptyPostsScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize()
     ) {
-
     }
 }
 

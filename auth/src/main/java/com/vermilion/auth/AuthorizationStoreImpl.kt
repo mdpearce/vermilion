@@ -60,7 +60,8 @@ class AuthorizationStoreImpl @Inject constructor(
                 UserAuthToken(
                     Token(tokenValue ?: ""),
                     expiryTime,
-                    refreshToken = refreshToken?.let { Token(it) })
+                    refreshToken = refreshToken?.let { Token(it) }
+                )
             }
             else -> throw IllegalStateException("Invalid token type: $tokenType")
         }
@@ -131,4 +132,3 @@ class AuthorizationStoreImpl @Inject constructor(
         prefs.edit().putString(DEVICE_ID_KEY, deviceId.value).apply()
     }
 }
-
