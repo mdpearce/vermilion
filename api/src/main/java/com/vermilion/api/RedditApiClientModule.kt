@@ -7,14 +7,18 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.vermilion.api.interceptors.AuthorizationInterceptor
 import com.vermilion.api.interceptors.BasicAuthorizationInterceptor
-import com.vermilion.auth.http.AccessTokenService
 import com.vermilion.auth.AuthorizationStore
+import com.vermilion.auth.http.AccessTokenService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import okhttp3.*
+import okhttp3.Authenticator
+import okhttp3.Credentials
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
+import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Converter
 import retrofit2.Retrofit
@@ -39,7 +43,6 @@ class RedditApiClientModule {
         private const val APP_ID = "app_id"
         private const val VERSION = "version"
         private const val DEVELOPER = "developer"
-
     }
 
     @Provides
@@ -66,11 +69,14 @@ class RedditApiClientModule {
 
     @Provides
     @Named(USER_AGENT)
-    fun provideUserAgentInterceptor(@Named(USER_AGENT) userAgent: String): Interceptor = object : Interceptor {
-        override fun intercept(chain: Interceptor.Chain): Response {
-            return chain.proceed(chain.request().newBuilder().header("User-Agent", userAgent).build())
+    fun provideUserAgentInterceptor(@Named(USER_AGENT) userAgent: String): Interceptor =
+        object : Interceptor {
+            override fun intercept(chain: Interceptor.Chain): Response {
+                return chain.proceed(
+                    chain.request().newBuilder().header("User-Agent", userAgent).build()
+                )
+            }
         }
-    }
 
     @Provides
     @Named(BASIC_AUTH)
@@ -116,15 +122,17 @@ class RedditApiClientModule {
             .build()
 
     @Provides
-    fun provideJacksonObjectMapper(): ObjectMapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+    fun provideJacksonObjectMapper(): ObjectMapper =
+        ObjectMapper().registerModule(KotlinModule.Builder().build())
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
     @Provides
     fun provideJacksonConverterFactory(objectMapper: ObjectMapper): Converter.Factory =
         JacksonConverterFactory.create(objectMapper)
 
     @Provides
-    fun provideAccessTokenService(@Named(UNAUTHENTICATED) retrofit: Retrofit): AccessTokenService = retrofit.create()
+    fun provideAccessTokenService(@Named(UNAUTHENTICATED) retrofit: Retrofit): AccessTokenService =
+        retrofit.create()
 
     @Provides
     @Named(REDDIT_API_CLIENT_ID)
@@ -160,5 +168,3 @@ class RedditApiClientModule {
     @Named(DEVELOPER)
     fun provideDeveloperName(): String = "NeaniesoftMichael"
 }
-
-

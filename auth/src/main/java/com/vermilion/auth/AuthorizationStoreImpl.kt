@@ -1,13 +1,17 @@
 package com.vermilion.auth
 
 import android.content.SharedPreferences
-import com.vermilion.auth.entities.*
+import com.vermilion.auth.entities.AuthToken
+import com.vermilion.auth.entities.DeviceAuthToken
+import com.vermilion.auth.entities.DeviceId
+import com.vermilion.auth.entities.Token
+import com.vermilion.auth.entities.UserAuthToken
 import com.vermilion.auth.errors.InvalidDeviceIdError
 import com.vermilion.auth.errors.UnsuccessfulTokenRequestError
 import com.vermilion.auth.http.AccessTokenService
 import java.time.Clock
 import java.time.Instant
-import java.util.*
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -50,20 +54,22 @@ class AuthorizationStoreImpl @Inject constructor(
     override fun getToken(accessTokenService: AccessTokenService): AuthToken {
         val tokenValue = prefs.getString(TOKEN_KEY, null)
         val expiryTime = Instant.ofEpochMilli(prefs.getLong(EXPIRY_TIME_KEY, 0L)) ?: Instant.EPOCH
-        val currentToken = when (val tokenType = prefs.getString(TOKEN_TYPE_KEY, TOKEN_TYPE_DEVICE)) {
-            TOKEN_TYPE_DEVICE -> {
-                val deviceId = getOrCreateDeviceId()
-                DeviceAuthToken(Token(tokenValue ?: ""), expiryTime, deviceId)
+        val currentToken =
+            when (val tokenType = prefs.getString(TOKEN_TYPE_KEY, TOKEN_TYPE_DEVICE)) {
+                TOKEN_TYPE_DEVICE -> {
+                    val deviceId = getOrCreateDeviceId()
+                    DeviceAuthToken(Token(tokenValue ?: ""), expiryTime, deviceId)
+                }
+                TOKEN_TYPE_USER -> {
+                    val refreshToken = prefs.getString(REFRESH_TOKEN_KEY, null)
+                    UserAuthToken(
+                        Token(tokenValue ?: ""),
+                        expiryTime,
+                        refreshToken = refreshToken?.let { Token(it) }
+                    )
+                }
+                else -> throw IllegalStateException("Invalid token type: $tokenType")
             }
-            TOKEN_TYPE_USER -> {
-                val refreshToken = prefs.getString(REFRESH_TOKEN_KEY, null)
-                UserAuthToken(
-                    Token(tokenValue ?: ""),
-                    expiryTime,
-                    refreshToken = refreshToken?.let { Token(it) })
-            }
-            else -> throw IllegalStateException("Invalid token type: $tokenType")
-        }
         return when (currentToken) {
             is DeviceAuthToken -> {
                 if (currentToken.token.value.isBlank() || isTokenExpired(currentToken.expiryTime)) {
@@ -83,7 +89,10 @@ class AuthorizationStoreImpl @Inject constructor(
 
     private fun DeviceAuthToken.fetchNewToken(accessTokenService: AccessTokenService): DeviceAuthToken {
         val response =
-            accessTokenService.deviceAccessToken("https://oauth.reddit.com/grants/installed_client", deviceId.value)
+            accessTokenService.deviceAccessToken(
+                "https://oauth.reddit.com/grants/installed_client",
+                deviceId.value
+            )
                 .execute()
         val body = response.body()
         if (response.isSuccessful && body != null) {
@@ -131,4 +140,3 @@ class AuthorizationStoreImpl @Inject constructor(
         prefs.edit().putString(DEVICE_ID_KEY, deviceId.value).apply()
     }
 }
-

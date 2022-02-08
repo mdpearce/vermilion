@@ -1,6 +1,10 @@
 package com.neaniesoft.vermilion.posts.adapters.driving.ui
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -8,7 +12,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.neaniesoft.vermilion.posts.domain.entities.*
+import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
+import com.neaniesoft.vermilion.posts.domain.entities.CommentCount
+import com.neaniesoft.vermilion.posts.domain.entities.CommunityName
+import com.neaniesoft.vermilion.posts.domain.entities.ImagePostSummary
+import com.neaniesoft.vermilion.posts.domain.entities.LinkPostSummary
+import com.neaniesoft.vermilion.posts.domain.entities.Post
+import com.neaniesoft.vermilion.posts.domain.entities.PostTitle
+import com.neaniesoft.vermilion.posts.domain.entities.PreviewText
+import com.neaniesoft.vermilion.posts.domain.entities.Score
+import com.neaniesoft.vermilion.posts.domain.entities.TextPostSummary
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import java.net.URL
 import java.time.Instant
@@ -29,7 +42,12 @@ fun PostCard(post: Post, modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.h6,
                 modifier = Modifier.padding(top = 8.dp)
             )
-            Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
+            Row(
+                horizontalArrangement = Arrangement.End,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
+            ) {
                 Text(text = post.communityName.value, style = MaterialTheme.typography.caption)
             }
         }

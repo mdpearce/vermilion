@@ -1,7 +1,11 @@
 package com.neaniesoft.vermilion.app
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
+import androidx.compose.material.BottomAppBar
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -27,7 +31,6 @@ fun VermilionApp() {
             },
             bottomBar = {
                 BottomAppBar {
-
                 }
             }
         ) { innerPadding ->

@@ -18,5 +18,4 @@ class BasicAuthorizationInterceptor @Inject constructor(
                 .build()
         )
     }
-
 }
