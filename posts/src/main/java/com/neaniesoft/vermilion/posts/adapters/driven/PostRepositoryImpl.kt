@@ -1,8 +1,19 @@
 package com.neaniesoft.vermilion.posts.adapters.driven
 
 import com.neaniesoft.vermilion.posts.adapters.driven.http.PostsService
-import com.neaniesoft.vermilion.posts.domain.entities.*
-import com.neaniesoft.vermilion.posts.domain.ports.*
+import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
+import com.neaniesoft.vermilion.posts.domain.entities.CommentCount
+import com.neaniesoft.vermilion.posts.domain.entities.Community
+import com.neaniesoft.vermilion.posts.domain.entities.CommunityName
+import com.neaniesoft.vermilion.posts.domain.entities.FrontPage
+import com.neaniesoft.vermilion.posts.domain.entities.NamedCommunity
+import com.neaniesoft.vermilion.posts.domain.entities.Post
+import com.neaniesoft.vermilion.posts.domain.entities.PostTitle
+import com.neaniesoft.vermilion.posts.domain.entities.PreviewText
+import com.neaniesoft.vermilion.posts.domain.entities.ResultSet
+import com.neaniesoft.vermilion.posts.domain.entities.Score
+import com.neaniesoft.vermilion.posts.domain.entities.TextPostSummary
+import com.neaniesoft.vermilion.posts.domain.ports.PostRepository
 import com.vermilion.api.entities.Link
 import com.vermilion.api.entities.LinkThing
 import java.net.URL
