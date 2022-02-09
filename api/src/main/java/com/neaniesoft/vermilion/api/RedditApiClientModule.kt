@@ -9,7 +9,6 @@ import com.neaniesoft.vermilion.api.interceptors.AuthorizationInterceptor
 import com.neaniesoft.vermilion.api.interceptors.BasicAuthorizationInterceptor
 import com.neaniesoft.vermilion.auth.AuthorizationStore
 import com.neaniesoft.vermilion.auth.http.AccessTokenService
-import com.vermilion.api.R
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
