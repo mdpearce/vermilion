@@ -8,4 +8,5 @@ object Versions {
     const val OKHTTP = "3.14.9"
     const val JACKSON = "2.13.1"
     const val KOTLINTER = "3.8.0"
+    const val ROOM = "2.4.1"
 }
