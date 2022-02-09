@@ -9,4 +9,5 @@ dependencies {
     testImplementation(Deps.ROOM_TESTING)
 
     implementation(project(":auth"))
+    implementation(Deps.APP_AUTH)
 }
