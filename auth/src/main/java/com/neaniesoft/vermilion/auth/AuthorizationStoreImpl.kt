@@ -30,6 +30,8 @@ class AuthorizationStoreImpl @Inject constructor(
         private const val REFRESH_TOKEN_KEY = "refresh_token"
         private const val TOKEN_TYPE_DEVICE = "device"
         private const val TOKEN_TYPE_USER = "user"
+        private const val LOGGED_IN_USER_ID_KEY = "logged_in_user_id"
+        private const val LOGGED_IN_USER_AUTH_TOKEN_ID_KEY = "logged_in_user_auth_token_id"
     }
 
     private enum class TokenType(val value: String) {
@@ -51,7 +53,10 @@ class AuthorizationStoreImpl @Inject constructor(
         }
     }
 
-    override fun getToken(accessTokenService: AccessTokenService): AuthToken {
+    override fun getToken(
+        accessTokenService: AccessTokenService,
+        accessTokenType: AccessTokenType
+    ): AuthToken {
         val tokenValue = prefs.getString(TOKEN_KEY, null)
         val expiryTime = Instant.ofEpochMilli(prefs.getLong(EXPIRY_TIME_KEY, 0L)) ?: Instant.EPOCH
         val currentToken =
@@ -81,6 +86,14 @@ class AuthorizationStoreImpl @Inject constructor(
             }
             is UserAuthToken -> TODO()
         }
+    }
+
+    override fun getCurrentLoggedInUserAccountId(): UUID? {
+        return prefs.getString(LOGGED_IN_USER_ID_KEY, null)?.let { UUID.fromString(it) }
+    }
+
+    override fun getCurrentLoggedInUserAuthTokenId(): String? {
+        return prefs.getString(LOGGED_IN_USER_AUTH_TOKEN_ID_KEY, null)
     }
 
     private fun isTokenExpired(expiryTime: Instant): Boolean {
