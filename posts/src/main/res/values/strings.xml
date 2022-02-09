@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="posts_screen_no_posts">No posts loaded.</string>
+    <string name="post_card_comment_count_0">No comments</string>
+    <string name="post_card_comment_count_1">1 comment</string>
+    <string name="post_card_comment_count_many">%1$d comments</string>
 </resources>

@@ -10,13 +10,17 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.neaniesoft.vermilion.posts.R
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.CommentCount
+import com.neaniesoft.vermilion.posts.domain.entities.CommunityId
 import com.neaniesoft.vermilion.posts.domain.entities.CommunityName
 import com.neaniesoft.vermilion.posts.domain.entities.ImagePostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.LinkPostSummary
+import com.neaniesoft.vermilion.posts.domain.entities.NamedCommunity
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostTitle
 import com.neaniesoft.vermilion.posts.domain.entities.PreviewText
@@ -48,7 +52,31 @@ fun PostCard(post: Post, modifier: Modifier = Modifier) {
                     .fillMaxWidth()
                     .padding(top = 8.dp)
             ) {
-                Text(text = post.communityName.value, style = MaterialTheme.typography.caption)
+                Text(
+                    text = if (post.community is NamedCommunity) {
+                        post.community.name.value
+                    } else {
+                        ""
+                    },
+                    style = MaterialTheme.typography.caption
+                )
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                val commentString = when (val count = post.commentCount.value) {
+                    0 -> stringResource(id = R.string.post_card_comment_count_0)
+                    1 -> stringResource(id = R.string.post_card_comment_count_1)
+                    else -> stringResource(id = R.string.post_card_comment_count_many, count)
+                }
+                Text(
+                    text = commentString,
+                    style = MaterialTheme.typography.caption
+                )
+                Text(text = post.score.value.toString(), style = MaterialTheme.typography.caption)
             }
         }
     }
@@ -77,11 +105,12 @@ fun PostCardPreview() {
 internal val DUMMY_TEXT_POST = Post(
     PostTitle("Some post with a very long title that is likely to split across multiple lines"),
     TextPostSummary(PreviewText("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")),
-    CommunityName("Subreddit"),
-    URL("https://some.url/someicon.png"),
+    NamedCommunity(CommunityName("Subreddit"), CommunityId("")),
     AuthorName("/u/SomeDude"),
     postedAt = Instant.now(),
+    awardCounts = emptyMap(),
     CommentCount(123),
     Score(1024),
+    flags = emptySet(),
     URL("http://reddit.com/")
 )

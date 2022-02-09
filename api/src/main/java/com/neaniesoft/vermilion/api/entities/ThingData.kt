@@ -16,8 +16,13 @@ data class Link(
     @JsonProperty("selftext") val selfText: String,
     @JsonProperty("selftext_html") val selfTextHtml: String?,
     @JsonProperty("subreddit") val subreddit: String,
+    @JsonProperty("subreddit_name_prefixed") val subredditNamePrefixed: String,
+    @JsonProperty("subreddit_id") val subredditId: String,
     @JsonProperty("thumbnail") val thumbnail: String,
     @JsonProperty("title") val title: String,
     @JsonProperty("url") val url: String,
-    @JsonProperty("stickied") val stickied: Boolean
+    @JsonProperty("stickied") val stickied: Boolean,
+    @JsonProperty("saved") val saved: Boolean,
+    @JsonProperty("over_18") val over18: Boolean?,
+    @JsonProperty("all_awardings") val allAwardings: List<Awarding>
 ) : ThingData()
