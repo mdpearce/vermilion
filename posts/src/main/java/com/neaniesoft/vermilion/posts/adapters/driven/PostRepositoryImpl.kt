@@ -1,15 +1,21 @@
 package com.neaniesoft.vermilion.posts.adapters.driven
 
+import com.neaniesoft.vermilion.api.entities.Awarding
 import com.neaniesoft.vermilion.api.entities.Link
 import com.neaniesoft.vermilion.api.entities.LinkThing
 import com.neaniesoft.vermilion.posts.adapters.driven.http.PostsService
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
+import com.neaniesoft.vermilion.posts.domain.entities.Award
+import com.neaniesoft.vermilion.posts.domain.entities.AwardCount
+import com.neaniesoft.vermilion.posts.domain.entities.AwardName
 import com.neaniesoft.vermilion.posts.domain.entities.CommentCount
 import com.neaniesoft.vermilion.posts.domain.entities.Community
+import com.neaniesoft.vermilion.posts.domain.entities.CommunityId
 import com.neaniesoft.vermilion.posts.domain.entities.CommunityName
 import com.neaniesoft.vermilion.posts.domain.entities.FrontPage
 import com.neaniesoft.vermilion.posts.domain.entities.NamedCommunity
 import com.neaniesoft.vermilion.posts.domain.entities.Post
+import com.neaniesoft.vermilion.posts.domain.entities.PostFlags
 import com.neaniesoft.vermilion.posts.domain.entities.PostTitle
 import com.neaniesoft.vermilion.posts.domain.entities.PreviewText
 import com.neaniesoft.vermilion.posts.domain.entities.ResultSet
@@ -53,12 +59,34 @@ internal fun Link.toPost(): Post {
     return Post(
         PostTitle(title),
         TextPostSummary(PreviewText(selfText)),
-        CommunityName(subreddit),
-        null,
+        NamedCommunity(CommunityName(subreddit), CommunityId(subredditId)),
         AuthorName(author),
         Instant.ofEpochMilli((created * 1000.0).roundToLong()),
+        allAwardings.toAwardsMap(),
         CommentCount(numComments),
         Score(score),
+        flags(),
         URL(url)
     )
+}
+
+internal fun List<Awarding>.toAwardsMap(): Map<Award, AwardCount> =
+    associateBy(keySelector = { awarding ->
+        Award(AwardName(awarding.name), URL(awarding.iconUrl))
+    }, valueTransform = { awarding ->
+        AwardCount(awarding.count)
+    })
+
+internal fun Link.flags(): Set<PostFlags> {
+    return mutableSetOf<PostFlags>().apply {
+        if (over18 == true) {
+            add(PostFlags.NSFW)
+        }
+        if (stickied) {
+            add(PostFlags.STICKIED)
+        }
+        if (saved) {
+            add(PostFlags.SAVED)
+        }
+    }
 }
