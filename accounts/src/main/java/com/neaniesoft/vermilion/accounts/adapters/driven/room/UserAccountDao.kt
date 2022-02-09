@@ -1,4 +1,4 @@
-package com.neaniesoft.vermilion.accounts
+package com.neaniesoft.vermilion.accounts.adapters.driven.room
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -9,14 +9,14 @@ import java.util.UUID
 @Dao
 interface UserAccountDao {
     @Query("SELECT * from user_accounts")
-    suspend fun getAll(): List<UserAccount>
+    suspend fun getAll(): List<UserAccountRecord>
 
     @Query("SELECT * from user_accounts WHERE id=:userId")
-    suspend fun getById(userId: UUID): UserAccount
+    suspend fun getById(userId: UUID): UserAccountRecord
 
     @Insert
-    suspend fun insertAll(vararg userAccount: UserAccount)
+    suspend fun insertAll(vararg userAccount: UserAccountRecord)
 
     @Delete
-    suspend fun delete(userAccount: UserAccount)
+    suspend fun delete(userAccount: UserAccountRecord)
 }

@@ -2,7 +2,7 @@ package com.neaniesoft.vermilion.db
 
 import android.content.Context
 import androidx.room.Room
-import com.neaniesoft.vermilion.accounts.UserAccountDao
+import com.neaniesoft.vermilion.accounts.adapters.driven.room.UserAccountDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
