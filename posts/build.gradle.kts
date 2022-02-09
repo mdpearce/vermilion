@@ -12,5 +12,6 @@ dependencies {
     implementation(Deps.JACKSON_ANNOTATIONS)
     implementation(project(":ui"))
     implementation(project(":api"))
+    implementation(project(":utils"))
     debugImplementation(Deps.COMPOSE_UI_TOOLING)
 }

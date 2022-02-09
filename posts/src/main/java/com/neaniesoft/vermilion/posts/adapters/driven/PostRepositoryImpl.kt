@@ -16,6 +16,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.TextPostSummary
 import com.neaniesoft.vermilion.posts.domain.ports.PostRepository
 import com.neaniesoft.vermilion.api.entities.Link
 import com.neaniesoft.vermilion.api.entities.LinkThing
+import com.neaniesoft.vermilion.utils.logger
 import java.net.URL
 import java.time.Instant
 import javax.inject.Inject
@@ -26,7 +27,11 @@ import kotlin.math.roundToLong
 class PostRepositoryImpl @Inject constructor(
     private val postsService: PostsService
 ) : PostRepository {
+
+    private val logger by logger()
+
     override suspend fun postsForCommunity(community: Community): ResultSet<Post> {
+        logger.debugIfEnabled { "Loading posts for $community" }
         val response = when (community) {
             is FrontPage -> postsService.frontPageBest()
             is NamedCommunity -> TODO()
