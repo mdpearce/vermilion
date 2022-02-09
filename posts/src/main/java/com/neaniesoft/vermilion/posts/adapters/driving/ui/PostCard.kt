@@ -57,7 +57,8 @@ fun PostCard(post: Post, modifier: Modifier = Modifier) {
                         post.community.name.value
                     } else {
                         ""
-                    }, style = MaterialTheme.typography.caption
+                    },
+                    style = MaterialTheme.typography.caption
                 )
             }
             Row(
