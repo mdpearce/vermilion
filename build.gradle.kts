@@ -18,6 +18,10 @@ buildscript {
     }
 }
 
+plugins {
+    id("org.jmailen.kotlinter").version(Versions.KOTLINTER)
+}
+
 subprojects {
     apply(plugin = "org.jmailen.kotlinter")
 }

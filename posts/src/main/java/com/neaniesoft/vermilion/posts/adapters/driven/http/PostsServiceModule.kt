@@ -1,6 +1,6 @@
 package com.neaniesoft.vermilion.posts.adapters.driven.http
 
-import com.vermilion.api.RedditApiClientModule
+import com.neaniesoft.vermilion.api.RedditApiClientModule
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
