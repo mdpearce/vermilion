@@ -10,8 +10,10 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.neaniesoft.vermilion.posts.R
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.CommentCount
 import com.neaniesoft.vermilion.posts.domain.entities.CommunityId
@@ -57,6 +59,23 @@ fun PostCard(post: Post, modifier: Modifier = Modifier) {
                         ""
                     }, style = MaterialTheme.typography.caption
                 )
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                val commentString = when (val count = post.commentCount.value) {
+                    0 -> stringResource(id = R.string.post_card_comment_count_0)
+                    1 -> stringResource(id = R.string.post_card_comment_count_1)
+                    else -> stringResource(id = R.string.post_card_comment_count_many, count)
+                }
+                Text(
+                    text = commentString,
+                    style = MaterialTheme.typography.caption
+                )
+                Text(text = post.score.value.toString(), style = MaterialTheme.typography.caption)
             }
         }
     }
