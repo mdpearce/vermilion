@@ -8,6 +8,14 @@ dependencies {
     implementation(Deps.ROOM_KOTLIN)
     testImplementation(Deps.ROOM_TESTING)
 
+    implementation(Deps.MATERIAL)
+    implementation(Deps.COMPOSE_UI)
+    implementation(Deps.COMPOSE_MATERIAL)
+    implementation(Deps.COMPOSE_UI_TOOLING_PREVIEW)
+    debugImplementation(Deps.COMPOSE_UI_TOOLING)
+
     implementation(project(":auth"))
+    implementation(project(":api"))
+    implementation(project(":ui"))
     implementation(Deps.APP_AUTH)
 }

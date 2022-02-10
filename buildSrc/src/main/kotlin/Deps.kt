@@ -36,4 +36,5 @@ object Deps {
     const val ROOM_KOTLIN = "androidx.room:room-ktx:${Versions.ROOM}"
     const val ROOM_TESTING = "androidx.room:room-testing:${Versions.ROOM}"
     const val APP_AUTH = "net.openid:appauth:0.11.1"
+    const val ACCOMPANIST_NAVIGATION_MATERIAL = "com.google.accompanist:accompanist-navigation-material:0.24.1-alpha"
 }
