@@ -24,36 +24,12 @@ class AuthorizationStoreImpl @Inject constructor(
         private const val TOKEN_KEY = "token"
         private const val EXPIRY_TIME_KEY = "expiry_time"
         private const val DEVICE_ID_KEY = "device_id"
-        private const val TOKEN_TYPE_KEY = "token_type"
-        private const val REFRESH_TOKEN_KEY = "refresh_token"
-        private const val TOKEN_TYPE_DEVICE = "device"
-        private const val TOKEN_TYPE_USER = "user"
         private const val LOGGED_IN_USER_ID_KEY = "logged_in_user_id"
-        private const val LOGGED_IN_USER_AUTH_TOKEN_ID_KEY = "logged_in_user_auth_token_id"
         private const val AUTH_STATE_KEY = "auth_state"
     }
 
     override fun getAuthState(): String {
         return prefs.getString(AUTH_STATE_KEY, "") ?: ""
-    }
-
-    private enum class TokenType(val value: String) {
-        DEVICE("device"),
-        USER("user");
-
-        fun from(value: String): TokenType {
-            return when (value) {
-                DEVICE.value -> {
-                    DEVICE
-                }
-                USER.value -> {
-                    USER
-                }
-                else -> {
-                    throw IllegalArgumentException("Could not determine token type from string '$value'")
-                }
-            }
-        }
     }
 
     override fun getDeviceToken(accessTokenService: AccessTokenService): AuthToken {
@@ -72,10 +48,6 @@ class AuthorizationStoreImpl @Inject constructor(
 
     override fun getCurrentLoggedInUserAccountId(): UUID? {
         return prefs.getString(LOGGED_IN_USER_ID_KEY, null)?.let { UUID.fromString(it) }
-    }
-
-    override fun getCurrentLoggedInUserAuthTokenId(): String? {
-        return prefs.getString(LOGGED_IN_USER_AUTH_TOKEN_ID_KEY, null)
     }
 
     override fun setLoggedInUserId(id: UUID) {
@@ -114,7 +86,7 @@ class AuthorizationStoreImpl @Inject constructor(
     }
 
     private fun AuthToken.save(): AuthToken {
-        saveToken(this.token, this.expiryTime, TokenType.DEVICE)
+        saveToken(this.token, this.expiryTime)
         return this
     }
 
@@ -133,10 +105,9 @@ class AuthorizationStoreImpl @Inject constructor(
         }
     }
 
-    private fun saveToken(accessToken: Token, expiryTime: Instant, tokenType: TokenType) {
+    private fun saveToken(accessToken: Token, expiryTime: Instant) {
         prefs.edit().putString(TOKEN_KEY, accessToken.value).apply()
         prefs.edit().putLong(EXPIRY_TIME_KEY, expiryTime.toEpochMilli()).apply()
-        prefs.edit().putString(TOKEN_TYPE_KEY, tokenType.value).apply()
     }
 
     private fun saveDeviceId(deviceId: DeviceId) {
