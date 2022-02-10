@@ -1,81 +1,79 @@
 package com.neaniesoft.vermilion.accounts.adapters.driving.ui
 
-import android.content.Context
+import android.content.Intent
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import com.neaniesoft.vermilion.accounts.domain.UserAccountRepository
+import com.neaniesoft.vermilion.accounts.domain.entities.AuthResponse
 import com.neaniesoft.vermilion.accounts.domain.entities.UserAccount
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityComponent
+import com.neaniesoft.vermilion.api.RedditApiClientModule
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ActivityContext
+import dagger.hilt.android.scopes.ActivityScoped
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flowOf
+import net.openid.appauth.AuthorizationException
+import net.openid.appauth.AuthorizationRequest
+import net.openid.appauth.AuthorizationResponse
 import net.openid.appauth.AuthorizationService
+import net.openid.appauth.AuthorizationServiceConfiguration
+import java.util.UUID
 import javax.inject.Inject
+import javax.inject.Named
 
 @HiltViewModel
 class UserAccountViewModel @Inject constructor(
-    private val userAccountRepository: UserAccountRepository
+    private val userAccountRepository: UserAccountRepository,
+    private val authUiProvider: AuthUiProvider
 ) : ViewModel() {
 
     val currentUser: StateFlow<UserAccount?> = userAccountRepository.currentUserAccount
 
-    private fun startAuthFlow() {
-        TODO("Not yet implemented")
+    fun onLoginClicked(): Intent {
+        userAccountRepository.loginAsNewUser()
+
+        return authUiProvider.getAuthIntent()
     }
 
-    fun startLoginFlow() {
-        TODO("Not yet implemented")
+    fun onAuthorizationResponse(response: AuthorizationResponse) {
+        val authResponse = AuthResponse(response)
+        userAccountRepository.handleAuthResponse(authResponse)
+    }
+
+    fun onAuthorizationError(exception: AuthorizationException) {
+
     }
 }
 
 interface AuthUiProvider {
-    fun startAuthFlow()
+    fun getAuthIntent(): Intent
 }
 
-// class AppAuthUiProvider @Inject constructor(
-//     @Named(RedditApiClientModule.REDDIT_API_CLIENT_ID) private val clientId: String,
-//     private val authorizationService: AuthorizationService
-// ) : AuthUiProvider {
-//     companion object {
-//         private val REDIRECT_URL = "com.neaniesoft.vermilion://oauth2redirect".toUri()
-//         private const val RESPONSE_TYPE = "code"
-//         private const val DURATION = "permanent"
-//         private const val SCOPE = "read"
-//     }
-//
-//     override fun startAuthFlow() {
-//         val stateString = stateString()
-//
-//         val configuration = configuration()
-//
-//         val request = AuthorizationRequest.Builder(configuration, clientId, RESPONSE_TYPE, REDIRECT_URL)
-//             .setScope(SCOPE)
-//             .setAdditionalParameters(mapOf("duration" to DURATION))
-//             .build()
-//
-//         authorizationService.performAuthorizationRequest(PendingIntent())
-//     }
-//
-//     private fun configuration() = AuthorizationServiceConfiguration(
-//         authorizationUrl(),
-//         tokenUrl()
-//     )
-//
-//     private fun authorizationUrl(): Uri =
-//         "https://www.reddit.com/api/v1/authorize?duration=$DURATION&scope=$SCOPE".toUri()
-//
-//     private fun tokenUrl(): Uri =
-//         "https://www.reddit.com/api/v1/access_token".toUri()
-//
-//     private fun stateString() = UUID.randomUUID().toString()
-// }
+@ActivityScoped
+class AppAuthUiProvider @Inject constructor(
+    @Named(RedditApiClientModule.REDDIT_API_CLIENT_ID) private val clientId: String,
+    private val authorizationService: AuthorizationService,
+    private val configuration: AuthorizationServiceConfiguration
+) : AuthUiProvider {
+    companion object {
+        private val REDIRECT_URL = "com.neaniesoft.vermilion://oauth2redirect".toUri()
+        private const val RESPONSE_TYPE = "code"
+        private const val DURATION = "permanent"
+        private const val SCOPE = "read identity"
+    }
 
-@Module
-@InstallIn(ActivityComponent::class)
-class AppAuthModule {
-    @Provides
-    fun provideAuthorizationService(@ActivityContext context: Context): AuthorizationService =
-        AuthorizationService(context)
+    override fun getAuthIntent(): Intent {
+        val stateString = stateString()
+
+        val request =
+            AuthorizationRequest.Builder(configuration, clientId, RESPONSE_TYPE, REDIRECT_URL)
+                .setScope(SCOPE)
+                .setState(stateString)
+                .setAdditionalParameters(mapOf("duration" to DURATION))
+                .build()
+
+        return authorizationService.getAuthorizationRequestIntent(request)
+    }
+
+    private fun stateString() = UUID.randomUUID().toString()
 }

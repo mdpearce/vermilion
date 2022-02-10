@@ -8,6 +8,5 @@ import java.util.UUID
 @Entity(tableName = "user_accounts")
 data class UserAccountRecord(
     @PrimaryKey val id: UUID,
-    @ColumnInfo(name = "username") val userName: String,
-    @ColumnInfo(name = "auth_token_id") val authTokenId: String
+    @ColumnInfo(name = "username") val userName: String
 )

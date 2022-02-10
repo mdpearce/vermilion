@@ -17,5 +17,6 @@ dependencies {
     implementation(project(":auth"))
     implementation(project(":api"))
     implementation(project(":ui"))
+    implementation(project(":utils"))
     implementation(Deps.APP_AUTH)
 }

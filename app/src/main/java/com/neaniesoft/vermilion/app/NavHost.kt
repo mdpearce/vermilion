@@ -21,7 +21,10 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
         composable(VermilionScreen.Posts.name) {
             PostsScreen()
         }
-        bottomSheet(VermilionScreen.MyAccount.name) {
+
+        bottomSheet(VermilionScreen.MyAccount.name, deepLinks = listOf(
+
+        )) {
             UserAccountScreen()
         }
         // val myAccountRoute = "my_account"

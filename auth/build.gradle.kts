@@ -7,4 +7,5 @@ dependencies {
     implementation(Deps.ANDROIDX_SECURITY_CRYPTO)
     implementation(Deps.RETROFIT)
     implementation(Deps.RETROFIT_JACKSON_CONVERTER)
+    implementation(Deps.APP_AUTH)
 }

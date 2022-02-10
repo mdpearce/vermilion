@@ -13,6 +13,8 @@ interface AuthorizationStore {
     fun getCurrentLoggedInUserAccountId(): UUID?
 
     fun getCurrentLoggedInUserAuthTokenId(): String?
+
+    fun setLoggedInUserId(id: UUID)
 }
 
 sealed class AccessTokenType {
