@@ -5,11 +5,12 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -52,7 +53,7 @@ fun LaunchAuthFlow(
     intent: Intent,
     onAuthResponse: (AuthorizationResponse?, AuthorizationException?) -> Unit,
 ) {
-    val request = rememberLauncherForActivityResult(
+    val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult(),
         onResult = { result ->
             val data = requireNotNull(result.data)
@@ -66,13 +67,15 @@ fun LaunchAuthFlow(
             onAuthResponse(response, exception)
         })
 
-    request.launch(intent)
+    LaunchedEffect(Unit) {
+        launcher.launch(intent)
+    }
 }
 
 @Composable
 fun NotLoggedIn(onLogInClicked: () -> Unit) {
-    Box(Modifier.fillMaxWidth()) {
-        Button(onLogInClicked, Modifier.align(Alignment.Center)) {
+    Box(Modifier.fillMaxSize()) {
+        Button(onLogInClicked, Modifier.align(Alignment.TopCenter)) {
             Text(
                 text = stringResource(id = R.string.my_account_log_in),
                 style = MaterialTheme.typography.button

@@ -6,6 +6,7 @@ import android.net.Uri
 import androidx.core.net.toUri
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
+import com.neaniesoft.vermilion.utils.logger
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -70,6 +71,8 @@ class AppAuthModule {
         private const val TOKEN_URI = "token_uri"
     }
 
+    private val logger by logger()
+
     @Provides
     fun provideAuthorizationService(@ApplicationContext context: Context): AuthorizationService =
         AuthorizationService(context)
@@ -99,10 +102,13 @@ class AppAuthModule {
         configuration: AuthorizationServiceConfiguration,
         authorizationStore: AuthorizationStore
     ): AuthState {
+
         val serializedState = authorizationStore.getAuthState()
         return if (serializedState.isEmpty()) {
+            logger.debugIfEnabled { "Empty auth state, creating unauthorized state"}
             AuthState(configuration)
         } else {
+            logger.debugIfEnabled { "Got state, deserializing" }
             AuthState.jsonDeserialize(serializedState)
         }
     }

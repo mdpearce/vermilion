@@ -8,4 +8,5 @@ dependencies {
     implementation(Deps.RETROFIT)
     implementation(Deps.RETROFIT_JACKSON_CONVERTER)
     api(Deps.APP_AUTH)
+    implementation(project(":utils"))
 }

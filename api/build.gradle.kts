@@ -7,6 +7,7 @@ plugins {
 
 dependencies {
     implementation(project(":auth"))
+    implementation(project(":utils"))
 
     implementation(Deps.COMPOSE_UI)
     implementation(Deps.RETROFIT)
