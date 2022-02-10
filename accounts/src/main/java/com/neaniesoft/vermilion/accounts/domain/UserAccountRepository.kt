@@ -55,7 +55,7 @@ class UserAccountRepository @Inject constructor(
         // This might lead to a race condition where the account is not saved before it is returned and used
         scope.launch {
             userAccountRecordRepository.saveUserAccount(account)
-            authorizationStore.setLoggedInUserId(account.id)
+            authorizationStore.setLoggedInUserId(account.id.value)
         }
         return account
     }
