@@ -34,9 +34,8 @@ fun UserAccountScreen(viewModel: UserAccountViewModel = hiltViewModel()) {
     if (loginClicked.value) {
         val intent = viewModel.onLoginClicked()
         LaunchAuthFlow(
-            intent,
-            { viewModel.onAuthorizationResponse(it) },
-            { viewModel.onAuthorizationError(it) })
+            intent
+        ) { response, exception -> viewModel.onAuthorizationResponse(response, exception) }
     }
 
     if (currentUserAccount == null) {
@@ -51,8 +50,7 @@ fun UserAccountScreen(viewModel: UserAccountViewModel = hiltViewModel()) {
 @Composable
 fun LaunchAuthFlow(
     intent: Intent,
-    onAuthResponseSuccess: (AuthorizationResponse) -> Unit,
-    onAuthResponseFailure: (AuthorizationException) -> Unit
+    onAuthResponse: (AuthorizationResponse?, AuthorizationException?) -> Unit,
 ) {
     val request = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult(),
@@ -64,10 +62,8 @@ fun LaunchAuthFlow(
             if (exception != null) {
                 Log.e("LaunchAuthFlow", exception.error.toString())
                 Log.e("LaunchAuthFlow", exception.errorDescription.toString())
-                onAuthResponseFailure(exception)
-            } else if (response != null) {
-                onAuthResponseSuccess(response)
             }
+            onAuthResponse(response, exception)
         })
 
     request.launch(intent)

@@ -46,8 +46,8 @@ class UserAccountRepository @Inject constructor(
         }
     }
 
-    fun handleAuthResponse(authResponse: AuthResponse<*>) {
-        authProcessor.updateAuthState(authResponse)
+    fun handleAuthResponse(authResponse: AuthResponse<*, *>) {
+        scope.launch { authProcessor.updateAuthState(authResponse) }
     }
 
     fun loginAsNewUser() {

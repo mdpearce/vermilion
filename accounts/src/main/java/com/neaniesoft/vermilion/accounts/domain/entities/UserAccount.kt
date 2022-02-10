@@ -13,7 +13,7 @@ value class UserAccountId(val value: UUID)
 @JvmInline
 value class AuthTokenId(val value: String)
 
-data class AuthResponse<T>(val response: T)
+data class AuthResponse<T, E>(val response: T?, val exception: E?)
 
 @JvmInline
 value class UserName(val value: String)

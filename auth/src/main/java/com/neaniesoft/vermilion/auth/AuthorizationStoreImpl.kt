@@ -32,6 +32,7 @@ class AuthorizationStoreImpl @Inject constructor(
         private const val TOKEN_TYPE_USER = "user"
         private const val LOGGED_IN_USER_ID_KEY = "logged_in_user_id"
         private const val LOGGED_IN_USER_AUTH_TOKEN_ID_KEY = "logged_in_user_auth_token_id"
+        private const val AUTH_STATE_KEY = "auth_state"
     }
 
     private enum class TokenType(val value: String) {
@@ -102,6 +103,10 @@ class AuthorizationStoreImpl @Inject constructor(
 
     private fun isTokenExpired(expiryTime: Instant): Boolean {
         return clock.millis() >= expiryTime.toEpochMilli()
+    }
+
+    override fun saveAuthState(stateAsString: String) {
+        prefs.edit().putString(AUTH_STATE_KEY, stateAsString).apply()
     }
 
     private fun DeviceAuthToken.fetchNewToken(accessTokenService: AccessTokenService): DeviceAuthToken {

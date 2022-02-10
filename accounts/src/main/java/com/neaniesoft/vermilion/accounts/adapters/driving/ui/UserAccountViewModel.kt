@@ -9,9 +9,7 @@ import com.neaniesoft.vermilion.accounts.domain.entities.UserAccount
 import com.neaniesoft.vermilion.api.RedditApiClientModule
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.scopes.ActivityScoped
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flowOf
 import net.openid.appauth.AuthorizationException
 import net.openid.appauth.AuthorizationRequest
 import net.openid.appauth.AuthorizationResponse
@@ -35,13 +33,12 @@ class UserAccountViewModel @Inject constructor(
         return authUiProvider.getAuthIntent()
     }
 
-    fun onAuthorizationResponse(response: AuthorizationResponse) {
-        val authResponse = AuthResponse(response)
+    fun onAuthorizationResponse(
+        response: AuthorizationResponse?,
+        exception: AuthorizationException?
+    ) {
+        val authResponse = AuthResponse(response, exception)
         userAccountRepository.handleAuthResponse(authResponse)
-    }
-
-    fun onAuthorizationError(exception: AuthorizationException) {
-
     }
 }
 
