@@ -1,5 +1,8 @@
 @file:Suppress("UnstableApiUsage")
 
+include(":dbentities")
+
+
 include(":db")
 
 

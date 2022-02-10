@@ -72,7 +72,7 @@ class AppAuthModule {
     }
 
     @Provides
-    fun provideAuthorizationService(@ActivityContext context: Context): AuthorizationService =
+    fun provideAuthorizationService(@ApplicationContext context: Context): AuthorizationService =
         AuthorizationService(context)
 
     @Provides

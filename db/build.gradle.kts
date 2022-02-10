@@ -8,5 +8,5 @@ dependencies {
     implementation(Deps.ROOM_KOTLIN)
     testImplementation(Deps.ROOM_TESTING)
 
-    implementation(project(":accounts"))
+    implementation(project(":dbentities"))
 }

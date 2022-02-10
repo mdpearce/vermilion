@@ -1,4 +1,4 @@
-package com.neaniesoft.vermilion.accounts.adapters.driven.room
+package com.neaniesoft.vermilion.dbentities.useraccount
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

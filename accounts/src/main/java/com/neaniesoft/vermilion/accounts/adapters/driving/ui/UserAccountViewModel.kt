@@ -7,7 +7,13 @@ import com.neaniesoft.vermilion.accounts.domain.UserAccountRepository
 import com.neaniesoft.vermilion.accounts.domain.entities.AuthResponse
 import com.neaniesoft.vermilion.accounts.domain.entities.UserAccount
 import com.neaniesoft.vermilion.api.RedditApiClientModule
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.scopes.ActivityRetainedScoped
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.flow.StateFlow
 import net.openid.appauth.AuthorizationException
@@ -46,7 +52,15 @@ interface AuthUiProvider {
     fun getAuthIntent(): Intent
 }
 
-@ActivityScoped
+@Module
+@InstallIn(ActivityRetainedComponent::class)
+abstract class AuthUiProviderModule {
+    @Binds
+    @ActivityRetainedScoped
+    abstract fun provideAuthUiProvider(provider: AppAuthUiProvider): AuthUiProvider
+}
+
+@ActivityRetainedScoped
 class AppAuthUiProvider @Inject constructor(
     @Named(RedditApiClientModule.REDDIT_API_CLIENT_ID) private val clientId: String,
     private val authorizationService: AuthorizationService,

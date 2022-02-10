@@ -2,7 +2,6 @@ package com.neaniesoft.vermilion.db
 
 import android.content.Context
 import androidx.room.Room
-import com.neaniesoft.vermilion.accounts.adapters.driven.room.UserAccountDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,8 +21,4 @@ class DatabaseModule {
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): VermilionDatabase =
         Room.databaseBuilder(context, VermilionDatabase::class.java, DB_NAME).build()
-
-    @Provides
-    fun provideUserAccountDao(db: VermilionDatabase): UserAccountDao =
-        db.userAccountDao()
 }
