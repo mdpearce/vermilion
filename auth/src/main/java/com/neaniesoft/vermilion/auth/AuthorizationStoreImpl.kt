@@ -50,8 +50,8 @@ class AuthorizationStoreImpl @Inject constructor(
         return prefs.getString(LOGGED_IN_USER_ID_KEY, null)?.let { UUID.fromString(it) }
     }
 
-    override fun setLoggedInUserId(id: UUID) {
-        prefs.edit().putString(LOGGED_IN_USER_ID_KEY, id.toString()).apply()
+    override fun setLoggedInUserId(id: UUID?) {
+        prefs.edit().putString(LOGGED_IN_USER_ID_KEY, id?.toString()).apply()
     }
 
     private fun isTokenExpired(expiryTime: Instant): Boolean {

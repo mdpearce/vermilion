@@ -46,6 +46,10 @@ class UserAccountViewModel @Inject constructor(
         val authResponse = AuthResponse(response, exception)
         userAccountRepository.handleAuthResponse(authResponse)
     }
+
+    fun onLogoutClicked() {
+        userAccountRepository.logout()
+    }
 }
 
 interface AuthUiProvider {

@@ -31,6 +31,7 @@ fun UserAccountScreen(viewModel: UserAccountViewModel = hiltViewModel()) {
     val currentUserAccount by viewModel.currentUser.collectAsState()
 
     val loginClicked: MutableState<Boolean> = remember { mutableStateOf(false) }
+    val logoutClicked: MutableState<Boolean> = remember { mutableStateOf(false) }
 
     if (loginClicked.value) {
         val intent = viewModel.onLoginClicked()
@@ -38,13 +39,18 @@ fun UserAccountScreen(viewModel: UserAccountViewModel = hiltViewModel()) {
             intent
         ) { response, exception -> viewModel.onAuthorizationResponse(response, exception) }
     }
+    if (logoutClicked.value) {
+        viewModel.onLogoutClicked()
+    }
 
     if (currentUserAccount == null) {
         NotLoggedIn {
             loginClicked.value = true
         }
     } else {
-        LoggedIn()
+        LoggedIn {
+            logoutClicked.value = true
+        }
     }
 }
 
@@ -85,7 +91,15 @@ fun NotLoggedIn(onLogInClicked: () -> Unit) {
 }
 
 @Composable
-fun LoggedIn() {
+fun LoggedIn(onLogOutClicked: () -> Unit) {
+    Box(Modifier.fillMaxSize()) {
+        Button(onLogOutClicked, Modifier.align(Alignment.TopCenter)) {
+            Text(
+                text = stringResource(id = R.string.my_account_log_out),
+                style = MaterialTheme.typography.button
+            )
+        }
+    }
 }
 
 @Preview

@@ -59,4 +59,11 @@ class UserAccountRepository @Inject constructor(
             _currentUserAccount.emit(account)
         }
     }
+
+    fun logout() {
+        scope.launch {
+            authorizationStore.setLoggedInUserId(null)
+            _currentUserAccount.emit(null)
+        }
+    }
 }
