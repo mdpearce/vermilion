@@ -50,13 +50,13 @@ class UserAccountRepository @Inject constructor(
         authProcessor.updateAuthState(authResponse)
     }
 
-    fun loginAsNewUser(): UserAccount {
+    fun loginAsNewUser() {
         val account = UserAccount(UserAccountId(UUID.randomUUID()), UserName("Not set"))
         // This might lead to a race condition where the account is not saved before it is returned and used
         scope.launch {
             userAccountRecordRepository.saveUserAccount(account)
             authorizationStore.setLoggedInUserId(account.id.value)
+            _currentUserAccount.emit(account)
         }
-        return account
     }
 }
