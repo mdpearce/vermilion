@@ -5,9 +5,8 @@ import com.neaniesoft.vermilion.auth.http.AccessTokenService
 import java.util.UUID
 
 interface AuthorizationStore {
-    fun getToken(
-        accessTokenService: AccessTokenService,
-        accessTokenType: AccessTokenType = AccessTokenType.Device
+    fun getDeviceToken(
+        accessTokenService: AccessTokenService
     ): AuthToken
 
     fun getCurrentLoggedInUserAccountId(): UUID?
@@ -16,6 +15,7 @@ interface AuthorizationStore {
 
     fun setLoggedInUserId(id: UUID)
     fun saveAuthState(stateAsString: String)
+    fun getAuthState(): String
 }
 
 sealed class AccessTokenType {

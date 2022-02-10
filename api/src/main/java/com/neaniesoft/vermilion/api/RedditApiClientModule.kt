@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.neaniesoft.vermilion.api.interceptors.AuthorizationInterceptor
 import com.neaniesoft.vermilion.api.interceptors.BasicAuthorizationInterceptor
-import com.neaniesoft.vermilion.auth.AuthorizationStore
 import com.neaniesoft.vermilion.auth.http.AccessTokenService
 import dagger.Module
 import dagger.Provides
@@ -99,21 +98,8 @@ class RedditApiClientModule {
         }
 
     @Provides
-    @Named(BEARER_AUTH)
-    fun provideBearerTokenAuthenticator(
-        authorizationStore: AuthorizationStore,
-        accessTokenService: AccessTokenService
-    ): Authenticator = Authenticator { _, response ->
-        val token = authorizationStore.getToken(accessTokenService).token
-        val credential = "Bearer ${token.value}"
-
-        response.request().newBuilder().header("Authorization", credential).build()
-    }
-
-    @Provides
     @Named(AUTHENTICATED)
     fun provideAuthenticatedOkhttpClient(
-        @Named(BEARER_AUTH) bearerTokenAuthenticator: Authenticator,
         authInterceptor: AuthorizationInterceptor
     ): OkHttpClient =
         OkHttpClient.Builder()

@@ -2,10 +2,8 @@ package com.neaniesoft.vermilion.auth
 
 import android.content.SharedPreferences
 import com.neaniesoft.vermilion.auth.entities.AuthToken
-import com.neaniesoft.vermilion.auth.entities.DeviceAuthToken
 import com.neaniesoft.vermilion.auth.entities.DeviceId
 import com.neaniesoft.vermilion.auth.entities.Token
-import com.neaniesoft.vermilion.auth.entities.UserAuthToken
 import com.neaniesoft.vermilion.auth.errors.InvalidDeviceIdError
 import com.neaniesoft.vermilion.auth.errors.UnsuccessfulTokenRequestError
 import com.neaniesoft.vermilion.auth.http.AccessTokenService
@@ -35,6 +33,10 @@ class AuthorizationStoreImpl @Inject constructor(
         private const val AUTH_STATE_KEY = "auth_state"
     }
 
+    override fun getAuthState(): String {
+        return prefs.getString(AUTH_STATE_KEY, "") ?: ""
+    }
+
     private enum class TokenType(val value: String) {
         DEVICE("device"),
         USER("user");
@@ -54,38 +56,17 @@ class AuthorizationStoreImpl @Inject constructor(
         }
     }
 
-    override fun getToken(
-        accessTokenService: AccessTokenService,
-        accessTokenType: AccessTokenType
-    ): AuthToken {
+    override fun getDeviceToken(accessTokenService: AccessTokenService): AuthToken {
         val tokenValue = prefs.getString(TOKEN_KEY, null)
         val expiryTime = Instant.ofEpochMilli(prefs.getLong(EXPIRY_TIME_KEY, 0L)) ?: Instant.EPOCH
-        val currentToken =
-            when (val tokenType = prefs.getString(TOKEN_TYPE_KEY, TOKEN_TYPE_DEVICE)) {
-                TOKEN_TYPE_DEVICE -> {
-                    val deviceId = getOrCreateDeviceId()
-                    DeviceAuthToken(Token(tokenValue ?: ""), expiryTime, deviceId)
-                }
-                TOKEN_TYPE_USER -> {
-                    val refreshToken = prefs.getString(REFRESH_TOKEN_KEY, null)
-                    UserAuthToken(
-                        Token(tokenValue ?: ""),
-                        expiryTime,
-                        refreshToken = refreshToken?.let { Token(it) }
-                    )
-                }
-                else -> throw IllegalStateException("Invalid token type: $tokenType")
-            }
-        return when (currentToken) {
-            is DeviceAuthToken -> {
-                if (currentToken.token.value.isBlank() || isTokenExpired(currentToken.expiryTime)) {
-                    val token = currentToken.fetchNewToken(accessTokenService)
-                    token.save()
-                } else {
-                    currentToken
-                }
-            }
-            is UserAuthToken -> TODO()
+        val deviceId = getOrCreateDeviceId()
+
+        val currentToken = AuthToken(Token(tokenValue ?: ""), expiryTime, deviceId)
+        return if (currentToken.token.value.isBlank() || isTokenExpired(currentToken.expiryTime)) {
+            val token = currentToken.fetchNewToken(accessTokenService)
+            token.save()
+        } else {
+            currentToken
         }
     }
 
@@ -109,7 +90,7 @@ class AuthorizationStoreImpl @Inject constructor(
         prefs.edit().putString(AUTH_STATE_KEY, stateAsString).apply()
     }
 
-    private fun DeviceAuthToken.fetchNewToken(accessTokenService: AccessTokenService): DeviceAuthToken {
+    private fun AuthToken.fetchNewToken(accessTokenService: AccessTokenService): AuthToken {
         val response =
             accessTokenService.deviceAccessToken(
                 "https://oauth.reddit.com/grants/installed_client",
@@ -119,7 +100,7 @@ class AuthorizationStoreImpl @Inject constructor(
         val body = response.body()
         if (response.isSuccessful && body != null) {
             if (body.deviceId == deviceId.value) {
-                return DeviceAuthToken(
+                return AuthToken(
                     Token(body.accessToken),
                     clock.instant().plusSeconds(body.expiresInSeconds),
                     deviceId
@@ -132,7 +113,7 @@ class AuthorizationStoreImpl @Inject constructor(
         }
     }
 
-    private fun DeviceAuthToken.save(): DeviceAuthToken {
+    private fun AuthToken.save(): AuthToken {
         saveToken(this.token, this.expiryTime, TokenType.DEVICE)
         return this
     }
