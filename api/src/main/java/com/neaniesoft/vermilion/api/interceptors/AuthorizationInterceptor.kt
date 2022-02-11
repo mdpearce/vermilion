@@ -23,7 +23,6 @@ class AuthorizationInterceptor @Inject constructor(
     override fun intercept(chain: Interceptor.Chain): Response {
 
         if (authState.isAuthorized) {
-            logger.debugIfEnabled { "Authorized, getting token" }
             val token: CompletableDeferred<String> = CompletableDeferred()
             authState.performActionWithFreshTokens(authorizationService, ClientSecretBasic("")) { accessToken, _, ex ->
                 logger.debugIfEnabled { "Got token" }
@@ -38,8 +37,6 @@ class AuthorizationInterceptor @Inject constructor(
             val freshToken = runBlocking {
                 token.await()
             }
-
-            logger.debugIfEnabled { "Have got fresh token" }
 
             return chain.proceed(
                 chain.request().newBuilder()
