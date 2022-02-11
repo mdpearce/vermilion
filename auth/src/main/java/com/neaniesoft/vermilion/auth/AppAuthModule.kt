@@ -41,7 +41,7 @@ class AppAuthModule {
     @Named(AUTHORIZATION_URI)
     @Provides
     fun provideAuthorizationUri(): Uri =
-        "https://www.reddit.com/api/v1/authorize".toUri()
+        "https://www.reddit.com/api/v1/authorize.compact".toUri()
 
     @Named(TOKEN_URI)
     @Provides
