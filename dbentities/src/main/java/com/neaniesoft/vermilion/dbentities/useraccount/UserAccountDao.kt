@@ -4,7 +4,6 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-import java.util.UUID
 
 @Dao
 interface UserAccountDao {
@@ -12,7 +11,7 @@ interface UserAccountDao {
     suspend fun getAll(): List<UserAccountRecord>
 
     @Query("SELECT * from user_accounts WHERE id=:userId")
-    suspend fun getById(userId: UUID): UserAccountRecord
+    suspend fun getById(userId: String): UserAccountRecord
 
     @Insert
     suspend fun insertAll(vararg userAccount: UserAccountRecord)

@@ -2,6 +2,16 @@ plugins {
     id("vermilion.android-module-conventions")
 }
 
+android {
+    defaultConfig {
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += "room.schemaLocation" to "$projectDir/schemas"
+            }
+        }
+    }
+}
+
 dependencies {
     implementation(Deps.ROOM_RUNTIME)
     kapt(Deps.ROOM_COMPILER)
