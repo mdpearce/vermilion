@@ -31,4 +31,10 @@ object Deps {
     const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.KOTLIN}"
     const val HILT_ANDROID_GRADLE_PLUGIN = "com.google.dagger:hilt-android-gradle-plugin:${Versions.HILT}"
     const val KOTLINTER_GRADLE_PLUGIN = "org.jmailen.gradle:kotlinter-gradle:${Versions.KOTLINTER}"
+    const val ROOM_RUNTIME = "androidx.room:room-runtime:${Versions.ROOM}"
+    const val ROOM_COMPILER = "androidx.room:room-compiler:${Versions.ROOM}"
+    const val ROOM_KOTLIN = "androidx.room:room-ktx:${Versions.ROOM}"
+    const val ROOM_TESTING = "androidx.room:room-testing:${Versions.ROOM}"
+    const val APP_AUTH = "net.openid:appauth:0.11.1"
+    const val ACCOMPANIST_NAVIGATION_MATERIAL = "com.google.accompanist:accompanist-navigation-material:0.24.1-alpha"
 }

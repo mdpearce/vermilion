@@ -19,6 +19,7 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        manifestPlaceholders["appAuthRedirectScheme"] = "com.neaniesoft.vermilion"
     }
 
     buildTypes {
@@ -67,8 +68,10 @@ dependencies {
     implementation(Deps.ANDROIDX_ACTIVITY_COMPOSE)
     implementation(Deps.HILT_NAVIGATION_COMPOSE)
     implementation(Deps.KOTLINX_COROUTINES_ANDROID)
+    implementation(Deps.ACCOMPANIST_NAVIGATION_MATERIAL)
     implementation(project(":posts"))
     implementation(project(":ui"))
+    implementation(project(":accounts"))
     testImplementation(Deps.JUNIT)
     androidTestImplementation(Deps.ANDROIDX_TEST_EXT)
     androidTestImplementation(Deps.ANDROIDX_TEST_ESPRESSO)

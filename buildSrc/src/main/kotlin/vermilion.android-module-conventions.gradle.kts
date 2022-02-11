@@ -13,6 +13,8 @@ android {
         targetSdk = 31
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        manifestPlaceholders["appAuthRedirectScheme"] = "com.neaniesoft.vermilion"
     }
 
     buildTypes {

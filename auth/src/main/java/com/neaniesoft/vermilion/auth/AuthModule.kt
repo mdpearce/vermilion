@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -47,11 +46,4 @@ class AuthModule {
     fun provideSystemClock(): Clock {
         return Clock.systemUTC()
     }
-}
-
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class AuthStoreModule {
-    @Binds
-    abstract fun bindAuthStoreImpl(authorizationStoreImpl: AuthorizationStoreImpl): AuthorizationStore
 }
