@@ -100,9 +100,11 @@ class RedditApiClientModule {
     @Provides
     @Named(AUTHENTICATED)
     fun provideAuthenticatedOkhttpClient(
+        @Named(USER_AGENT) userAgentInterceptor: Interceptor,
         authInterceptor: AuthorizationInterceptor
     ): OkHttpClient =
         OkHttpClient.Builder()
+            .addInterceptor(userAgentInterceptor)
             .addInterceptor(authInterceptor)
             .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS))
             .build()

@@ -1,18 +1,19 @@
 package com.neaniesoft.vermilion.posts.domain.entities
 
-import java.net.URL
+import android.net.Uri
 
 sealed class PostSummary
 
 data class ImagePostSummary(
-    val thumbnailUrl: URL,
-    val previewUrl: URL,
-    val fullSizeUrl: URL
+    val linkHost: LinkHost,
+    val thumbnailUri: Uri,
+    val previews: List<UriImage>,
+    val fullSizeUri: Uri
 ) : PostSummary()
 
 data class GalleryPostSummary(
-    val thumbnailUrl: URL,
-    val previewURL: URL
+    val thumbnailUri: Uri,
+    val previewUri: Uri
 )
 
 data class LinkPostSummary(
@@ -22,3 +23,9 @@ data class LinkPostSummary(
 data class TextPostSummary(
     val previewText: PreviewText
 ) : PostSummary()
+
+data class UriImage(
+    val uri: Uri,
+    val width: Int,
+    val height: Int
+)

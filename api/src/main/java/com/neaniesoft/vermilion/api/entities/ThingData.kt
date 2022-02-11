@@ -24,5 +24,7 @@ data class Link(
     @JsonProperty("stickied") val stickied: Boolean,
     @JsonProperty("saved") val saved: Boolean,
     @JsonProperty("over_18") val over18: Boolean?,
-    @JsonProperty("all_awardings") val allAwardings: List<Awarding>
+    @JsonProperty("all_awardings") val allAwardings: List<Awarding>,
+    @JsonProperty("post_hint") val postHint: String?,
+    @JsonProperty("preview") val preview: Preview?
 ) : ThingData()

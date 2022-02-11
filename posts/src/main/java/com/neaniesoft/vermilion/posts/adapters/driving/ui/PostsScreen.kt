@@ -23,6 +23,9 @@ fun PostsScreen(
     viewModel: PostsViewModel = hiltViewModel()
 ) {
     val state = viewModel.state.collectAsState()
+    // val imageLoader = viewModel.getImageLoader(LocalContext.current)
+
+    // CompositionLocalProvider(LocalImageLoader provides imageLoader) {
 
     Box {
         when (val currentState = state.value) {
@@ -35,6 +38,7 @@ fun PostsScreen(
             }
         }
     }
+    // }
 }
 
 @Composable
