@@ -104,7 +104,7 @@ jobs:
       resource-class: large
       tag: 2021.12.1
     steps:
-      - add_ssh_keys
+      - add_ssh_keys:
           fingerprints:
             - "7a:74:c1:91:81:cc:3a:7e:71:8c:a8:74:01:2a:9d:07"
       - checkout
