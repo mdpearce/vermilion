@@ -26,6 +26,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.ResultSet
 import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.posts.domain.entities.TextPostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.UriImage
+import com.neaniesoft.vermilion.posts.domain.entities.VideoPostSummary
 import com.neaniesoft.vermilion.posts.domain.ports.PostRepository
 import com.neaniesoft.vermilion.utils.logger
 import org.apache.commons.text.StringEscapeUtils
@@ -97,6 +98,20 @@ internal fun Link.postSummary(): PostSummary {
         hint.endsWith("self") -> {
             TextPostSummary(
                 PreviewText(selfText)
+            )
+        }
+        hint.endsWith("video") -> {
+            VideoPostSummary(
+                LinkHost(domain),
+                Uri.parse(thumbnail),
+                preview?.images?.first()?.resolutions?.sortedBy { image -> image.height }?.map {
+                    UriImage(
+                        Uri.parse(StringEscapeUtils.unescapeHtml4(it.url)),
+                        it.width,
+                        it.height
+                    )
+                } ?: emptyList(),
+                Uri.parse(url)
             )
         }
         else -> {

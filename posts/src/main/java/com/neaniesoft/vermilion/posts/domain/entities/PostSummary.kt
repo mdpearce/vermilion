@@ -29,3 +29,10 @@ data class UriImage(
     val width: Int,
     val height: Int
 )
+
+data class VideoPostSummary(
+    val linkHost: LinkHost,
+    val thumbnailUri: Uri,
+    val previews: List<UriImage>,
+    val linkUri: Uri
+) : PostSummary()
