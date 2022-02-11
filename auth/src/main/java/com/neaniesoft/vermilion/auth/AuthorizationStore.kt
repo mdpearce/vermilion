@@ -14,8 +14,3 @@ interface AuthorizationStore {
     fun saveAuthState(stateAsString: String?)
     fun getAuthState(): String
 }
-
-sealed class AccessTokenType {
-    object Device : AccessTokenType()
-    data class User(val accountId: UUID) : AccessTokenType()
-}
