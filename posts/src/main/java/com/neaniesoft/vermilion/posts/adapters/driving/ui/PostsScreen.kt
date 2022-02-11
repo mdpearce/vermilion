@@ -9,12 +9,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.LocalImageLoader
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 
@@ -23,18 +26,22 @@ fun PostsScreen(
     viewModel: PostsViewModel = hiltViewModel()
 ) {
     val state = viewModel.state.collectAsState()
+    // val imageLoader = viewModel.getImageLoader(LocalContext.current)
 
-    Box {
-        when (val currentState = state.value) {
-            is PostsScreenState.Empty -> {
-                EmptyPostsScreen(currentState.isLoading)
-            }
-            is PostsScreenState.Error -> TODO()
-            is PostsScreenState.Posts -> {
-                PostsList(posts = currentState.posts)
+    // CompositionLocalProvider(LocalImageLoader provides imageLoader) {
+
+        Box {
+            when (val currentState = state.value) {
+                is PostsScreenState.Empty -> {
+                    EmptyPostsScreen(currentState.isLoading)
+                }
+                is PostsScreenState.Error -> TODO()
+                is PostsScreenState.Posts -> {
+                    PostsList(posts = currentState.posts)
+                }
             }
         }
-    }
+    // }
 }
 
 @Composable

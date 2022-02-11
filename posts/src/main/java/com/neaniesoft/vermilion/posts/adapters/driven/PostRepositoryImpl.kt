@@ -28,6 +28,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.TextPostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.UriImage
 import com.neaniesoft.vermilion.posts.domain.ports.PostRepository
 import com.neaniesoft.vermilion.utils.logger
+import org.apache.commons.text.StringEscapeUtils
 import java.net.URL
 import java.time.Instant
 import java.util.Locale
@@ -77,15 +78,19 @@ internal fun Link.toPost(): Post {
 }
 
 internal fun Link.postSummary(): PostSummary {
-    val hint = postHint.lowercase(Locale.ENGLISH)
+    val hint = postHint?.lowercase(Locale.ENGLISH) ?: "self"
     return when {
         hint.endsWith("image") -> {
             ImagePostSummary(
                 LinkHost(domain),
                 Uri.parse(thumbnail),
-                preview.images.resolutions.sortedBy { image -> image.height }.map {
-                    UriImage(Uri.parse(it.url), it.width, it.height)
-                },
+                preview?.images?.first()?.resolutions?.sortedBy { image -> image.height }?.map {
+                    UriImage(
+                        Uri.parse(StringEscapeUtils.unescapeHtml4(it.url)),
+                        it.width,
+                        it.height
+                    )
+                } ?: emptyList(),
                 Uri.parse(url)
             )
         }

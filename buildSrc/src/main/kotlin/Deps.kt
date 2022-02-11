@@ -37,4 +37,7 @@ object Deps {
     const val ROOM_TESTING = "androidx.room:room-testing:${Versions.ROOM}"
     const val APP_AUTH = "net.openid:appauth:0.11.1"
     const val ACCOMPANIST_NAVIGATION_MATERIAL = "com.google.accompanist:accompanist-navigation-material:0.24.1-alpha"
+    const val COIL = "io.coil-kt:coil:${Versions.COIL}"
+    const val COIL_COMPOSE = "io.coil-kt:coil-compose:${Versions.COIL}"
+    const val COMMONS_TEXT = "org.apache.commons:commons-text:1.9"
 }

@@ -1,10 +1,14 @@
 package com.neaniesoft.vermilion.posts.adapters.driving.ui
 
+import android.net.Uri
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -13,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberImagePainter
 import com.neaniesoft.vermilion.posts.R
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.CommentCount
@@ -38,7 +43,9 @@ fun PostCard(post: Post, modifier: Modifier = Modifier) {
                 is TextPostSummary -> {
                     TextSummary(content = summary.previewText.value)
                 }
-                is ImagePostSummary -> TODO()
+                is ImagePostSummary -> {
+                    ImageSummary(imageUri = summary.previews.last().uri)
+                }
                 is LinkPostSummary -> TODO()
             }
             Text(
@@ -91,7 +98,12 @@ fun TextSummary(content: String) {
 }
 
 @Composable
-fun ImageSummary(imageUrl: URL) {
+fun ImageSummary(imageUri: Uri) {
+    val painter = rememberImagePainter(imageUri.toString())
+
+    BoxWithConstraints(Modifier.fillMaxWidth()) {
+        Image(modifier = Modifier.size(maxWidth), painter = painter, contentDescription = "")
+    }
 }
 
 @Preview(name = "Text Post card light")
