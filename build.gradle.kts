@@ -20,6 +20,7 @@ buildscript {
 
 plugins {
     id("org.jmailen.kotlinter").version(Versions.KOTLINTER)
+    id("com.dipien.releaseshub.gradle.plugin").version(Versions.RELEASES_HUB)
 }
 
 subprojects {
