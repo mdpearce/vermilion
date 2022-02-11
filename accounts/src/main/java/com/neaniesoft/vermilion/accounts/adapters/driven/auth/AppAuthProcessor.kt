@@ -4,10 +4,6 @@ import com.neaniesoft.vermilion.accounts.domain.entities.AuthResponse
 import com.neaniesoft.vermilion.accounts.domain.ports.AuthProcessor
 import com.neaniesoft.vermilion.auth.AuthorizationStore
 import com.neaniesoft.vermilion.utils.logger
-import dagger.Binds
-import dagger.Module
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
 import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationException
 import net.openid.appauth.AuthorizationResponse
@@ -54,9 +50,3 @@ class AppAuthProcessor @Inject constructor(
     }
 }
 
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class AuthProcessorModule {
-    @Binds
-    abstract fun provideAuthProcessor(processor: AppAuthProcessor): AuthProcessor
-}
