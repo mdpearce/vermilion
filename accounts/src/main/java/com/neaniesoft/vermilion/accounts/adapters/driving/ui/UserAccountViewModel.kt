@@ -2,7 +2,7 @@ package com.neaniesoft.vermilion.accounts.adapters.driving.ui
 
 import android.content.Intent
 import androidx.lifecycle.ViewModel
-import com.neaniesoft.vermilion.accounts.domain.UserAccountRepository
+import com.neaniesoft.vermilion.accounts.domain.UserAccountService
 import com.neaniesoft.vermilion.accounts.domain.entities.AuthResponse
 import com.neaniesoft.vermilion.accounts.domain.entities.UserAccount
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,14 +13,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UserAccountViewModel @Inject constructor(
-    private val userAccountRepository: UserAccountRepository,
+    private val userAccountService: UserAccountService,
     private val authUiProvider: AuthUiProvider
 ) : ViewModel() {
 
-    val currentUser: StateFlow<UserAccount?> = userAccountRepository.currentUserAccount
+    val currentUser: StateFlow<UserAccount?> = userAccountService.currentUserAccount
 
     fun onLoginClicked(): Intent {
-        userAccountRepository.loginAsNewUser()
+        userAccountService.loginAsNewUser()
 
         return authUiProvider.getAuthIntent()
     }
@@ -30,11 +30,11 @@ class UserAccountViewModel @Inject constructor(
         exception: AuthorizationException?
     ) {
         val authResponse = AuthResponse(response, exception)
-        userAccountRepository.handleAuthResponse(authResponse)
+        userAccountService.handleAuthResponse(authResponse)
     }
 
     fun onLogoutClicked() {
-        userAccountRepository.logout()
+        userAccountService.logout()
     }
 }
 

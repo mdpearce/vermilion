@@ -3,15 +3,15 @@ package com.neaniesoft.vermilion.accounts.adapters.driven.room
 import com.neaniesoft.vermilion.accounts.domain.entities.UserAccount
 import com.neaniesoft.vermilion.accounts.domain.entities.UserAccountId
 import com.neaniesoft.vermilion.accounts.domain.entities.UserName
-import com.neaniesoft.vermilion.accounts.domain.ports.UserAccountRecordRepository
+import com.neaniesoft.vermilion.accounts.domain.ports.UserAccountRepository
 import com.neaniesoft.vermilion.dbentities.useraccount.UserAccountDao
 import com.neaniesoft.vermilion.dbentities.useraccount.UserAccountRecord
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class UserAccountRoomRecordRepository @Inject constructor(private val userAccountDao: UserAccountDao) :
-    UserAccountRecordRepository {
+class UserAccountRoomRepository @Inject constructor(private val userAccountDao: UserAccountDao) :
+    UserAccountRepository {
     override suspend fun getUserAccountWithId(id: UserAccountId): UserAccount {
         val dbRecord = userAccountDao.getById(id.value)
 

@@ -5,7 +5,7 @@ import com.neaniesoft.vermilion.accounts.domain.entities.UserAccount
 import com.neaniesoft.vermilion.accounts.domain.entities.UserAccountId
 import com.neaniesoft.vermilion.accounts.domain.entities.UserName
 import com.neaniesoft.vermilion.accounts.domain.ports.AuthProcessor
-import com.neaniesoft.vermilion.accounts.domain.ports.UserAccountRecordRepository
+import com.neaniesoft.vermilion.accounts.domain.ports.UserAccountRepository
 import com.neaniesoft.vermilion.auth.AuthorizationStore
 import com.neaniesoft.vermilion.utils.CoroutinesModule
 import kotlinx.coroutines.CoroutineDispatcher
@@ -20,8 +20,8 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 @Singleton
-class UserAccountRepository @Inject constructor(
-    private val userAccountRecordRepository: UserAccountRecordRepository,
+class UserAccountService @Inject constructor(
+    private val userAccountRepository: UserAccountRepository,
     private val authorizationStore: AuthorizationStore,
     private val authProcessor: AuthProcessor,
     @Named(CoroutinesModule.IO_DISPATCHER) private val dispatcher: CoroutineDispatcher
@@ -54,7 +54,7 @@ class UserAccountRepository @Inject constructor(
         val account = UserAccount(UserAccountId(UUID.randomUUID()), UserName("Not set"))
         // This might lead to a race condition where the account is not saved before it is returned and used
         scope.launch {
-            userAccountRecordRepository.saveUserAccount(account)
+            userAccountRepository.saveUserAccount(account)
             authorizationStore.setLoggedInUserId(account.id.value)
             _currentUserAccount.emit(account)
         }
