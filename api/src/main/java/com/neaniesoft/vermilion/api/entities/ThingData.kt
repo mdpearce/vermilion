@@ -28,19 +28,3 @@ data class Link(
     @JsonProperty("post_hint") val postHint: String?,
     @JsonProperty("preview") val preview: Preview?
 ) : ThingData()
-
-data class Preview(
-    @JsonProperty("images") val images: List<Images>,
-    @JsonProperty("enabled") val enabled: Boolean
-)
-
-data class Images(
-    @JsonProperty("source") val source: Image,
-    @JsonProperty("resolutions") val resolutions: List<Image>
-)
-
-data class Image(
-    @JsonProperty("url") val url: String,
-    @JsonProperty("width") val width: Int,
-    @JsonProperty("height") val height: Int
-)
