@@ -71,7 +71,8 @@ fun LaunchAuthFlow(
                 Log.e("LaunchAuthFlow", exception.errorDescription.toString())
             }
             onAuthResponse(response, exception)
-        })
+        }
+    )
 
     LaunchedEffect(Unit) {
         launcher.launch(intent)

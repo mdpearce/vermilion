@@ -37,4 +37,3 @@ class UserAccountViewModel @Inject constructor(
         userAccountService.logout()
     }
 }
-

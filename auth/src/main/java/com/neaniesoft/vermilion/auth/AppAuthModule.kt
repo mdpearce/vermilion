@@ -57,7 +57,7 @@ class AppAuthModule {
 
         val serializedState = authorizationStore.getAuthState()
         return if (serializedState.isEmpty()) {
-            logger.debugIfEnabled { "Empty auth state, creating unauthorized state"}
+            logger.debugIfEnabled { "Empty auth state, creating unauthorized state" }
             AuthState(configuration)
         } else {
             logger.debugIfEnabled { "Got state, deserializing" }

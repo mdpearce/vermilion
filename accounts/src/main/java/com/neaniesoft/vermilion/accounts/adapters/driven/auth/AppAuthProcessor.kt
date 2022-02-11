@@ -34,7 +34,6 @@ class AppAuthProcessor @Inject constructor(
         val resp =
             requireNotNull(authorizationResponse) { "No exception, but null response" }
 
-
         authorizationService.performTokenRequest(
             resp.createTokenExchangeRequest(),
             ClientSecretBasic("")
@@ -49,4 +48,3 @@ class AppAuthProcessor @Inject constructor(
         authorizationStore.saveAuthState(null)
     }
 }
-
