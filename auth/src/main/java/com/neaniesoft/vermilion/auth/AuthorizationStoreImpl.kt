@@ -58,7 +58,7 @@ class AuthorizationStoreImpl @Inject constructor(
         return clock.millis() >= expiryTime.toEpochMilli()
     }
 
-    override fun saveAuthState(stateAsString: String) {
+    override fun saveAuthState(stateAsString: String?) {
         prefs.edit().putString(AUTH_STATE_KEY, stateAsString).apply()
     }
 

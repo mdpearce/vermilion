@@ -48,6 +48,10 @@ class AppAuthProcessor @Inject constructor(
             authorizationStore.saveAuthState(authState.jsonSerializeString())
         }
     }
+
+    override fun invalidateAuthState() {
+        authorizationStore.saveAuthState(null)
+    }
 }
 
 @Module

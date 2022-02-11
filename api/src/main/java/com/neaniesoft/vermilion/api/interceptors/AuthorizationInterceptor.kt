@@ -7,6 +7,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.runBlocking
 import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationService
+import net.openid.appauth.ClientSecretBasic
 import okhttp3.Interceptor
 import okhttp3.Response
 import javax.inject.Inject
@@ -24,7 +25,7 @@ class AuthorizationInterceptor @Inject constructor(
         if (authState.isAuthorized) {
             logger.debugIfEnabled { "Authorized, getting token" }
             val token: CompletableDeferred<String> = CompletableDeferred()
-            authState.performActionWithFreshTokens(authorizationService) { accessToken, idToken, ex ->
+            authState.performActionWithFreshTokens(authorizationService, ClientSecretBasic("")) { accessToken, _, ex ->
                 logger.debugIfEnabled { "Got token" }
                 if (ex != null) {
                     logger.errorIfEnabled { "Error getting fresh token: ${ex.error}" }

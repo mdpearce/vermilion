@@ -11,7 +11,7 @@ interface AuthorizationStore {
 
     fun getCurrentLoggedInUserAccountId(): UUID?
     fun setLoggedInUserId(id: UUID?)
-    fun saveAuthState(stateAsString: String)
+    fun saveAuthState(stateAsString: String?)
     fun getAuthState(): String
 }
 
