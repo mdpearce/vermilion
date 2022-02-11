@@ -24,5 +24,23 @@ data class Link(
     @JsonProperty("stickied") val stickied: Boolean,
     @JsonProperty("saved") val saved: Boolean,
     @JsonProperty("over_18") val over18: Boolean?,
-    @JsonProperty("all_awardings") val allAwardings: List<Awarding>
+    @JsonProperty("all_awardings") val allAwardings: List<Awarding>,
+    @JsonProperty("post_hint") val postHint: String,
+    @JsonProperty("preview") val preview: Preview
 ) : ThingData()
+
+data class Preview(
+    @JsonProperty("images") val images: Images,
+    @JsonProperty("enabled") val enabled: Boolean
+)
+
+data class Images(
+    @JsonProperty("source") val source: Image,
+    @JsonProperty("resolutions") val resolutions: List<Image>
+)
+
+data class Image(
+    @JsonProperty("url") val url: String,
+    @JsonProperty("width") val width: Int,
+    @JsonProperty("height") val height: Int
+)

@@ -1,5 +1,6 @@
 package com.neaniesoft.vermilion.posts.adapters.driven
 
+import android.net.Uri
 import com.neaniesoft.vermilion.api.entities.Awarding
 import com.neaniesoft.vermilion.api.entities.Link
 import com.neaniesoft.vermilion.api.entities.LinkThing
@@ -13,18 +14,23 @@ import com.neaniesoft.vermilion.posts.domain.entities.Community
 import com.neaniesoft.vermilion.posts.domain.entities.CommunityId
 import com.neaniesoft.vermilion.posts.domain.entities.CommunityName
 import com.neaniesoft.vermilion.posts.domain.entities.FrontPage
+import com.neaniesoft.vermilion.posts.domain.entities.ImagePostSummary
+import com.neaniesoft.vermilion.posts.domain.entities.LinkHost
 import com.neaniesoft.vermilion.posts.domain.entities.NamedCommunity
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlags
+import com.neaniesoft.vermilion.posts.domain.entities.PostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.PostTitle
 import com.neaniesoft.vermilion.posts.domain.entities.PreviewText
 import com.neaniesoft.vermilion.posts.domain.entities.ResultSet
 import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.posts.domain.entities.TextPostSummary
+import com.neaniesoft.vermilion.posts.domain.entities.UriImage
 import com.neaniesoft.vermilion.posts.domain.ports.PostRepository
 import com.neaniesoft.vermilion.utils.logger
 import java.net.URL
 import java.time.Instant
+import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.roundToLong
@@ -58,7 +64,7 @@ class PostRepositoryImpl @Inject constructor(
 internal fun Link.toPost(): Post {
     return Post(
         PostTitle(title),
-        TextPostSummary(PreviewText(selfText)),
+        postSummary(),
         NamedCommunity(CommunityName(subreddit), CommunityId(subredditId)),
         AuthorName(author),
         Instant.ofEpochMilli((created * 1000.0).roundToLong()),
@@ -68,6 +74,30 @@ internal fun Link.toPost(): Post {
         flags(),
         URL(url)
     )
+}
+
+internal fun Link.postSummary(): PostSummary {
+    val hint = postHint.lowercase(Locale.ENGLISH)
+    return when {
+        hint.endsWith("image") -> {
+            ImagePostSummary(
+                LinkHost(domain),
+                Uri.parse(thumbnail),
+                preview.images.resolutions.sortedBy { image -> image.height }.map {
+                    UriImage(Uri.parse(it.url), it.width, it.height)
+                },
+                Uri.parse(url)
+            )
+        }
+        hint.endsWith("self") -> {
+            TextPostSummary(
+                PreviewText(selfText)
+            )
+        }
+        else -> {
+            TextPostSummary(PreviewText(""))
+        }
+    }
 }
 
 internal fun List<Awarding>.toAwardsMap(): Map<Award, AwardCount> =
