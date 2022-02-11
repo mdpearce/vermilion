@@ -1,18 +1,13 @@
 package com.neaniesoft.vermilion.app
 
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomAppBar
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.plusAssign
@@ -54,14 +49,3 @@ fun VermilionApp() {
     }
 }
 
-@Composable
-fun BottomNavBar(onUserAccountClicked: () -> Unit) {
-    Row(Modifier.fillMaxWidth()) {
-        IconButton(onClick = onUserAccountClicked) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_baseline_account_circle_24),
-                contentDescription = null
-            )
-        }
-    }
-}

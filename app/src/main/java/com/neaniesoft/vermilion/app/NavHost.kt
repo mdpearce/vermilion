@@ -22,19 +22,8 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
             PostsScreen()
         }
 
-        bottomSheet(VermilionScreen.MyAccount.name, deepLinks = listOf(
-
-        )) {
+        bottomSheet(VermilionScreen.MyAccount.name) {
             UserAccountScreen()
         }
-        // val myAccountRoute = "my_account"
-        // composable(
-        //     myAccountRoute,
-        //     deepLinks = listOf(navDeepLink {
-        //         uriPattern = "com.neaniesoft.vermilion://$myAccountRoute"
-        //     })
-        // ) {
-        //     UserAccountScreen()
-        // }
     }
 }
