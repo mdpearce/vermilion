@@ -98,6 +98,26 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug-unsigned.apk
       - android/save-gradle-cache
       - android/save-build-cache
+  upgrade-dependencies:
+    executor:
+      name: android/android-machine
+      resource-class: large
+      tag: 2021.12.1
+    steps:
+      - add_ssh_keys
+          fingerprints:
+            - "7a:74:c1:91:81:cc:3a:7e:71:8c:a8:74:01:2a:9d:07"
+      - checkout
+      - android/restore-gradle-cache
+      - android/restore-build-cache
+      - run:
+          name: Git set upstream branch
+          command: |
+            git branch --set-upstream-to=origin/main main
+      - run:
+          name: Upgrade dependencies
+          command: |
+            ./gradlew upgradeDependencies
 
 workflows:
   test-and-build:
@@ -137,3 +157,13 @@ workflows:
           filters:
             branches:
               only: main # Commits to main branch
+  - nightly:
+      triggers:
+        - schedule:
+            cron: "0 12 * * *"
+            filters:
+              branches:
+                only:
+                  -main
+      jobs:
+        - upgrade-dependencies
