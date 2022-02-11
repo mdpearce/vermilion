@@ -19,8 +19,8 @@ buildscript {
 }
 
 plugins {
-    id("org.jmailen.kotlinter").version(Versions.KOTLINTER)
-    id("com.dipien.releaseshub.gradle.plugin").version(Versions.RELEASES_HUB)
+    id("org.jmailen.kotlinter").version("3.8.0")
+    id("com.dipien.releaseshub.gradle.plugin").version("3.1.0")
 }
 
 subprojects {
@@ -29,4 +29,8 @@ subprojects {
 
 tasks.create("clean", Delete::class) {
     this.setDelete(rootProject.buildDir)
+}
+
+releasesHub {
+    dependenciesPaths = listOf("buildSrc/src/main/kotlin/Deps.kt")
 }
