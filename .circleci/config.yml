@@ -157,6 +157,7 @@ workflows:
           filters:
             branches:
               only: main # Commits to main branch
+
   - nightly:
       triggers:
         - schedule:
