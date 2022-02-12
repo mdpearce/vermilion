@@ -1,12 +1,25 @@
 package com.neaniesoft.vermilion.auth
 
 import android.content.SharedPreferences
+import com.github.michaelbull.result.Ok
+import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.andThen
+import com.github.michaelbull.result.map
+import com.github.michaelbull.result.mapError
+import com.github.michaelbull.result.onSuccess
+import com.github.michaelbull.result.runCatching
+import com.github.michaelbull.result.toErrorIf
 import com.neaniesoft.vermilion.auth.entities.AuthToken
 import com.neaniesoft.vermilion.auth.entities.DeviceId
 import com.neaniesoft.vermilion.auth.entities.Token
-import com.neaniesoft.vermilion.auth.errors.InvalidDeviceIdError
-import com.neaniesoft.vermilion.auth.errors.UnsuccessfulTokenRequestError
+import com.neaniesoft.vermilion.auth.errors.AuthError
+import com.neaniesoft.vermilion.auth.errors.AuthTokenServiceIoError
+import com.neaniesoft.vermilion.auth.errors.EmptyBody
+import com.neaniesoft.vermilion.auth.errors.InvalidDeviceId
+import com.neaniesoft.vermilion.auth.errors.UnhandledError
+import com.neaniesoft.vermilion.auth.errors.UnsuccessfulTokenRequest
 import com.neaniesoft.vermilion.auth.http.AccessTokenService
+import java.io.IOException
 import java.time.Clock
 import java.time.Instant
 import java.util.UUID
@@ -32,17 +45,17 @@ class AuthorizationStoreImpl @Inject constructor(
         return prefs.getString(AUTH_STATE_KEY, "") ?: ""
     }
 
-    override fun getDeviceToken(accessTokenService: AccessTokenService): AuthToken {
+    override fun getDeviceToken(accessTokenService: AccessTokenService): Result<AuthToken, AuthError> {
         val tokenValue = prefs.getString(TOKEN_KEY, null)
         val expiryTime = Instant.ofEpochMilli(prefs.getLong(EXPIRY_TIME_KEY, 0L)) ?: Instant.EPOCH
         val deviceId = getOrCreateDeviceId()
 
         val currentToken = AuthToken(Token(tokenValue ?: ""), expiryTime, deviceId)
         return if (currentToken.token.value.isBlank() || isTokenExpired(currentToken.expiryTime)) {
-            val token = currentToken.fetchNewToken(accessTokenService)
-            token.save()
+            currentToken.fetchNewToken(accessTokenService)
+                .onSuccess { token -> token.save() }
         } else {
-            currentToken
+            Ok(currentToken)
         }
     }
 
@@ -62,26 +75,31 @@ class AuthorizationStoreImpl @Inject constructor(
         prefs.edit().putString(AUTH_STATE_KEY, stateAsString).apply()
     }
 
-    private fun AuthToken.fetchNewToken(accessTokenService: AccessTokenService): AuthToken {
-        val response =
+    private fun AuthToken.fetchNewToken(accessTokenService: AccessTokenService): Result<AuthToken, AuthError> {
+        return runCatching {
             accessTokenService.deviceAccessToken(
                 "https://oauth.reddit.com/grants/installed_client",
                 deviceId.value
-            )
-                .execute()
-        val body = response.body()
-        if (response.isSuccessful && body != null) {
-            if (body.deviceId == deviceId.value) {
-                return AuthToken(
-                    Token(body.accessToken),
-                    clock.instant().plusSeconds(body.expiresInSeconds),
-                    deviceId
-                )
-            } else {
-                throw InvalidDeviceIdError("DeviceId ${body.deviceId} does not match stored ID ${deviceId.value}")
+            ).execute()
+        }.mapError {
+            when (it) {
+                is IOException -> AuthTokenServiceIoError(it)
+                else -> UnhandledError(it)
             }
-        } else {
-            throw UnsuccessfulTokenRequestError("Unsuccessful request for token: ${response.code()}")
+        }.toErrorIf({ !it.isSuccessful }) {
+            UnsuccessfulTokenRequest(it.code())
+
+        }.andThen {
+            runCatching { requireNotNull(it.body()) }
+                .mapError { EmptyBody }
+        }.toErrorIf({ it.deviceId != deviceId.value }) {
+            InvalidDeviceId
+        }.map {
+            AuthToken(
+                Token(it.accessToken),
+                clock.instant().plusSeconds(it.expiresInSeconds),
+                deviceId
+            )
         }
     }
 
