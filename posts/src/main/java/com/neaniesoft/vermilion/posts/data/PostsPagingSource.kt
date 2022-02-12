@@ -9,11 +9,15 @@ import com.neaniesoft.vermilion.posts.data.entities.PagingQuery
 import com.neaniesoft.vermilion.posts.domain.entities.Community
 import com.neaniesoft.vermilion.posts.domain.entities.FirstSet
 import com.neaniesoft.vermilion.posts.domain.entities.Post
+import com.neaniesoft.vermilion.utils.Logger
+import com.neaniesoft.vermilion.utils.logger
 
 class PostsPagingSource constructor(
     private val postRepository: PostRepository,
     private val community: Community
 ) : PagingSource<PagingQuery, Post>() {
+    private val logger: Logger by logger()
+
     override suspend fun load(params: LoadParams<PagingQuery>): LoadResult<PagingQuery, Post> {
         val query = params.key ?: PagingQuery(FirstSet, 0)
         val response = postRepository.postsForCommunity(
@@ -35,10 +39,12 @@ class PostsPagingSource constructor(
         }
 
         return response.get()
-            ?: LoadResult.Error(
+            ?: LoadResult.Error<PagingQuery, Post>(
                 response.getError()
                     ?: IllegalStateException("No error returned, but not value either")
-            )
+            ).also {
+                logger.errorIfEnabled(it.throwable) { "Error occurred during paging" }
+            }
     }
 
     override fun getRefreshKey(state: PagingState<PagingQuery, Post>): PagingQuery {
