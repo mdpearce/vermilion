@@ -50,6 +50,7 @@ class PostRepositoryImpl @Inject constructor(
 
     override suspend fun postsForCommunity(
         community: Community,
+        requestedCount: Int,
         previousCount: Int?,
         listingKey: ListingKey
     ): ResultSet<Post> {
@@ -58,12 +59,18 @@ class PostRepositoryImpl @Inject constructor(
             is FrontPage -> {
                 when (listingKey) {
                     is BeforeKey -> postsService.frontPageBest(
+                        requestedCount,
                         listingKey.value,
                         null,
                         previousCount
                     )
-                    is AfterKey -> postsService.frontPageBest(null, listingKey.value, previousCount)
-                    is FirstSet -> postsService.frontPageBest(null, null, null)
+                    is AfterKey -> postsService.frontPageBest(
+                        requestedCount,
+                        null,
+                        listingKey.value,
+                        previousCount
+                    )
+                    is FirstSet -> postsService.frontPageBest(requestedCount, null, null, null)
                 }
             }
             is NamedCommunity -> TODO()

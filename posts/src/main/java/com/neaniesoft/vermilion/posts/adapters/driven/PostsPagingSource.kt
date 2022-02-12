@@ -19,6 +19,7 @@ class PostsPagingSource constructor(
             val query = params.key ?: PagingQuery(FirstSet, 0)
             val response = postRepository.postsForCommunity(
                 community = community,
+                requestedCount = params.loadSize,
                 previousCount = query.previousCount,
                 listingKey = query.listingKey
             )

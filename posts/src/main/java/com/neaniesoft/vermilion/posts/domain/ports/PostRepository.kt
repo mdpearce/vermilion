@@ -8,6 +8,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.ResultSet
 interface PostRepository {
     suspend fun postsForCommunity(
         community: Community,
+        requestedCount: Int,
         previousCount: Int?,
         listingKey: ListingKey
     ): ResultSet<Post>

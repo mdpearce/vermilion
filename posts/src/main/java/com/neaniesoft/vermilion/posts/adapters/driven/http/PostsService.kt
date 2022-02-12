@@ -7,6 +7,7 @@ import retrofit2.http.Query
 interface PostsService {
     @GET("best")
     suspend fun frontPageBest(
+        @Query("limit") limit: Int,
         @Query("before") before: String?,
         @Query("after") after: String?,
         @Query("count") count: Int?

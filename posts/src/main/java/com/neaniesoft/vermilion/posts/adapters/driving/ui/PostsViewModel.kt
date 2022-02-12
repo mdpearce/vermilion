@@ -3,8 +3,11 @@ package com.neaniesoft.vermilion.posts.adapters.driving.ui
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
 import coil.ImageLoader
 import com.neaniesoft.vermilion.api.RedditApiClientModule
+import com.neaniesoft.vermilion.posts.adapters.driven.PostsPagingSource
 import com.neaniesoft.vermilion.posts.domain.entities.FrontPage
 import com.neaniesoft.vermilion.posts.domain.ports.PostRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,17 +28,18 @@ class PostsViewModel @Inject constructor(
         MutableStateFlow(PostsScreenState.Empty())
     val state: StateFlow<PostsScreenState> = _state
 
+    val pageFlow = Pager(PagingConfig(pageSize = 25)) {
+        PostsPagingSource(postRepository, FrontPage)
+    }
+
     init {
-        fetchPostsFromRepository()
+        // fetchPostsFromRepository()
     }
 
-    fun getImageLoader(context: Context): ImageLoader =
-        ImageLoader(context).newBuilder().okHttpClient(okhttpClient).build()
-
-    private fun fetchPostsFromRepository() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val posts = postRepository.postsForCommunity(FrontPage)
-            _state.emit(PostsScreenState.Posts(posts.results, false))
-        }
-    }
+    // private fun fetchPostsFromRepository() {
+    //     viewModelScope.launch(Dispatchers.IO) {
+    //         val posts = postRepository.postsForCommunity(FrontPage)
+    //         _state.emit(PostsScreenState.Posts(posts.results, false))
+    //     }
+    // }
 }
