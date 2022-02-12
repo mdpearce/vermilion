@@ -8,7 +8,7 @@ import androidx.navigation.compose.composable
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.bottomSheet
 import com.neaniesoft.vermilion.accounts.adapters.driving.ui.UserAccountScreen
-import com.neaniesoft.vermilion.posts.adapters.driving.ui.PostsScreen
+import com.neaniesoft.vermilion.posts.ui.PostsScreen
 
 @ExperimentalMaterialNavigationApi
 @Composable

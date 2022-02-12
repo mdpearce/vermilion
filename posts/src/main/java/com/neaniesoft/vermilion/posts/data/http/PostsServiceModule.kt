@@ -1,4 +1,4 @@
-package com.neaniesoft.vermilion.posts.adapters.driven.http
+package com.neaniesoft.vermilion.posts.data.http
 
 import com.neaniesoft.vermilion.api.RedditApiClientModule
 import dagger.Module

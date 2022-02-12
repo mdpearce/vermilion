@@ -13,6 +13,8 @@ dependencies {
     implementation(Deps.COIL)
     implementation(Deps.COIL_COMPOSE)
     implementation(Deps.COMMONS_TEXT)
+    implementation(Deps.PAGING_RUNTIME)
+    implementation(Deps.PAGING_COMPOSE)
     implementation(project(":ui"))
     implementation(project(":api"))
     implementation(project(":utils"))
