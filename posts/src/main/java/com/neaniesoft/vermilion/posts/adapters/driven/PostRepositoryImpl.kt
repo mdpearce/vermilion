@@ -5,17 +5,21 @@ import com.neaniesoft.vermilion.api.entities.Awarding
 import com.neaniesoft.vermilion.api.entities.Link
 import com.neaniesoft.vermilion.api.entities.LinkThing
 import com.neaniesoft.vermilion.posts.adapters.driven.http.PostsService
+import com.neaniesoft.vermilion.posts.domain.entities.AfterKey
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.Award
 import com.neaniesoft.vermilion.posts.domain.entities.AwardCount
 import com.neaniesoft.vermilion.posts.domain.entities.AwardName
+import com.neaniesoft.vermilion.posts.domain.entities.BeforeKey
 import com.neaniesoft.vermilion.posts.domain.entities.CommentCount
 import com.neaniesoft.vermilion.posts.domain.entities.Community
 import com.neaniesoft.vermilion.posts.domain.entities.CommunityId
 import com.neaniesoft.vermilion.posts.domain.entities.CommunityName
+import com.neaniesoft.vermilion.posts.domain.entities.FirstSet
 import com.neaniesoft.vermilion.posts.domain.entities.FrontPage
 import com.neaniesoft.vermilion.posts.domain.entities.ImagePostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.LinkHost
+import com.neaniesoft.vermilion.posts.domain.entities.ListingKey
 import com.neaniesoft.vermilion.posts.domain.entities.NamedCommunity
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlags
@@ -44,10 +48,24 @@ class PostRepositoryImpl @Inject constructor(
 
     private val logger by logger()
 
-    override suspend fun postsForCommunity(community: Community): ResultSet<Post> {
+    override suspend fun postsForCommunity(
+        community: Community,
+        previousCount: Int?,
+        listingKey: ListingKey
+    ): ResultSet<Post> {
         logger.debugIfEnabled { "Loading posts for $community" }
         val response = when (community) {
-            is FrontPage -> postsService.frontPageBest()
+            is FrontPage -> {
+                when (listingKey) {
+                    is BeforeKey -> postsService.frontPageBest(
+                        listingKey.value,
+                        null,
+                        previousCount
+                    )
+                    is AfterKey -> postsService.frontPageBest(null, listingKey.value, previousCount)
+                    is FirstSet -> postsService.frontPageBest(null, null, null)
+                }
+            }
             is NamedCommunity -> TODO()
         }
 
@@ -59,7 +77,12 @@ class PostRepositoryImpl @Inject constructor(
             }
         }
 
-        return ResultSet(posts)
+        return ResultSet(
+            posts,
+            response.data.before?.let { BeforeKey(it) },
+            response.data.after?.let { AfterKey(it) },
+            previousCount ?: 0
+        )
     }
 }
 
