@@ -56,6 +56,7 @@ dependencies {
     implementation(Deps.LIFECYCLE_VIEWMODEL_COMPOSE)
     implementation(Deps.LIFECYCLE_VIEWMODEL)
     implementation(Deps.HILT_NAVIGATION_COMPOSE)
+    implementation(Deps.KOTLIN_RESULT)
 
     implementation(Deps.ANDROIDX_CORE)
     implementation(Deps.ANDROIDX_APPCOMPAT)
