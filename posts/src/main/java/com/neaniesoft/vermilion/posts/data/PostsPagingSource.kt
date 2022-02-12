@@ -39,4 +39,3 @@ class PostsPagingSource constructor(
         return PagingQuery(FirstSet, 0)
     }
 }
-
