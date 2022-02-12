@@ -40,4 +40,6 @@ object Deps {
     const val COIL = "io.coil-kt:coil:1.4.0"
     const val COIL_COMPOSE = "io.coil-kt:coil-compose:1.4.0"
     const val COMMONS_TEXT = "org.apache.commons:commons-text:1.9"
+    const val PAGING_RUNTIME = "androidx.paging:paging-runtime:3.1.0"
+    const val PAGING_COMPOSE = "androidx.paging:paging-compose:1.0.0-alpha14"
 }
