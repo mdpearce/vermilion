@@ -2,9 +2,9 @@ package com.neaniesoft.vermilion.posts.adapters.driven
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import com.neaniesoft.vermilion.posts.adapters.driven.entities.PagingQuery
 import com.neaniesoft.vermilion.posts.domain.entities.Community
 import com.neaniesoft.vermilion.posts.domain.entities.FirstSet
-import com.neaniesoft.vermilion.posts.domain.entities.ListingKey
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.ports.PostRepository
 import retrofit2.HttpException
@@ -27,7 +27,7 @@ class PostsPagingSource constructor(
             return LoadResult.Page(
                 data = response.results,
                 prevKey = null,
-                nextKey = response.afterKey?.let { query.copy(listingKey = it) }
+                nextKey = response.afterKey?.let { query.copy(listingKey = it, previousCount = query.previousCount + response.results.size) }
             )
         } catch (e: IOException) {
             return LoadResult.Error(e)
@@ -41,7 +41,3 @@ class PostsPagingSource constructor(
     }
 }
 
-data class PagingQuery(
-    val listingKey: ListingKey,
-    val previousCount: Int
-)

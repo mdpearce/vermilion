@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Card
@@ -93,6 +94,13 @@ fun PostCard(post: Post, modifier: Modifier = Modifier) {
                 Text(text = post.score.value.toString(), style = MaterialTheme.typography.caption)
             }
         }
+    }
+}
+
+@Composable
+fun PostCardPlaceholder() {
+    Card(elevation = 8.dp, modifier = Modifier.fillMaxWidth().height(200.dp)) {
+        
     }
 }
 
