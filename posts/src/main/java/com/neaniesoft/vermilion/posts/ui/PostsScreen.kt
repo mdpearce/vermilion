@@ -1,4 +1,4 @@
-package com.neaniesoft.vermilion.posts.adapters.driving.ui
+package com.neaniesoft.vermilion.posts.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer

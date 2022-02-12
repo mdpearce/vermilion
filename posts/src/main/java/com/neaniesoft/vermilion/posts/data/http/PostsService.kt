@@ -1,6 +1,6 @@
-package com.neaniesoft.vermilion.posts.adapters.driven.http
+package com.neaniesoft.vermilion.posts.data.http
 
-import com.neaniesoft.vermilion.posts.adapters.driven.entities.PostsResponse
+import com.neaniesoft.vermilion.posts.data.entities.PostsResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 

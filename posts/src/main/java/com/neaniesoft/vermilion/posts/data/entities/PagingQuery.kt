@@ -1,4 +1,4 @@
-package com.neaniesoft.vermilion.posts.adapters.driven.entities
+package com.neaniesoft.vermilion.posts.data.entities
 
 import com.neaniesoft.vermilion.posts.domain.entities.ListingKey
 

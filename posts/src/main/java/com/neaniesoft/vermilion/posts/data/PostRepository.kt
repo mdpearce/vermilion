@@ -1,4 +1,4 @@
-package com.neaniesoft.vermilion.posts.domain.ports
+package com.neaniesoft.vermilion.posts.data
 
 import com.neaniesoft.vermilion.posts.domain.entities.Community
 import com.neaniesoft.vermilion.posts.domain.entities.ListingKey

@@ -1,10 +1,10 @@
-package com.neaniesoft.vermilion.posts.adapters.driven
+package com.neaniesoft.vermilion.posts.data
 
 import android.net.Uri
 import com.neaniesoft.vermilion.api.entities.Awarding
 import com.neaniesoft.vermilion.api.entities.Link
 import com.neaniesoft.vermilion.api.entities.LinkThing
-import com.neaniesoft.vermilion.posts.adapters.driven.http.PostsService
+import com.neaniesoft.vermilion.posts.data.http.PostsService
 import com.neaniesoft.vermilion.posts.domain.entities.AfterKey
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.Award
@@ -31,7 +31,6 @@ import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.posts.domain.entities.TextPostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.UriImage
 import com.neaniesoft.vermilion.posts.domain.entities.VideoPostSummary
-import com.neaniesoft.vermilion.posts.domain.ports.PostRepository
 import com.neaniesoft.vermilion.utils.logger
 import org.apache.commons.text.StringEscapeUtils
 import java.net.URL

@@ -1,4 +1,4 @@
-package com.neaniesoft.vermilion.posts.adapters.driving.ui
+package com.neaniesoft.vermilion.posts.ui
 
 import android.net.Uri
 import androidx.compose.foundation.Image

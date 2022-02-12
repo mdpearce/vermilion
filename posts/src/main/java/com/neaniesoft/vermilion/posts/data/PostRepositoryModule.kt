@@ -1,6 +1,5 @@
-package com.neaniesoft.vermilion.posts.adapters.driven
+package com.neaniesoft.vermilion.posts.data
 
-import com.neaniesoft.vermilion.posts.domain.ports.PostRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

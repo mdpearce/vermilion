@@ -1,12 +1,11 @@
-package com.neaniesoft.vermilion.posts.adapters.driven
+package com.neaniesoft.vermilion.posts.data
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.neaniesoft.vermilion.posts.adapters.driven.entities.PagingQuery
+import com.neaniesoft.vermilion.posts.data.entities.PagingQuery
 import com.neaniesoft.vermilion.posts.domain.entities.Community
 import com.neaniesoft.vermilion.posts.domain.entities.FirstSet
 import com.neaniesoft.vermilion.posts.domain.entities.Post
-import com.neaniesoft.vermilion.posts.domain.ports.PostRepository
 import retrofit2.HttpException
 import java.io.IOException
 

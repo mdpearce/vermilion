@@ -1,4 +1,4 @@
-package com.neaniesoft.vermilion.posts.adapters.driven.entities
+package com.neaniesoft.vermilion.posts.data.entities
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.neaniesoft.vermilion.api.entities.Thing
