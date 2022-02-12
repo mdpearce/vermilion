@@ -31,24 +31,37 @@ class AuthorizationInterceptor @Inject constructor(
                 authorizationService,
                 ClientSecretBasic("")
             ) { accessToken, _, ex ->
-                logger.debugIfEnabled { "Got token" }
                 if (ex != null) {
-                    logger.errorIfEnabled { "Error getting fresh token: ${ex.error}" }
-                    throw ex
+                    val errorMessage =
+                        "Error getting fresh token: ${ex.error}, code: ${ex.code}, desc: ${ex.errorDescription}"
+                    logger.errorIfEnabled { errorMessage }
+                    token.completeExceptionally(ex)
+                } else {
+                    if (accessToken == null) {
+                        token.completeExceptionally(NullPointerException("Access token was null, but no authorization exception occurred"))
+                    } else {
+                        token.complete(accessToken)
+                    }
                 }
-                val validAccessToken =
-                    requireNotNull(accessToken) { "Access token was null, but no authorization exception occurred" }
-                token.complete(validAccessToken)
-            }
-            val freshToken = runBlocking {
-                token.await()
             }
 
-            return chain.proceed(
-                chain.request().newBuilder()
-                    .header("Authorization", "bearer $freshToken")
-                    .build()
-            )
+            return try {
+                val freshToken = runBlocking {
+                    token.await()
+                }
+                chain.proceed(
+                    chain.request().newBuilder()
+                        .header("Authorization", "bearer $freshToken")
+                        .build()
+                )
+            } catch (e: Throwable) {
+                Response.Builder().code(500).body(
+                    ResponseBody.create(
+                        null,
+                        "Error obtaining token.\n$e (${e.message}) caused by ${e.cause} (${e.cause?.message})"
+                    )
+                ).build()
+            }
         } else {
             logger.debugIfEnabled { "Not authorized, using device token" }
             val tokenResult = authorizationStore.getDeviceToken(accessTokenService)
