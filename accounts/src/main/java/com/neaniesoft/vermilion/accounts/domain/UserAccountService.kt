@@ -1,5 +1,7 @@
 package com.neaniesoft.vermilion.accounts.domain
 
+import com.github.michaelbull.result.onFailure
+import com.github.michaelbull.result.onSuccess
 import com.neaniesoft.vermilion.accounts.domain.entities.AuthResponse
 import com.neaniesoft.vermilion.accounts.domain.entities.UserAccount
 import com.neaniesoft.vermilion.accounts.domain.entities.UserAccountId
@@ -8,6 +10,7 @@ import com.neaniesoft.vermilion.accounts.domain.ports.AuthProcessor
 import com.neaniesoft.vermilion.accounts.domain.ports.UserAccountRepository
 import com.neaniesoft.vermilion.auth.AuthorizationStore
 import com.neaniesoft.vermilion.utils.CoroutinesModule
+import com.neaniesoft.vermilion.utils.logger
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,6 +30,8 @@ class UserAccountService @Inject constructor(
     @Named(CoroutinesModule.IO_DISPATCHER) private val dispatcher: CoroutineDispatcher
 ) {
     private val scope = CoroutineScope(dispatcher)
+
+    private val logger by logger()
 
     private val _currentUserAccount: MutableStateFlow<UserAccount?> =
         MutableStateFlow(currentLoggedInUserAccount())
@@ -55,6 +60,8 @@ class UserAccountService @Inject constructor(
         // This might lead to a race condition where the account is not saved before it is returned and used
         scope.launch {
             userAccountRepository.saveUserAccount(account)
+                .onFailure { error -> logger.errorIfEnabled(error.cause) { "Error saving user account to disk. $error" } }
+                .onSuccess { userAccount -> logger.debugIfEnabled { "Saved user account with id ${userAccount.id}" } }
             authorizationStore.setLoggedInUserId(account.id.value)
             _currentUserAccount.emit(account)
         }
