@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 sealed class ThingData
 
 data class Link(
+    @JsonProperty("id") val id: String,
     @JsonProperty("author") val author: String,
     @JsonProperty("domain") val domain: String,
     @JsonProperty("hidden") val hidden: Boolean,

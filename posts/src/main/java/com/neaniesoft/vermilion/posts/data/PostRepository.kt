@@ -12,6 +12,6 @@ interface PostRepository {
         community: Community,
         requestedCount: Int,
         previousCount: Int?,
-        listingKey: ListingKey
+        afterKey: String?
     ): Result<ResultSet<Post>, PostError>
 }

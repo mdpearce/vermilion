@@ -19,14 +19,13 @@ import com.neaniesoft.vermilion.posts.domain.entities.CommentCount
 import com.neaniesoft.vermilion.posts.domain.entities.Community
 import com.neaniesoft.vermilion.posts.domain.entities.CommunityId
 import com.neaniesoft.vermilion.posts.domain.entities.CommunityName
-import com.neaniesoft.vermilion.posts.domain.entities.FirstSet
 import com.neaniesoft.vermilion.posts.domain.entities.FrontPage
 import com.neaniesoft.vermilion.posts.domain.entities.ImagePostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.LinkHost
-import com.neaniesoft.vermilion.posts.domain.entities.ListingKey
 import com.neaniesoft.vermilion.posts.domain.entities.NamedCommunity
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlags
+import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.PostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.PostTitle
 import com.neaniesoft.vermilion.posts.domain.entities.PreviewText
@@ -57,27 +56,18 @@ class PostRepositoryImpl @Inject constructor(
         community: Community,
         requestedCount: Int,
         previousCount: Int?,
-        listingKey: ListingKey
+        afterKey: String?
     ): Result<ResultSet<Post>, PostError> {
         logger.debugIfEnabled { "Loading posts for $community" }
         return runCatching {
             when (community) {
                 is FrontPage -> {
-                    when (listingKey) {
-                        is BeforeKey -> postsService.frontPageBest(
-                            requestedCount,
-                            listingKey.value,
-                            null,
-                            previousCount
-                        )
-                        is AfterKey -> postsService.frontPageBest(
-                            requestedCount,
-                            null,
-                            listingKey.value,
-                            previousCount
-                        )
-                        is FirstSet -> postsService.frontPageBest(requestedCount, null, null, null)
-                    }
+                    postsService.frontPageBest(
+                        requestedCount,
+                        null,
+                        afterKey,
+                        previousCount
+                    )
                 }
                 is NamedCommunity -> TODO()
             }
@@ -97,7 +87,6 @@ class PostRepositoryImpl @Inject constructor(
                 posts,
                 response.data.before?.let { BeforeKey(it) },
                 response.data.after?.let { AfterKey(it) },
-                previousCount ?: 0
             )
         }
     }
@@ -105,6 +94,7 @@ class PostRepositoryImpl @Inject constructor(
 
 internal fun Link.toPost(): Post {
     return Post(
+        PostId(id),
         PostTitle(title),
         postSummary(),
         NamedCommunity(CommunityName(subreddit), CommunityId(subredditId)),

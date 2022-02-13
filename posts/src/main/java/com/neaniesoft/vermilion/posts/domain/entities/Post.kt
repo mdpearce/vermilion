@@ -4,6 +4,7 @@ import java.net.URL
 import java.time.Instant
 
 data class Post(
+    val id: PostId,
     val title: PostTitle,
     val summary: PostSummary,
     val community: Community,
@@ -15,3 +16,6 @@ data class Post(
     val flags: Set<PostFlags>,
     val link: URL
 )
+
+@JvmInline
+value class PostId(val value: String)
