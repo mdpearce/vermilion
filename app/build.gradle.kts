@@ -69,6 +69,7 @@ dependencies {
     implementation(Deps.HILT_NAVIGATION_COMPOSE)
     implementation(Deps.KOTLINX_COROUTINES_ANDROID)
     implementation(Deps.ACCOMPANIST_NAVIGATION_MATERIAL)
+    implementation(Deps.KOTLIN_RESULT)
     implementation(project(":posts"))
     implementation(project(":ui"))
     implementation(project(":accounts"))

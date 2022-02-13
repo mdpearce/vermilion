@@ -1,5 +1,11 @@
 package com.neaniesoft.vermilion.accounts.adapters.driven.room
 
+import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.map
+import com.github.michaelbull.result.mapError
+import com.github.michaelbull.result.runCatching
+import com.neaniesoft.vermilion.accounts.domain.entities.AccountError
+import com.neaniesoft.vermilion.accounts.domain.entities.DatabaseError
 import com.neaniesoft.vermilion.accounts.domain.entities.UserAccount
 import com.neaniesoft.vermilion.accounts.domain.entities.UserAccountId
 import com.neaniesoft.vermilion.accounts.domain.entities.UserName
@@ -19,8 +25,11 @@ class UserAccountRoomRepository @Inject constructor(private val userAccountDao: 
         return dbRecord.toUserAccount()
     }
 
-    override suspend fun saveUserAccount(account: UserAccount) {
-        userAccountDao.insertAll(account.toRecord())
+    override suspend fun saveUserAccount(account: UserAccount): Result<UserAccount, AccountError> {
+        return runCatching {
+            userAccountDao.insertAll(account.toRecord())
+        }.map { account }
+            .mapError { DatabaseError(it) }
     }
 }
 

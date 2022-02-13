@@ -1,6 +1,10 @@
 package com.neaniesoft.vermilion.posts.data
 
 import android.net.Uri
+import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.map
+import com.github.michaelbull.result.mapError
+import com.github.michaelbull.result.runCatching
 import com.neaniesoft.vermilion.api.entities.Awarding
 import com.neaniesoft.vermilion.api.entities.Link
 import com.neaniesoft.vermilion.api.entities.LinkThing
@@ -31,6 +35,8 @@ import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.posts.domain.entities.TextPostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.UriImage
 import com.neaniesoft.vermilion.posts.domain.entities.VideoPostSummary
+import com.neaniesoft.vermilion.posts.domain.errors.PostError
+import com.neaniesoft.vermilion.posts.domain.errors.PostsApiError
 import com.neaniesoft.vermilion.utils.logger
 import org.apache.commons.text.StringEscapeUtils
 import java.net.URL
@@ -52,43 +58,48 @@ class PostRepositoryImpl @Inject constructor(
         requestedCount: Int,
         previousCount: Int?,
         listingKey: ListingKey
-    ): ResultSet<Post> {
+    ): Result<ResultSet<Post>, PostError> {
         logger.debugIfEnabled { "Loading posts for $community" }
-        val response = when (community) {
-            is FrontPage -> {
-                when (listingKey) {
-                    is BeforeKey -> postsService.frontPageBest(
-                        requestedCount,
-                        listingKey.value,
-                        null,
-                        previousCount
-                    )
-                    is AfterKey -> postsService.frontPageBest(
-                        requestedCount,
-                        null,
-                        listingKey.value,
-                        previousCount
-                    )
-                    is FirstSet -> postsService.frontPageBest(requestedCount, null, null, null)
+        return runCatching {
+            when (community) {
+                is FrontPage -> {
+                    when (listingKey) {
+                        is BeforeKey -> postsService.frontPageBest(
+                            requestedCount,
+                            listingKey.value,
+                            null,
+                            previousCount
+                        )
+                        is AfterKey -> postsService.frontPageBest(
+                            requestedCount,
+                            null,
+                            listingKey.value,
+                            previousCount
+                        )
+                        is FirstSet -> postsService.frontPageBest(requestedCount, null, null, null)
+                    }
+                }
+                is NamedCommunity -> TODO()
+            }
+        }.mapError {
+            PostsApiError(it)
+        }.map { response ->
+            val posts = response.data.children.mapNotNull { child ->
+                if (child is LinkThing) {
+                    child.data.toPost()
+                } else {
+                    logger.warnIfEnabled { "Unknown thing type in posts response" }
+                    null
                 }
             }
-            is NamedCommunity -> TODO()
-        }
 
-        val posts = response.data.children.map { child ->
-            if (child is LinkThing) {
-                child.data.toPost()
-            } else {
-                throw IllegalArgumentException("Unknown thing type in posts response")
-            }
+            ResultSet(
+                posts,
+                response.data.before?.let { BeforeKey(it) },
+                response.data.after?.let { AfterKey(it) },
+                previousCount ?: 0
+            )
         }
-
-        return ResultSet(
-            posts,
-            response.data.before?.let { BeforeKey(it) },
-            response.data.after?.let { AfterKey(it) },
-            previousCount ?: 0
-        )
     }
 }
 
