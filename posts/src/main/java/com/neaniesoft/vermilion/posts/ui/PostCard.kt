@@ -25,7 +25,6 @@ import coil.compose.rememberImagePainter
 import com.neaniesoft.vermilion.posts.R
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.CommentCount
-import com.neaniesoft.vermilion.posts.domain.entities.CommunityId
 import com.neaniesoft.vermilion.posts.domain.entities.CommunityName
 import com.neaniesoft.vermilion.posts.domain.entities.ImagePostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.LinkPostSummary
@@ -100,9 +99,11 @@ fun PostCard(post: Post, modifier: Modifier = Modifier) {
 
 @Composable
 fun PostCardPlaceholder() {
-    Card(elevation = 8.dp, modifier = Modifier
-        .fillMaxWidth()
-        .height(200.dp)) {
+    Card(
+        elevation = 8.dp, modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp)
+    ) {
     }
 }
 
@@ -163,7 +164,7 @@ internal val DUMMY_TEXT_POST = Post(
     PostId(""),
     PostTitle("Some post with a very long title that is likely to split across multiple lines"),
     TextPostSummary(PreviewText("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")),
-    NamedCommunity(CommunityName("Subreddit"), CommunityId("")),
+    NamedCommunity(CommunityName("Subreddit")),
     AuthorName("/u/SomeDude"),
     postedAt = Instant.now(),
     awardCounts = emptyMap(),

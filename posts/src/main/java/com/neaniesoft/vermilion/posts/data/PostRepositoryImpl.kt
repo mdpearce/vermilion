@@ -17,7 +17,6 @@ import com.neaniesoft.vermilion.posts.domain.entities.AwardName
 import com.neaniesoft.vermilion.posts.domain.entities.BeforeKey
 import com.neaniesoft.vermilion.posts.domain.entities.CommentCount
 import com.neaniesoft.vermilion.posts.domain.entities.Community
-import com.neaniesoft.vermilion.posts.domain.entities.CommunityId
 import com.neaniesoft.vermilion.posts.domain.entities.CommunityName
 import com.neaniesoft.vermilion.posts.domain.entities.FrontPage
 import com.neaniesoft.vermilion.posts.domain.entities.ImagePostSummary
@@ -97,7 +96,7 @@ internal fun Link.toPost(): Post {
         PostId(id),
         PostTitle(title),
         postSummary(),
-        NamedCommunity(CommunityName(subreddit), CommunityId(subredditId)),
+        NamedCommunity(CommunityName(subreddit)),
         AuthorName(author),
         Instant.ofEpochMilli((created * 1000.0).roundToLong()),
         allAwardings.toAwardsMap(),
