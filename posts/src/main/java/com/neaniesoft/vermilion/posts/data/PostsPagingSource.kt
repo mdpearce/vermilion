@@ -41,7 +41,7 @@ class PostsPagingSource constructor(
         return response.get()
             ?: LoadResult.Error<PagingQuery, Post>(
                 response.getError()
-                    ?: IllegalStateException("No error returned, but not value either")
+                    ?: IllegalStateException("No error returned, but no value either")
             ).also {
                 logger.errorIfEnabled(it.throwable) { "Error occurred during paging" }
             }
