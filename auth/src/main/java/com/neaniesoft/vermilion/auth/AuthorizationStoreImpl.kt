@@ -88,7 +88,6 @@ class AuthorizationStoreImpl @Inject constructor(
             }
         }.toErrorIf({ !it.isSuccessful }) {
             UnsuccessfulTokenRequest(it.code())
-
         }.andThen {
             runCatching { requireNotNull(it.body()) }
                 .mapError { EmptyBody }
