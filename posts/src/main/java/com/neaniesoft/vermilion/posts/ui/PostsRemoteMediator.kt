@@ -78,9 +78,10 @@ class PostsRemoteMediator(
                 lastItem.postId
             }
         }
+        val previousCount = state.pages.fold(0) { acc, page -> acc + page.data.size }
 
         val result =
-            postRepository.postsForCommunity(community, state.config.pageSize, null, loadKey)
+            postRepository.postsForCommunity(community, state.config.pageSize, previousCount, loadKey)
                 .andThen { response ->
                     runCatching {
                         database.withTransaction {

@@ -11,4 +11,7 @@ import dagger.hilt.components.SingletonComponent
 class PostDaoModule {
     @Provides
     fun providePostDao(db: VermilionDatabase) = db.postDao()
+
+    @Provides
+    fun providePostRemoteKeyDao(db: VermilionDatabase) = db.postRemoteKeysDao()
 }
