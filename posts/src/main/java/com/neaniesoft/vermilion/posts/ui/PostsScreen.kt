@@ -40,19 +40,22 @@ fun PostsScreen(
 ) {
     val pagingItems = viewModel.pageFlow.collectAsLazyPagingItems()
     Box {
-        PostsList(posts = pagingItems)
+        PostsList(posts = pagingItems) { post ->
+            viewModel.onPostClicked(post)
+        }
     }
 }
 
 @Composable
 fun PostsList(
-    posts: LazyPagingItems<Post>
+    posts: LazyPagingItems<Post>,
+    onPostClicked: (Post) -> Unit
 ) {
     LazyColumn {
         items(posts) { post ->
             Spacer(Modifier.height(12.dp))
             if (post != null) {
-                PostCard(post = post)
+                PostCard(post = post, onPostClicked)
             } else {
                 PostCardPlaceholder()
             }
@@ -171,7 +174,7 @@ fun PostsScreenPreview() {
                     )
                 )
             ).collectAsLazyPagingItems()
-        )
+        ) {}
     }
 }
 
@@ -188,6 +191,6 @@ fun PostsScreenPreviewDark() {
                     )
                 )
             ).collectAsLazyPagingItems()
-        )
+        ) {}
     }
 }

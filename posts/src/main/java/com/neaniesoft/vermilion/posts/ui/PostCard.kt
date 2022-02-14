@@ -1,5 +1,6 @@
 package com.neaniesoft.vermilion.posts.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,8 +34,8 @@ import java.net.URL
 import java.time.Instant
 
 @Composable
-fun PostCard(post: Post, modifier: Modifier = Modifier) {
-    Card(elevation = 16.dp) {
+fun PostCard(post: Post, onClick: (Post) -> Unit, modifier: Modifier = Modifier) {
+    Card(elevation = 16.dp, modifier = modifier.clickable { onClick(post) }) {
         Column(modifier = modifier.padding(16.dp)) {
             when (val summary = post.summary) {
                 is TextPostSummary -> {
@@ -104,7 +105,7 @@ fun PostCardPlaceholder() {
 @Composable
 fun PostCardPreview() {
     VermilionTheme {
-        PostCard(post = DUMMY_TEXT_POST)
+        PostCard(post = DUMMY_TEXT_POST, {})
     }
 }
 
