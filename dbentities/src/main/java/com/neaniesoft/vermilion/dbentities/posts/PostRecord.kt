@@ -17,7 +17,14 @@ data class PostRecord(
     val previewWidth: Int?,
     val previewHeight: Int?,
     val linkUri: String,
-    val previewText: String?
+    val previewText: String?,
+    val communityName: String,
+    val authorName: String,
+    val postedAt: Long,
+    // val awards TODO implement caching of awards
+    val commentCount: Int,
+    val score: Int,
+    val flags: String
 )
 
 enum class PostType {

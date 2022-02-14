@@ -20,5 +20,5 @@ class DatabaseModule {
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): VermilionDatabase =
-        Room.databaseBuilder(context, VermilionDatabase::class.java, DB_NAME).build()
+        Room.databaseBuilder(context, VermilionDatabase::class.java, DB_NAME).fallbackToDestructiveMigration().build()
 }

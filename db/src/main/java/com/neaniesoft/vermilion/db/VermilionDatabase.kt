@@ -7,7 +7,7 @@ import com.neaniesoft.vermilion.dbentities.posts.PostRecord
 import com.neaniesoft.vermilion.dbentities.useraccount.UserAccountDao
 import com.neaniesoft.vermilion.dbentities.useraccount.UserAccountRecord
 
-@Database(entities = [UserAccountRecord::class, PostRecord::class], version = 1)
+@Database(entities = [UserAccountRecord::class, PostRecord::class], version = 2)
 abstract class VermilionDatabase : RoomDatabase() {
     abstract fun userAccountDao(): UserAccountDao
     abstract fun postDao(): PostDao

@@ -17,5 +17,5 @@ interface PostDao {
     suspend fun deleteByQuery(query: String)
 
     @Query("SELECT insertedAt FROM posts WHERE `query` == :query ORDER BY insertedAt DESC LIMIT 1")
-    suspend fun lastUpdatedAt(query: String): Long
+    suspend fun lastUpdatedAt(query: String): Long?
 }
