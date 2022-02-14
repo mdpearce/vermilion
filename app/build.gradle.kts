@@ -70,6 +70,8 @@ dependencies {
     implementation(Deps.KOTLINX_COROUTINES_ANDROID)
     implementation(Deps.ACCOMPANIST_NAVIGATION_MATERIAL)
     implementation(Deps.KOTLIN_RESULT)
+    implementation(Deps.PAGING_RUNTIME)
+    implementation(Deps.PAGING_COMPOSE)
     implementation(project(":posts"))
     implementation(project(":ui"))
     implementation(project(":accounts"))
