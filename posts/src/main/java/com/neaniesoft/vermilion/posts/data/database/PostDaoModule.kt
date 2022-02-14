@@ -1,4 +1,4 @@
-package com.neaniesoft.vermilion.posts.data
+package com.neaniesoft.vermilion.posts.data.database
 
 import com.neaniesoft.vermilion.db.VermilionDatabase
 import dagger.Module

@@ -16,6 +16,3 @@ data class Post(
     val flags: Set<PostFlags>,
     val link: URL
 )
-
-@JvmInline
-value class PostId(val value: String)
