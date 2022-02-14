@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CustomTabNavigator">
+        <!-- The background color of the toolbar at the top of the screen, above the web page -->
+        <attr name="toolbarColor" format="reference" />
+        <!-- The background color of the navigation bar (home, back, app switcher) -->
+        <attr name="navigationBarColor" format="reference" />
+        <!-- Can be "system", "light" or "dark". "light" has a light background with a
+            dark foreground. "dark" has a dark background with a light foreground. "system" will
+            automatically decide whether to use the light or dark scheme. More specific color
+            attributes override this, so if you wish to use unusual colors you could select a theme
+            that would result in a contrasting foreground. -->
+        <attr name="colorScheme" format="enum">
+            <enum name="system" value="0"/>
+            <enum name="light" value="1"/>
+            <enum name="dark" value="2"/>
+        </attr>
+        <!-- The animation to use when showing the Chrome Custom Tab screen -->
+        <attr name="enterAnim" format="reference" />
+        <!-- The animation to use when leaving the Chrome Custom Tab screen -->
+        <attr name="exitAnim" format="reference" />
+        <!-- When true, show the up (back arrow) icon instead of the close button in the toolbar
+            to exit the screen. The default value is false. -->
+        <attr name="upInsteadOfClose" format="boolean" />
+        <!-- Chrome Custom Tabs has a simple way to add "Share" to the three-dot menu, which intelligently
+            has the user select from relevant installed apps. -->
+        <attr name="addDefaultShareMenuItem" format="boolean" />
+    </declare-styleable>
+</resources>
