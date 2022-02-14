@@ -1,36 +1,28 @@
 package com.neaniesoft.vermilion.posts.ui
 
-import android.net.Uri
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
 import com.neaniesoft.vermilion.posts.R
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.CommentCount
-import com.neaniesoft.vermilion.posts.domain.entities.CommunityId
 import com.neaniesoft.vermilion.posts.domain.entities.CommunityName
 import com.neaniesoft.vermilion.posts.domain.entities.ImagePostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.LinkPostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.NamedCommunity
 import com.neaniesoft.vermilion.posts.domain.entities.Post
+import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.PostTitle
 import com.neaniesoft.vermilion.posts.domain.entities.PreviewText
 import com.neaniesoft.vermilion.posts.domain.entities.Score
@@ -99,44 +91,12 @@ fun PostCard(post: Post, modifier: Modifier = Modifier) {
 
 @Composable
 fun PostCardPlaceholder() {
-    Card(elevation = 8.dp, modifier = Modifier.fillMaxWidth().height(200.dp)) {
-    }
-}
-
-@Composable
-fun TextSummary(content: String) {
-    Text(
-        text = content,
-        style = MaterialTheme.typography.body1
-    )
-}
-
-@Composable
-fun ImageSummary(imageUri: Uri) {
-    val painter = rememberImagePainter(imageUri.toString())
-
-    BoxWithConstraints(Modifier.fillMaxWidth()) {
-        Image(modifier = Modifier.size(maxWidth), painter = painter, contentDescription = "")
-    }
-}
-
-@Composable
-fun VideoSummary(previewImageUri: Uri) {
-    val painter = rememberImagePainter(previewImageUri.toString())
-
-    BoxWithConstraints(Modifier.fillMaxWidth()) {
-        Image(
-            modifier = Modifier.size(maxWidth),
-            painter = painter,
-            contentDescription = ""
-        )
-        Image(
-            modifier = Modifier
-                .size(48.dp)
-                .align(Alignment.Center),
-            imageVector = ImageVector.vectorResource(id = R.drawable.ic_baseline_play_circle_filled_24),
-            contentDescription = "Video icon"
-        )
+    Card(
+        elevation = 8.dp,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp)
+    ) {
     }
 }
 
@@ -148,18 +108,11 @@ fun PostCardPreview() {
     }
 }
 
-@Preview(name = "Video summary")
-@Composable
-fun VideoSummaryPreview() {
-    VermilionTheme {
-        VideoSummary(previewImageUri = Uri.parse("https://www.google.com.au/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png"))
-    }
-}
-
 internal val DUMMY_TEXT_POST = Post(
+    PostId(""),
     PostTitle("Some post with a very long title that is likely to split across multiple lines"),
     TextPostSummary(PreviewText("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")),
-    NamedCommunity(CommunityName("Subreddit"), CommunityId("")),
+    NamedCommunity(CommunityName("Subreddit")),
     AuthorName("/u/SomeDude"),
     postedAt = Instant.now(),
     awardCounts = emptyMap(),

@@ -4,6 +4,7 @@ import java.net.URL
 import java.time.Instant
 
 data class Post(
+    val id: PostId,
     val title: PostTitle,
     val summary: PostSummary,
     val community: Community,

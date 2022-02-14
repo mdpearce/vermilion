@@ -1,5 +1,6 @@
 package com.neaniesoft.vermilion.posts.data
 
+import com.neaniesoft.vermilion.posts.data.http.PostRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

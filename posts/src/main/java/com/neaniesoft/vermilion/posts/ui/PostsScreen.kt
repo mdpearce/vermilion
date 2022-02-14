@@ -21,6 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
@@ -32,6 +33,7 @@ import com.neaniesoft.vermilion.ui.theme.Vermilion500
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import kotlinx.coroutines.flow.flowOf
 
+@ExperimentalPagingApi
 @Composable
 fun PostsScreen(
     viewModel: PostsViewModel = hiltViewModel()
