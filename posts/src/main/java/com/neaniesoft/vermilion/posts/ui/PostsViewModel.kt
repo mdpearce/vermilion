@@ -41,7 +41,6 @@ class PostsViewModel @Inject constructor(
         )
     ) {
         postDao.pagingSource(query)
-
     }.flow.map { pagingData ->
         pagingData.map {
             it.toPost()

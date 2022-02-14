@@ -92,7 +92,8 @@ fun PostCard(post: Post, modifier: Modifier = Modifier) {
 @Composable
 fun PostCardPlaceholder() {
     Card(
-        elevation = 8.dp, modifier = Modifier
+        elevation = 8.dp,
+        modifier = Modifier
             .fillMaxWidth()
             .height(200.dp)
     ) {

@@ -98,12 +98,14 @@ class PostsRemoteMediator(
                             )
 
                             // Insert new posts into db, which invalidates current PagingData
-                            postDao.insertAll(response.results.map {
-                                it.toPostRecord(
-                                    query,
-                                    clock
-                                )
-                            })
+                            postDao.insertAll(
+                                response.results.map {
+                                    it.toPostRecord(
+                                        query,
+                                        clock
+                                    )
+                                }
+                            )
                             response
                         }
                     }.mapError { PostsPersistenceError(it) }
