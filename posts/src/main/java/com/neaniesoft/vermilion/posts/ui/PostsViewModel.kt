@@ -9,6 +9,7 @@ import androidx.paging.cachedIn
 import androidx.paging.map
 import com.neaniesoft.vermilion.db.VermilionDatabase
 import com.neaniesoft.vermilion.dbentities.posts.PostDao
+import com.neaniesoft.vermilion.dbentities.posts.PostRemoteKeyDao
 import com.neaniesoft.vermilion.posts.data.PostRepository
 import com.neaniesoft.vermilion.posts.domain.entities.FrontPage
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,12 +21,10 @@ import javax.inject.Inject
 class PostsViewModel @Inject constructor(
     postRepository: PostRepository,
     postDao: PostDao,
+    postRemoteKeyDao: PostRemoteKeyDao,
     database: VermilionDatabase,
     clock: Clock
 ) : ViewModel() {
-    // val pageFlow = Pager(PagingConfig(pageSize = 20)) {
-    //     PostsPagingSource(postRepository, FrontPage)
-    // }.flow.cachedIn(viewModelScope)
     private val query = requireNotNull(FrontPage::class.simpleName)
 
     @ExperimentalPagingApi
@@ -33,7 +32,11 @@ class PostsViewModel @Inject constructor(
         PagingConfig(pageSize = 20),
         remoteMediator = PostsRemoteMediator(
             query,
-            postDao, postRepository, database, clock
+            postDao,
+            postRemoteKeyDao,
+            postRepository,
+            database,
+            clock
         )
     ) {
         postDao.pagingSource(query)

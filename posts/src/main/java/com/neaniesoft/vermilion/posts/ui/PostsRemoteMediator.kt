@@ -1,6 +1,5 @@
 package com.neaniesoft.vermilion.posts.ui
 
-import android.util.Log
 import androidx.core.net.toUri
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
@@ -16,6 +15,8 @@ import com.github.michaelbull.result.runCatching
 import com.neaniesoft.vermilion.db.VermilionDatabase
 import com.neaniesoft.vermilion.dbentities.posts.PostDao
 import com.neaniesoft.vermilion.dbentities.posts.PostRecord
+import com.neaniesoft.vermilion.dbentities.posts.PostRemoteKey
+import com.neaniesoft.vermilion.dbentities.posts.PostRemoteKeyDao
 import com.neaniesoft.vermilion.dbentities.posts.PostType
 import com.neaniesoft.vermilion.posts.data.PostRepository
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
@@ -48,6 +49,7 @@ import java.util.concurrent.TimeUnit
 class PostsRemoteMediator(
     private val query: String,
     private val postDao: PostDao,
+    private val postRemoteKeyDao: PostRemoteKeyDao,
     private val postRepository: PostRepository,
     private val database: VermilionDatabase,
     private val clock: Clock
@@ -55,7 +57,7 @@ class PostsRemoteMediator(
 
     private val logger by logger()
 
-    val community = URI.create(query).path.let {
+    private val community = URI.create(query).path.let {
         if (it == FrontPage::class.simpleName) {
             FrontPage
         } else {
@@ -73,21 +75,45 @@ class PostsRemoteMediator(
             LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
             LoadType.APPEND -> {
                 // if lastItem is null here, it means the initial refresh returned no items.
-                val lastItem = state.lastItemOrNull()
-                    ?: return MediatorResult.Success(endOfPaginationReached = true)
-                lastItem.postId
+                // val lastItem = state.lastItemOrNull()
+                //     ?: return MediatorResult.Success(endOfPaginationReached = true)
+                // lastItem.postId
+
+                val remoteKey =
+                    database.withTransaction { postRemoteKeyDao.remoteKeyByQuery(query) }
+
+                // We need to explicitly check for null, as null is only valid for the initial page load, and it indicates that the end of pagination has been reached, i.e. there are no items to display.
+                if (remoteKey.nextKey == null) {
+                    return MediatorResult.Success(endOfPaginationReached = true)
+                }
+
+                remoteKey.nextKey
             }
         }
         val previousCount = state.pages.fold(0) { acc, page -> acc + page.data.size }
 
         val result =
-            postRepository.postsForCommunity(community, state.config.pageSize, previousCount, loadKey)
+            postRepository.postsForCommunity(
+                community,
+                state.config.pageSize,
+                previousCount,
+                loadKey
+            )
                 .andThen { response ->
                     runCatching {
                         database.withTransaction {
                             if (loadType == LoadType.REFRESH) {
+                                postRemoteKeyDao.deleteByQuery(query)
                                 postDao.deleteByQuery(query)
                             }
+
+                            // Update the remote key for this page
+                            postRemoteKeyDao.insertOrReplace(
+                                PostRemoteKey(
+                                    query,
+                                    response.afterKey?.value
+                                )
+                            )
 
                             // Insert new posts into db, which invalidates current PagingData
                             postDao.insertAll(response.results.map {
@@ -128,9 +154,6 @@ class PostsRemoteMediator(
 }
 
 fun PostRecord.toPost(): Post {
-
-    Log.d("toPost", "flags: $flags")
-
     return Post(
         id = PostId(postId),
         title = PostTitle(title),
