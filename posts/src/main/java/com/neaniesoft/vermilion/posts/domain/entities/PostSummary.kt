@@ -7,7 +7,7 @@ sealed class PostSummary
 data class ImagePostSummary(
     val linkHost: LinkHost,
     val thumbnailUri: Uri,
-    val previews: List<UriImage>,
+    val preview: UriImage?,
     val fullSizeUri: Uri
 ) : PostSummary()
 
@@ -33,6 +33,6 @@ data class UriImage(
 data class VideoPostSummary(
     val linkHost: LinkHost,
     val thumbnailUri: Uri,
-    val previews: List<UriImage>,
+    val preview: UriImage?,
     val linkUri: Uri
 ) : PostSummary()

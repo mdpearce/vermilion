@@ -22,7 +22,7 @@ import javax.inject.Singleton
 
 @Singleton
 class PostRepositoryImpl @Inject constructor(
-    private val postsService: PostsService
+    private val postsService: PostsService,
 ) : PostRepository {
 
     private val logger by logger()

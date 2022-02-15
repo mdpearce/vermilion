@@ -1,6 +1,5 @@
 package com.neaniesoft.vermilion.posts.ui
 
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,15 +7,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.layout.ContentScale
 import coil.compose.rememberImagePainter
 import com.neaniesoft.vermilion.posts.R
-import com.neaniesoft.vermilion.ui.theme.VermilionTheme
+import com.neaniesoft.vermilion.posts.domain.entities.UriImage
 
 @Composable
 fun TextSummary(content: String) {
@@ -26,39 +21,27 @@ fun TextSummary(content: String) {
     )
 }
 
-@Composable
-fun ImageSummary(imageUri: Uri) {
-    val painter = rememberImagePainter(imageUri.toString())
+private const val MIN_RATIO = 1.0f
 
-    BoxWithConstraints(Modifier.fillMaxWidth()) {
-        Image(modifier = Modifier.size(maxWidth), painter = painter, contentDescription = "")
+@Composable
+fun ImageSummary(image: UriImage) {
+    val painter = rememberImagePainter(image.uri.toString()) {
+        placeholder(R.drawable.image_placeholder)
+        crossfade(true)
     }
-}
-
-@Composable
-fun VideoSummary(previewImageUri: Uri) {
-    val painter = rememberImagePainter(previewImageUri.toString())
 
     BoxWithConstraints(Modifier.fillMaxWidth()) {
+        val ratio = kotlin.math.max((image.width.toFloat() / image.height.toFloat()), MIN_RATIO)
         Image(
-            modifier = Modifier.size(maxWidth),
+            modifier = Modifier.size(maxWidth, maxWidth.div(ratio)),
             painter = painter,
-            contentDescription = ""
-        )
-        Image(
-            modifier = Modifier
-                .size(48.dp)
-                .align(Alignment.Center),
-            imageVector = ImageVector.vectorResource(id = R.drawable.ic_baseline_play_circle_filled_24),
-            contentDescription = "Video icon"
+            contentDescription = "",
+            contentScale = ContentScale.Crop
         )
     }
 }
 
-@Preview(name = "Video summary")
 @Composable
-fun VideoSummaryPreview() {
-    VermilionTheme {
-        VideoSummary(previewImageUri = Uri.parse("https://www.google.com.au/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png"))
-    }
+fun VideoSummary(image: UriImage) {
+    ImageSummary(image = image)
 }
