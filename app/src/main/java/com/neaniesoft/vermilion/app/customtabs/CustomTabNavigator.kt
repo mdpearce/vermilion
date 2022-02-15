@@ -22,12 +22,18 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.withStyledAttributes
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
+import androidx.navigation.NamedNavArgument
+import androidx.navigation.NavDeepLink
 import androidx.navigation.NavDestination
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.Navigator
+import androidx.navigation.get
 import com.neaniesoft.vermilion.app.R
+import com.neaniesoft.vermilion.app.VermilionScreen
 import com.neaniesoft.vermilion.utils.logger
 import java.net.URLDecoder
+import java.net.URLEncoder
 import java.time.Clock
 
 /**
@@ -207,3 +213,24 @@ class CustomTabNavigator(
         }
     }
 }
+
+fun NavGraphBuilder.customTab(
+    route: String, arguments: List<NamedNavArgument> = emptyList(),
+    deepLinks: List<NavDeepLink> = emptyList()
+) {
+    addDestination(
+        CustomTabNavigator.Destination(provider[CustomTabNavigator::class].apply { warmUpBrowserInstance() })
+            .apply {
+                this.route = route
+                arguments.forEach { (argName, argument) ->
+                    addArgument(argName, argument)
+                }
+                deepLinks.forEach { deepLink ->
+                    addDeepLink(deepLink)
+                }
+            }
+    )
+}
+
+fun customTabRoute(uri: Uri): String =
+    VermilionScreen.CustomTab.name + "/" + URLEncoder.encode(uri.toString(), "utf-8")
