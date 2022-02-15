@@ -1,5 +1,6 @@
 package com.neaniesoft.vermilion.app.customtabs
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ComponentName
 import android.content.Context
@@ -29,7 +30,7 @@ import com.neaniesoft.vermilion.utils.logger
 import java.net.URLDecoder
 import java.time.Clock
 
-@Navigator.Name("customtab")
+@Navigator.Name("custom_tab")
 class CustomTabNavigator(
     private val context: Context,
     private val clock: Clock
@@ -141,7 +142,7 @@ class CustomTabNavigator(
         return true
     }
 
-    fun bindCustomTabsService() {
+    fun warmUpBrowserInstance() {
         val connection = object : CustomTabsServiceConnection() {
             override fun onServiceDisconnected(name: ComponentName) {
             }
@@ -178,6 +179,7 @@ class CustomTabNavigator(
         var upInsteadOfClose: Boolean = false
 
         var addDefaultShareMenuItem: Boolean = false
+        @SuppressLint("MissingSuperCall")
         override fun onInflate(context: Context, attrs: AttributeSet) {
             super.onInflate(context, attrs)
 

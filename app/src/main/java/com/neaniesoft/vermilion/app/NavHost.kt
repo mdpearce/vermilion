@@ -50,7 +50,7 @@ fun NavGraphBuilder.customTab(
     route: String, arguments: List<NamedNavArgument> = emptyList(),
     deepLinks: List<NavDeepLink> = emptyList()
 ) {
-    addDestination(CustomTabNavigator.Destination(provider[CustomTabNavigator::class])
+    addDestination(CustomTabNavigator.Destination(provider[CustomTabNavigator::class].apply { warmUpBrowserInstance() })
         .apply {
             this.route = route
             arguments.forEach { (argName, argument) ->
