@@ -30,6 +30,11 @@ import com.neaniesoft.vermilion.utils.logger
 import java.net.URLDecoder
 import java.time.Clock
 
+/**
+ * This custom navigator routes to Custom Tabs for a given uri passed in as an argument.
+ *
+ * It is heavily inspired by https://medium.com/@chadschultz/using-chrome-custom-tabs-with-the-navigation-component-from-android-jetpack-187b53014793
+ */
 @Navigator.Name("custom_tab")
 class CustomTabNavigator(
     private val context: Context,
@@ -46,7 +51,7 @@ class CustomTabNavigator(
 
     private val urisInProgressStartTimes: MutableMap<Uri, Long> = mutableMapOf()
 
-    var throttleTimeoutMs: Long = 2000L
+    private val throttleTimeoutMs: Long = 2000L
 
     val customTabsCallback by lazy {
         object : CustomTabsCallback() {
@@ -128,6 +133,9 @@ class CustomTabNavigator(
                 )
             }
 
+    /**
+     * Ensure we don't navigate to the same uri if the user double-taps quickly on a link
+     */
     private fun shouldAllowLaunch(uri: Uri): Boolean {
         val tabStartTime = urisInProgressStartTimes[uri]
         if (tabStartTime != null) {
@@ -179,6 +187,7 @@ class CustomTabNavigator(
         var upInsteadOfClose: Boolean = false
 
         var addDefaultShareMenuItem: Boolean = false
+
         @SuppressLint("MissingSuperCall")
         override fun onInflate(context: Context, attrs: AttributeSet) {
             super.onInflate(context, attrs)
