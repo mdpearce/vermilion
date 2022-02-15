@@ -8,9 +8,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.max
+import androidx.compose.ui.layout.ContentScale
 import coil.compose.rememberImagePainter
+import com.neaniesoft.vermilion.posts.R
 import com.neaniesoft.vermilion.posts.domain.entities.UriImage
 
 @Composable
@@ -21,38 +21,28 @@ fun TextSummary(content: String) {
     )
 }
 
+private const val MIN_RATIO = 1.0f
+
 @Composable
 fun ImageSummary(image: UriImage) {
-    val painter = rememberImagePainter(image.uri.toString())
+    val painter = rememberImagePainter(image.uri.toString()) {
+        placeholder(R.drawable.image_placeholder)
+        crossfade(true)
+
+    }
 
     BoxWithConstraints(Modifier.fillMaxWidth()) {
-        val ratio = image.width.toFloat() / image.height.toFloat()
-        val actualImageWidth = with(LocalDensity.current) {
-            image.width.toDp()
-        }
-        val imageWidth = max(actualImageWidth, maxWidth)
+        val ratio = kotlin.math.max((image.width.toFloat() / image.height.toFloat()), MIN_RATIO)
         Image(
-            modifier = Modifier.size(imageWidth, imageWidth.div(ratio)),
+            modifier = Modifier.size(maxWidth, maxWidth.div(ratio)),
             painter = painter,
-            contentDescription = ""
+            contentDescription = "",
+            contentScale = ContentScale.Crop
         )
     }
 }
 
 @Composable
 fun VideoSummary(image: UriImage) {
-    val painter = rememberImagePainter(image.uri.toString())
-
-    BoxWithConstraints(Modifier.fillMaxWidth()) {
-        val ratio = image.width.toFloat() / image.height.toFloat()
-        val actualImageWidth = with(LocalDensity.current) {
-            image.width.toDp()
-        }
-        val imageWidth = max(actualImageWidth, maxWidth)
-        Image(
-            modifier = Modifier.size(imageWidth, imageWidth.div(ratio)),
-            painter = painter,
-            contentDescription = ""
-        )
-    }
+    ImageSummary(image = image)
 }
