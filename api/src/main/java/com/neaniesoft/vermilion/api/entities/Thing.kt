@@ -10,3 +10,8 @@ sealed class Thing(open val data: ThingData)
 data class LinkThing(
     override val data: Link
 ) : Thing(data)
+
+@JsonTypeName("t1")
+data class CommentThing(
+    override val data: Comment
+) : Thing(data)

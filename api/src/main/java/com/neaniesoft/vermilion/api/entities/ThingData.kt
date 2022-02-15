@@ -29,3 +29,30 @@ data class Link(
     @JsonProperty("post_hint") val postHint: String?,
     @JsonProperty("preview") val preview: Preview?
 ) : ThingData()
+
+data class Comment(
+    @JsonProperty("id") val id: String,
+    @JsonProperty("subreddit_id") val subredditId: String,
+    @JsonProperty("subreddit") val subreddit: String,
+    @JsonProperty("subreddit_name_prefixed") val subredditNamePrefixed: String,
+    @JsonProperty("total_awards_received") val totalAwardsReceived: Int,
+    @JsonProperty("replies") val replies: Listing,
+    @JsonProperty("saved") val saved: Boolean,
+    @JsonProperty("author") val author: String,
+    @JsonProperty("created_utc") val createdUtc: Double,
+    @JsonProperty("parent_id") val parentId: String,
+    @JsonProperty("score") val score: Int,
+    @JsonProperty("author_fullname") val authorFullname: String,
+    @JsonProperty("body") val body: String,
+    @JsonProperty("edited") val edited: Boolean,
+    @JsonProperty("name") val name: String,
+    @JsonProperty("is_submitter") val isSubmitter: Boolean,
+    @JsonProperty("stickied") val sticked: Boolean,
+    @JsonProperty("score_hidden") val scoreHidden: Boolean,
+    @JsonProperty("permalink") val permalink: String,
+    @JsonProperty("locked") val locked: Boolean,
+    @JsonProperty("link_id") val linkId: String,
+    @JsonProperty("controversiality") val controversiality: Int,
+    @JsonProperty("depth") val depth: Int,
+    @JsonProperty("ups") val ups: Int
+) : ThingData()
