@@ -9,6 +9,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
 import coil.compose.rememberImagePainter
 import com.neaniesoft.vermilion.posts.R
 import com.neaniesoft.vermilion.posts.domain.entities.UriImage
@@ -17,7 +18,9 @@ import com.neaniesoft.vermilion.posts.domain.entities.UriImage
 fun TextSummary(content: String) {
     Text(
         text = content,
-        style = MaterialTheme.typography.body1
+        style = MaterialTheme.typography.body1,
+        maxLines = 8,
+        overflow = TextOverflow.Ellipsis
     )
 }
 
