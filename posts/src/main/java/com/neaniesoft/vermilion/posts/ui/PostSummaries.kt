@@ -1,6 +1,7 @@
 package com.neaniesoft.vermilion.posts.ui
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -31,10 +32,9 @@ fun TextSummary(content: String, shouldTruncate: Boolean) {
 private const val MIN_RATIO = 1.0f
 
 @Composable
-fun ImageSummary(image: UriImage, shouldTruncate: Boolean) {
+fun ImageSummary(image: UriImage, shouldTruncate: Boolean, onClick: () -> Unit) {
     val painter = rememberImagePainter(image.uri.toString()) {
         placeholder(R.drawable.image_placeholder)
-        crossfade(true)
     }
 
     BoxWithConstraints(Modifier.fillMaxWidth()) {
@@ -44,7 +44,9 @@ fun ImageSummary(image: UriImage, shouldTruncate: Boolean) {
             image.width.toFloat() / image.height.toFloat()
         }
         Image(
-            modifier = Modifier.size(maxWidth, maxWidth.div(ratio)),
+            modifier = Modifier
+                .size(maxWidth, maxWidth.div(ratio))
+                .clickable { onClick() },
             painter = painter,
             contentDescription = "",
             contentScale = ContentScale.Crop
@@ -53,6 +55,6 @@ fun ImageSummary(image: UriImage, shouldTruncate: Boolean) {
 }
 
 @Composable
-fun VideoSummary(image: UriImage, shouldTruncate: Boolean) {
-    ImageSummary(image = image, shouldTruncate)
+fun VideoSummary(image: UriImage, shouldTruncate: Boolean, onClick: () -> Unit) {
+    ImageSummary(image = image, shouldTruncate, onClick)
 }

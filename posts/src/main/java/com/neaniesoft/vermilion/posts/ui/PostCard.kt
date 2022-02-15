@@ -36,25 +36,41 @@ import java.net.URL
 import java.time.Instant
 
 @Composable
-fun PostCard(post: Post, onClick: (Post) -> Unit, modifier: Modifier = Modifier) {
+fun PostCard(
+    post: Post,
+    onClick: (Post) -> Unit,
+    onMediaClicked: (Post) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Card(elevation = 16.dp, modifier = modifier.clickable { onClick(post) }) {
-        PostSummary(post = post, modifier = modifier, shouldTruncate = true)
+        PostSummary(post = post, modifier = modifier, shouldTruncate = true, onMediaClicked)
     }
 }
 
 @Composable
-fun PostSummary(post: Post, modifier: Modifier = Modifier, shouldTruncate: Boolean) {
+fun PostSummary(
+    post: Post,
+    modifier: Modifier = Modifier,
+    shouldTruncate: Boolean,
+    onMediaClicked: (Post) -> Unit
+) {
     Column(modifier = modifier.padding(16.dp)) {
         when (val summary = post.summary) {
             is TextPostSummary -> {
                 TextSummary(content = summary.previewText.value, shouldTruncate)
             }
             is ImagePostSummary -> {
-                ImageSummary(image = summary.preview ?: UriImage("".toUri(), 0, 0), shouldTruncate)
+                ImageSummary(
+                    image = summary.preview ?: UriImage("".toUri(), 0, 0),
+                    shouldTruncate
+                ) { onMediaClicked(post) }
             }
             is LinkPostSummary -> TODO()
             is VideoPostSummary -> {
-                VideoSummary(image = summary.preview ?: UriImage("".toUri(), 0, 0), shouldTruncate)
+                VideoSummary(
+                    image = summary.preview ?: UriImage("".toUri(), 0, 0),
+                    shouldTruncate
+                ) { onMediaClicked(post) }
             }
         }
         Text(
@@ -112,7 +128,7 @@ fun PostCardPlaceholder() {
 @Composable
 fun PostCardPreview() {
     VermilionTheme {
-        PostCard(post = DUMMY_TEXT_POST, {})
+        PostCard(post = DUMMY_TEXT_POST, {}, {})
     }
 }
 

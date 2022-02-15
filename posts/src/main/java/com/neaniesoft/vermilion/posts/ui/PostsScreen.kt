@@ -21,6 +21,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadState
@@ -45,23 +46,25 @@ fun PostsScreen(
     val pagingItems = viewModel.pageFlow.collectAsLazyPagingItems()
 
     Box {
-        PostsList(posts = pagingItems) { post ->
-            // onOpenUri(post.link.toString().toUri())
+        PostsList(posts = pagingItems, onMediaClicked = {
+            onOpenUri(it.link.toString().toUri())
+        }, onPostClicked = { post ->
             onOpenPostDetails(post.id)
-        }
+        })
     }
 }
 
 @Composable
 fun PostsList(
     posts: LazyPagingItems<Post>,
-    onPostClicked: (Post) -> Unit
+    onPostClicked: (Post) -> Unit,
+    onMediaClicked: (Post) -> Unit
 ) {
     LazyColumn {
         items(posts) { post ->
             Spacer(Modifier.height(12.dp))
             if (post != null) {
-                PostCard(post = post, onPostClicked)
+                PostCard(post = post, onPostClicked, onMediaClicked)
             } else {
                 PostCardPlaceholder()
             }
@@ -179,8 +182,7 @@ fun PostsScreenPreview() {
                         DUMMY_TEXT_POST
                     )
                 )
-            ).collectAsLazyPagingItems()
-        ) {}
+            ).collectAsLazyPagingItems(), {}) {}
     }
 }
 
@@ -196,7 +198,6 @@ fun PostsScreenPreviewDark() {
                         DUMMY_TEXT_POST
                     )
                 )
-            ).collectAsLazyPagingItems()
-        ) {}
+            ).collectAsLazyPagingItems(), {}) {}
     }
 }
