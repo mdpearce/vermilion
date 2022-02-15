@@ -1,5 +1,6 @@
 package com.neaniesoft.vermilion.postdetails
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.room.withTransaction
@@ -18,12 +19,23 @@ import javax.inject.Inject
 @HiltViewModel
 class PostDetailsViewModel @Inject constructor(
     private val database: VermilionDatabase,
-    private val postDao: PostDao
+    private val postDao: PostDao,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val _post: MutableStateFlow<PostDetailsState> = MutableStateFlow(Empty)
     val post: StateFlow<PostDetailsState> = _post.asStateFlow()
 
-    fun onLoadPost(id: PostId) {
+    private val postId = savedStateHandle.get<String>("id")
+
+    init {
+        loadPost(
+            PostId(
+                postId ?: throw IllegalStateException("Could not obtain post ID from saved state")
+            )
+        )
+    }
+
+    private fun loadPost(id: PostId) {
         viewModelScope.launch {
             val post = database.withTransaction {
                 postDao.postWithId(id.value)

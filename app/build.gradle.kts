@@ -74,6 +74,7 @@ dependencies {
     implementation(Deps.PAGING_COMPOSE)
     implementation(Deps.ANDROIDX_BROWSER)
     implementation(project(":posts"))
+    implementation(project(":postdetails"))
     implementation(project(":ui"))
     implementation(project(":accounts"))
     implementation(project(":utils"))

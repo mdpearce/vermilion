@@ -13,6 +13,7 @@ import com.google.accompanist.navigation.material.bottomSheet
 import com.neaniesoft.vermilion.accounts.adapters.driving.ui.UserAccountScreen
 import com.neaniesoft.vermilion.app.customtabs.customTab
 import com.neaniesoft.vermilion.app.customtabs.customTabRoute
+import com.neaniesoft.vermilion.postdetails.PostDetailsScreen
 import com.neaniesoft.vermilion.posts.ui.PostsScreen
 
 @ExperimentalMaterialNavigationApi
@@ -25,7 +26,9 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
         modifier = modifier
     ) {
         composable(VermilionScreen.Posts.name) {
-            PostsScreen { uri ->
+            PostsScreen(onOpenPostDetails = { postId ->
+                navController.navigate("${VermilionScreen.PostDetails}/${postId.value}")
+            }) { uri ->
                 navController.navigate(customTabRoute(uri))
             }
         }
@@ -34,7 +37,7 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
             "${VermilionScreen.PostDetails.name}/{id}",
             arguments = listOf(navArgument("id") { type = NavType.StringType })
         ) {
-
+            PostDetailsScreen()
         }
 
         bottomSheet(VermilionScreen.MyAccount.name) {

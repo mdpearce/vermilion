@@ -21,7 +21,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadState
@@ -31,6 +30,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import com.neaniesoft.vermilion.posts.R
 import com.neaniesoft.vermilion.posts.domain.entities.Post
+import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.ui.theme.Vermilion500
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import kotlinx.coroutines.flow.flowOf
@@ -39,13 +39,15 @@ import kotlinx.coroutines.flow.flowOf
 @Composable
 fun PostsScreen(
     viewModel: PostsViewModel = hiltViewModel(),
+    onOpenPostDetails: (postId: PostId) -> Unit,
     onOpenUri: (uri: Uri) -> Unit
 ) {
     val pagingItems = viewModel.pageFlow.collectAsLazyPagingItems()
 
     Box {
         PostsList(posts = pagingItems) { post ->
-            onOpenUri(post.link.toString().toUri())
+            // onOpenUri(post.link.toString().toUri())
+            onOpenPostDetails(post.id)
         }
     }
 }
