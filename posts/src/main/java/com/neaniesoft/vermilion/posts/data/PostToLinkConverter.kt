@@ -3,6 +3,7 @@ package com.neaniesoft.vermilion.posts.data
 import android.net.Uri
 import com.neaniesoft.vermilion.api.entities.Awarding
 import com.neaniesoft.vermilion.api.entities.Link
+import com.neaniesoft.vermilion.posts.domain.choosePreviewImage
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.Award
 import com.neaniesoft.vermilion.posts.domain.entities.AwardCount
@@ -52,13 +53,13 @@ internal fun Link.postSummary(): PostSummary {
             ImagePostSummary(
                 LinkHost(domain),
                 Uri.parse(thumbnail),
-                preview?.images?.first()?.resolutions?.sortedBy { image -> image.height }?.map {
+                preview?.images?.first()?.resolutions?.map {
                     UriImage(
                         Uri.parse(StringEscapeUtils.unescapeHtml4(it.url)),
                         it.width,
                         it.height
                     )
-                } ?: emptyList(),
+                }?.choosePreviewImage(),
                 Uri.parse(url)
             )
         }
@@ -71,13 +72,13 @@ internal fun Link.postSummary(): PostSummary {
             VideoPostSummary(
                 LinkHost(domain),
                 Uri.parse(thumbnail),
-                preview?.images?.first()?.resolutions?.sortedBy { image -> image.height }?.map {
+                preview?.images?.first()?.resolutions?.map {
                     UriImage(
                         Uri.parse(StringEscapeUtils.unescapeHtml4(it.url)),
                         it.width,
                         it.height
                     )
-                } ?: emptyList(),
+                }?.choosePreviewImage(),
                 Uri.parse(url)
             )
         }

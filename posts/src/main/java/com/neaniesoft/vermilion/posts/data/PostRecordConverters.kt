@@ -34,13 +34,13 @@ fun PostRecord.toPost(): Post {
                 LinkHost(linkHost),
                 thumbnailUri = thumbnailUri?.toUri()
                     ?: throw IllegalStateException("Image post with no thumbnail returned from db"),
-                previews = listOf(
+                preview =
                     UriImage(
                         previewUri?.toUri()
                             ?: throw IllegalStateException("Image post with no preview returned from db"),
                         previewWidth ?: 0,
                         previewHeight ?: 0
-                    )
+
                 ),
                 fullSizeUri = linkUri.toUri()
             )
@@ -52,13 +52,13 @@ fun PostRecord.toPost(): Post {
                 LinkHost(linkHost),
                 thumbnailUri = thumbnailUri?.toUri()
                     ?: throw IllegalStateException("Video post with no thumbnail returned from db"),
-                previews = listOf(
+                preview =
                     UriImage(
                         previewUri?.toUri()
                             ?: throw IllegalStateException("Video post with no preview returned from db"),
                         previewWidth ?: 0,
                         previewHeight ?: 0
-                    )
+
                 ),
                 linkUri = linkUri.toUri()
             )
@@ -97,18 +97,18 @@ fun Post.toPostRecord(query: String, clock: Clock): PostRecord = PostRecord(
         else -> null
     },
     previewUri = when (summary) {
-        is ImagePostSummary -> summary.previews.last().uri.toString()
-        is VideoPostSummary -> summary.previews.last().uri.toString()
+        is ImagePostSummary -> summary.preview?.uri.toString()
+        is VideoPostSummary -> summary.preview?.uri.toString()
         else -> null
     },
     previewWidth = when (summary) {
-        is ImagePostSummary -> summary.previews.last().width
-        is VideoPostSummary -> summary.previews.last().width
+        is ImagePostSummary -> summary.preview?.width
+        is VideoPostSummary -> summary.preview?.width
         else -> null
     },
     previewHeight = when (summary) {
-        is ImagePostSummary -> summary.previews.last().height
-        is VideoPostSummary -> summary.previews.last().height
+        is ImagePostSummary -> summary.preview?.height
+        is VideoPostSummary -> summary.preview?.height
         else -> null
     },
     linkUri = link.toString(),
