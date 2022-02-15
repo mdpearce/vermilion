@@ -35,11 +35,11 @@ fun PostRecord.toPost(): Post {
                 thumbnailUri = thumbnailUri?.toUri()
                     ?: throw IllegalStateException("Image post with no thumbnail returned from db"),
                 preview =
-                    UriImage(
-                        previewUri?.toUri()
-                            ?: throw IllegalStateException("Image post with no preview returned from db"),
-                        previewWidth ?: 0,
-                        previewHeight ?: 0
+                UriImage(
+                    previewUri?.toUri()
+                        ?: throw IllegalStateException("Image post with no preview returned from db"),
+                    previewWidth ?: 0,
+                    previewHeight ?: 0
 
                 ),
                 fullSizeUri = linkUri.toUri()
@@ -53,11 +53,11 @@ fun PostRecord.toPost(): Post {
                 thumbnailUri = thumbnailUri?.toUri()
                     ?: throw IllegalStateException("Video post with no thumbnail returned from db"),
                 preview =
-                    UriImage(
-                        previewUri?.toUri()
-                            ?: throw IllegalStateException("Video post with no preview returned from db"),
-                        previewWidth ?: 0,
-                        previewHeight ?: 0
+                UriImage(
+                    previewUri?.toUri()
+                        ?: throw IllegalStateException("Video post with no preview returned from db"),
+                    previewWidth ?: 0,
+                    previewHeight ?: 0
 
                 ),
                 linkUri = linkUri.toUri()
