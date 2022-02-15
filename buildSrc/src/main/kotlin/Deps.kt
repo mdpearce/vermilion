@@ -44,4 +44,5 @@ object Deps {
     const val PAGING_RUNTIME = "androidx.paging:paging-runtime:3.1.0"
     const val PAGING_COMPOSE = "androidx.paging:paging-compose:1.0.0-alpha14"
     const val KOTLIN_RESULT = "com.michael-bull.kotlin-result:kotlin-result:1.1.14"
+    const val ANDROIDX_BROWSER = "androidx.browser:browser:1.3.0"
 }

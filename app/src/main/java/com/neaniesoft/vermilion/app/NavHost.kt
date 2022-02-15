@@ -3,14 +3,20 @@ package com.neaniesoft.vermilion.app
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import androidx.paging.ExperimentalPagingApi
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.bottomSheet
 import com.neaniesoft.vermilion.accounts.adapters.driving.ui.UserAccountScreen
+import com.neaniesoft.vermilion.app.customtabs.customTab
+import com.neaniesoft.vermilion.app.customtabs.customTabRoute
 import com.neaniesoft.vermilion.posts.ui.PostsScreen
 
 @ExperimentalMaterialNavigationApi
+@ExperimentalPagingApi
 @Composable
 fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
     NavHost(
@@ -19,11 +25,18 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
         modifier = modifier
     ) {
         composable(VermilionScreen.Posts.name) {
-            PostsScreen()
+            PostsScreen { uri ->
+                navController.navigate(customTabRoute(uri))
+            }
         }
 
         bottomSheet(VermilionScreen.MyAccount.name) {
             UserAccountScreen()
         }
+
+        customTab(
+            "${VermilionScreen.CustomTab.name}/{uri}",
+            arguments = listOf(navArgument("uri") { type = NavType.StringType })
+        )
     }
 }
