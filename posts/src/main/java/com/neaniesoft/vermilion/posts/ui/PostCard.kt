@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import com.neaniesoft.vermilion.posts.R
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.CommentCount
@@ -28,6 +29,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.PostTitle
 import com.neaniesoft.vermilion.posts.domain.entities.PreviewText
 import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.posts.domain.entities.TextPostSummary
+import com.neaniesoft.vermilion.posts.domain.entities.UriImage
 import com.neaniesoft.vermilion.posts.domain.entities.VideoPostSummary
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import java.net.URL
@@ -42,11 +44,11 @@ fun PostCard(post: Post, onClick: (Post) -> Unit, modifier: Modifier = Modifier)
                     TextSummary(content = summary.previewText.value)
                 }
                 is ImagePostSummary -> {
-                    ImageSummary(imageUri = summary.previews.last().uri)
+                    ImageSummary(image = summary.preview ?: UriImage("".toUri(), 0, 0))
                 }
                 is LinkPostSummary -> TODO()
                 is VideoPostSummary -> {
-                    VideoSummary(previewImageUri = summary.previews.last().uri)
+                    VideoSummary(image = summary.preview ?: UriImage("".toUri(), 0, 0))
                 }
             }
             Text(
