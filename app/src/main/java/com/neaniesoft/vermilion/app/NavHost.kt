@@ -30,6 +30,13 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
             }
         }
 
+        composable(
+            "${VermilionScreen.PostDetails.name}/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.StringType })
+        ) {
+
+        }
+
         bottomSheet(VermilionScreen.MyAccount.name) {
             UserAccountScreen()
         }
