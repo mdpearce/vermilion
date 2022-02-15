@@ -21,6 +21,7 @@ dependencies {
     implementation(project(":auth"))
     implementation(project(":dbentities"))
     implementation(project(":db"))
+    implementation(project(":posts"))
     debugImplementation(Deps.COMPOSE_UI_TOOLING)
 
     implementation(Deps.ROOM_RUNTIME)
