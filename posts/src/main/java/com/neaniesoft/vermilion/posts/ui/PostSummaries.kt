@@ -28,7 +28,6 @@ fun ImageSummary(image: UriImage) {
     val painter = rememberImagePainter(image.uri.toString()) {
         placeholder(R.drawable.image_placeholder)
         crossfade(true)
-
     }
 
     BoxWithConstraints(Modifier.fillMaxWidth()) {
