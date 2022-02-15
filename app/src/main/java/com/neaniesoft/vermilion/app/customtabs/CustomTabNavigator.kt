@@ -169,7 +169,7 @@ class CustomTabNavigator(
                 session = client.newSession(customTabsCallback)
             }
         }
-        //TODO See if we need to specify different packages when using a different browser that supports custom tabs
+        // TODO See if we need to specify different packages when using a different browser that supports custom tabs
         CustomTabsClient.bindCustomTabsService(context, "com.android.chrome", connection)
     }
 
@@ -215,7 +215,8 @@ class CustomTabNavigator(
 }
 
 fun NavGraphBuilder.customTab(
-    route: String, arguments: List<NamedNavArgument> = emptyList(),
+    route: String,
+    arguments: List<NamedNavArgument> = emptyList(),
     deepLinks: List<NavDeepLink> = emptyList()
 ) {
     addDestination(
