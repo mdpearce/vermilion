@@ -13,7 +13,6 @@ import com.neaniesoft.vermilion.dbentities.posts.PostRemoteKeyDao
 import com.neaniesoft.vermilion.posts.data.PostRepository
 import com.neaniesoft.vermilion.posts.data.toPost
 import com.neaniesoft.vermilion.posts.domain.entities.FrontPage
-import com.neaniesoft.vermilion.posts.domain.entities.Post
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
 import java.time.Clock
@@ -47,9 +46,4 @@ class PostsViewModel @Inject constructor(
             it.toPost()
         }
     }.cachedIn(viewModelScope)
-
-    fun onPostClicked(post: Post) {
-
-
-    }
 }
