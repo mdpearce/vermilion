@@ -1,7 +1,6 @@
 package com.neaniesoft.vermilion.dbentities.comments
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
@@ -24,8 +23,8 @@ interface CommentDao {
     suspend fun insertAll(comments: List<CommentRecord>)
 
     @Update
-    suspend fun update(comment: CommentRecord)
+    suspend fun update(comment: CommentRecord): Int
 
-    @Delete
-    suspend fun deleteAllForPost(postId: String)
+    @Query("DELETE FROM comments WHERE postId == :postId")
+    suspend fun deleteAllForPost(postId: String): Int
 }
