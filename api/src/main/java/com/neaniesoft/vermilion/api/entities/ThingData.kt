@@ -30,7 +30,7 @@ data class Link(
     @JsonProperty("preview") val preview: Preview?
 ) : ThingData()
 
-data class Comment(
+data class CommentData(
     @JsonProperty("id") val id: String,
     @JsonProperty("subreddit_id") val subredditId: String,
     @JsonProperty("subreddit") val subreddit: String,

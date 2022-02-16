@@ -13,5 +13,5 @@ data class LinkThing(
 
 @JsonTypeName("t1")
 data class CommentThing(
-    override val data: Comment
+    override val data: CommentData
 ) : Thing(data)

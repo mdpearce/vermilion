@@ -6,7 +6,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.Score
 import java.time.Instant
 
-data class CommentNode(
+data class Comment(
     val id: CommentId,
     val content: CommentContent,
     val flags: Set<CommentFlags>,
@@ -18,8 +18,7 @@ data class CommentNode(
     val controversialIndex: ControversialIndex,
     val depth: CommentDepth,
     val upVotes: UpVotesCount,
-    val parent: CommentNode?,
-    val children: List<CommentNode>
+    val parentId: CommentId?,
 )
 
 @JvmInline

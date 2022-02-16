@@ -5,7 +5,9 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "comments")
 data class CommentRecord(
-    @PrimaryKey val id: String,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int,
+    val commentId: String,
     val postId: String,
     val parentId: String?,
     val path: String?,
