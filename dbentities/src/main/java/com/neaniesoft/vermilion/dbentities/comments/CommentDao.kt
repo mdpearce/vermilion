@@ -16,6 +16,9 @@ interface CommentDao {
     @Query("SELECT * from comments WHERE path LIKE :commentPath || '%'")
     suspend fun getAllDescendantsOfCommentWithPath(commentPath: String): List<CommentRecord>
 
+    @Query("SELECT insertedAt FROM comments WHERE postId == :postId ORDER BY insertedAt DESC LIMIT 1")
+    suspend fun getLastInsertedAtForPost(postId: String): Long
+
     @Insert
     suspend fun insertAll(vararg comments: CommentRecord)
 
