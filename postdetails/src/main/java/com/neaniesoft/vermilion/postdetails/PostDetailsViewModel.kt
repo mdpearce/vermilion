@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.room.withTransaction
 import com.neaniesoft.vermilion.db.VermilionDatabase
 import com.neaniesoft.vermilion.dbentities.posts.PostDao
+import com.neaniesoft.vermilion.postdetails.data.CommentRepository
 import com.neaniesoft.vermilion.posts.data.toPost
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
@@ -20,19 +21,23 @@ import javax.inject.Inject
 class PostDetailsViewModel @Inject constructor(
     private val database: VermilionDatabase,
     private val postDao: PostDao,
+    private val commentRepository: CommentRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val _post: MutableStateFlow<PostDetailsState> = MutableStateFlow(Empty)
     val post: StateFlow<PostDetailsState> = _post.asStateFlow()
 
-    private val postId = savedStateHandle.get<String>("id")
+    private val _comments: MutableStateFlow<List<Comment>> = MutableStateFlow(emptyList())
+    val comments: StateFlow<List<Comment>> = _comments.asStateFlow()
+
+    private val postId = PostId(
+        savedStateHandle.get<String>("id")
+            ?: throw IllegalStateException("Could not obtain post ID from saved state")
+    )
 
     init {
-        loadPost(
-            PostId(
-                postId ?: throw IllegalStateException("Could not obtain post ID from saved state")
-            )
-        )
+        loadPost(postId)
+        loadComments(postId)
     }
 
     private fun loadPost(id: PostId) {
@@ -45,6 +50,14 @@ class PostDetailsViewModel @Inject constructor(
             } else {
                 _post.emit(PostDetails(post.toPost()))
             }
+        }
+    }
+
+    private fun loadComments(id: PostId) {
+        viewModelScope.launch {
+            val comments = commentRepository.getFlattenedCommentTreeForPost(id)
+
+            _comments.emit(comments)
         }
     }
 }
