@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 4,
-    "identityHash": "8266e4b5ffb5772a7fb4107f8e466969",
+    "identityHash": "9d4301e13efc36e16d0393718af79355",
     "entities": [
       {
         "tableName": "user_accounts",
@@ -186,7 +186,7 @@
       },
       {
         "tableName": "comments",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `postId` TEXT NOT NULL, `parentId` TEXT, `path` TEXT, `body` TEXT NOT NULL, `flags` TEXT NOT NULL, `author` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `score` INTEGER NOT NULL, `link` TEXT NOT NULL, `controversialIndex` INTEGER NOT NULL, `depth` INTEGER NOT NULL, `upVotes` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `postId` TEXT NOT NULL, `parentId` TEXT, `path` TEXT, `body` TEXT NOT NULL, `flags` TEXT NOT NULL, `author` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `insertedAt` INTEGER NOT NULL, `score` INTEGER NOT NULL, `link` TEXT NOT NULL, `controversialIndex` INTEGER NOT NULL, `depth` INTEGER NOT NULL, `upVotes` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -237,6 +237,12 @@
             "notNull": true
           },
           {
+            "fieldPath": "insertedAt",
+            "columnName": "insertedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
             "fieldPath": "score",
             "columnName": "score",
             "affinity": "INTEGER",
@@ -280,7 +286,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8266e4b5ffb5772a7fb4107f8e466969')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9d4301e13efc36e16d0393718af79355')"
     ]
   }
 }

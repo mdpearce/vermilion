@@ -13,6 +13,7 @@ data class CommentRecord(
     val flags: String,
     val author: String,
     val createdAt: Long,
+    val insertedAt: Long,
     val score: Int,
     val link: String,
     val controversialIndex: Int,
