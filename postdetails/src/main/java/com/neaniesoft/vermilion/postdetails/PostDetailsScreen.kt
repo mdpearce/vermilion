@@ -1,10 +1,17 @@
 package com.neaniesoft.vermilion.postdetails
 
 import android.net.Uri
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -20,6 +27,8 @@ fun PostDetailsScreen(
     onOpenUri: (Uri) -> Unit
 ) {
     val postDetailsState by viewModel.post.collectAsState()
+    val comments by viewModel.comments.collectAsState()
+
     LazyColumn {
         when (val currentPostDetailsState = postDetailsState) {
             is PostDetails -> {
@@ -45,5 +54,18 @@ fun PostDetailsScreen(
                 )
             }
         }
+
+        items(comments) { item ->
+            Row(Modifier.fillMaxWidth()) {
+                Box(
+                    modifier = Modifier
+                        .background(MaterialTheme.colors.secondary)
+                        .fillMaxHeight()
+                        .width((8 * item.depth.value).dp)
+                )
+                Text(text = item.content.value, style = MaterialTheme.typography.body1)
+            }
+        }
+
     }
 }
