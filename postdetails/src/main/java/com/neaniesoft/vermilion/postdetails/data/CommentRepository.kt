@@ -42,7 +42,7 @@ class CommentRepositoryImpl @Inject constructor(
     override suspend fun getFlattenedCommentTreeForPost(postId: PostId): List<Comment> {
         val apiResponse = apiService.commentsForArticle(postId.value)
 
-        val commentRecords: List<CommentRecord> = apiResponse.getCommentRecords(clock)
+        val commentRecords: List<CommentRecord> = apiResponse[1].getCommentRecords(clock)
 
         val comments = database.withTransaction {
             dao.deleteAllForPost(postId.value)
@@ -85,6 +85,7 @@ fun CommentRecord.toComment(): Comment {
 
 fun CommentRecord.getFlags(): Set<CommentFlags> {
     return flags.split(",")
+        .filter { it.isNotEmpty() }
         .map { CommentFlags.valueOf(it) }
         .toSet()
 }
@@ -98,13 +99,13 @@ fun CommentResponse.getCommentRecords(clock: Clock): List<CommentRecord> {
 }
 
 fun CommentData.children(): List<CommentData> {
-    return if (replies.children.isEmpty()) {
+    return if (replies?.data?.children.isNullOrEmpty()) {
         listOf(this)
     } else {
-        replies.children.flatMap {
+        replies?.data?.children?.flatMap {
             (it as? CommentThing)?.data?.children()
                 ?: throw IllegalStateException("Should not be null here")
-        }
+        } ?: throw IllegalStateException("Should not be null here either")
     }
 }
 
@@ -115,7 +116,7 @@ fun CommentData.toCommentRecord(clock: Clock): CommentRecord {
         } else {
             null
         },
-        if (edited) {
+        if (edited > 0) {
             CommentFlags.EDITED
         } else {
             null

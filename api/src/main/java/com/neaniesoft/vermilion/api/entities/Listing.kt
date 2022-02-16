@@ -8,3 +8,7 @@ data class Listing(
     @JsonProperty("before") val before: String?,
     @JsonProperty("children") val children: List<Thing>
 )
+
+data class ListingResponse(
+    @JsonProperty("data") val data: Listing
+)

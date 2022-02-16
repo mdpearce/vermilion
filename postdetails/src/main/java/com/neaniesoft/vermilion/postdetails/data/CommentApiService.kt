@@ -15,7 +15,7 @@ import javax.inject.Named
 
 interface CommentApiService {
     @GET("/comments/{articleId}")
-    suspend fun commentsForArticle(@Path("articleId") articleId: String): CommentResponse
+    suspend fun commentsForArticle(@Path("articleId") articleId: String): Array<CommentResponse>
 }
 
 data class CommentResponse(
