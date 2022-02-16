@@ -21,8 +21,11 @@ class CommentRepositoryImpl @Inject constructor(
     private val apiService: CommentApiService,
     private val dao: CommentDao,
     private val clock: Clock
-) {
+) : CommentRepository {
     private val logger by logger()
+    override suspend fun getCommentTreeForPost(postId: PostId): List<CommentNode> {
+        TODO("Not yet implemented")
+    }
 }
 
 @Module
