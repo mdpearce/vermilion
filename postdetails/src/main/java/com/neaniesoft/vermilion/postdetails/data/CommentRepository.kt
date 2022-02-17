@@ -13,6 +13,7 @@ import com.neaniesoft.vermilion.postdetails.domain.entities.CommentDepth
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentFlags
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentId
 import com.neaniesoft.vermilion.postdetails.domain.entities.ControversialIndex
+import com.neaniesoft.vermilion.postdetails.domain.entities.DurationString
 import com.neaniesoft.vermilion.postdetails.domain.entities.UpVotesCount
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
@@ -20,8 +21,10 @@ import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.utils.logger
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import org.ocpsoft.prettytime.PrettyTime
 import java.time.Clock
 import java.time.Instant
 import javax.inject.Inject
@@ -36,7 +39,8 @@ class CommentRepositoryImpl @Inject constructor(
     private val apiService: CommentApiService,
     private val database: VermilionDatabase,
     private val dao: CommentDao,
-    private val clock: Clock
+    private val clock: Clock,
+    private val prettyTime: PrettyTime
 ) : CommentRepository {
     private val logger by logger()
     override suspend fun getFlattenedCommentTreeForPost(postId: PostId): List<Comment> {
@@ -62,17 +66,18 @@ class CommentRepositoryImpl @Inject constructor(
             dao.getAllForPost(postId.value)
         }
 
-        return comments.map { it.toComment() }
+        return comments.map { it.toComment(prettyTime) }
     }
 }
 
-fun CommentRecord.toComment(): Comment {
+fun CommentRecord.toComment(prettyTime: PrettyTime): Comment {
     return Comment(
         id = CommentId(commentId),
         content = CommentContent(body),
         flags = getFlags(),
         authorName = AuthorName(author),
         createdAt = Instant.ofEpochMilli(createdAt),
+        createdAtDurationString = createdAt.formatDuration(prettyTime),
         score = Score(score),
         link = link.toUri(),
         postId = PostId(postId),
@@ -81,6 +86,17 @@ fun CommentRecord.toComment(): Comment {
         upVotes = UpVotesCount(upVotes),
         parentId = parentId?.let { CommentId(it) }
     )
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+class PrettyTimeModule {
+    @Provides
+    fun providePrettyTime(): PrettyTime = PrettyTime()
+}
+
+fun Long.formatDuration(prettyTime: PrettyTime): DurationString {
+    return DurationString(prettyTime.format(Instant.ofEpochSecond(this)))
 }
 
 fun CommentRecord.getFlags(): Set<CommentFlags> {

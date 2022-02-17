@@ -12,6 +12,7 @@ data class Comment(
     val flags: Set<CommentFlags>,
     val authorName: AuthorName,
     val createdAt: Instant,
+    val createdAtDurationString: DurationString,
     val score: Score,
     val link: Uri,
     val postId: PostId,
@@ -20,6 +21,9 @@ data class Comment(
     val upVotes: UpVotesCount,
     val parentId: CommentId?,
 )
+
+@JvmInline
+value class DurationString(val value: String)
 
 @JvmInline
 value class UpVotesCount(val value: Int)
