@@ -31,6 +31,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.posts.domain.entities.TextPostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.UriImage
 import com.neaniesoft.vermilion.posts.domain.entities.VideoPostSummary
+import com.neaniesoft.vermilion.posts.domain.entities.isNsfw
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import java.net.URL
 import java.time.Instant
@@ -62,14 +63,16 @@ fun PostSummary(
             is ImagePostSummary -> {
                 ImageSummary(
                     image = summary.preview ?: UriImage("".toUri(), 0, 0),
-                    shouldTruncate
+                    isNsfw = post.isNsfw(),
+                    shouldTruncate = shouldTruncate
                 ) { onMediaClicked(post) }
             }
             is LinkPostSummary -> TODO()
             is VideoPostSummary -> {
                 VideoSummary(
                     image = summary.preview ?: UriImage("".toUri(), 0, 0),
-                    shouldTruncate
+                    isNsfw = post.isNsfw(),
+                    shouldTruncate = shouldTruncate
                 ) { onMediaClicked(post) }
             }
         }
