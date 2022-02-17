@@ -1,14 +1,5 @@
 @file:Suppress("UnstableApiUsage")
 
-include(":postdetails")
-
-
-include(":dbentities")
-
-
-include(":db")
-
-
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -26,3 +17,6 @@ include(":api")
 include(":auth")
 include(":accounts")
 include(":utils")
+include(":postdetails")
+include(":db")
+include(":dbentities")
