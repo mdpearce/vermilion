@@ -42,7 +42,7 @@ data class CommentData(
     @JsonProperty("created_utc") val createdUtc: Double,
     @JsonProperty("parent_id") val parentId: String,
     @JsonProperty("score") val score: Int,
-    @JsonProperty("author_fullname") val authorFullname: String,
+    @JsonProperty("author_fullname") val authorFullname: String?,
     @JsonProperty("body") val body: String,
     @JsonProperty("edited") val edited: Double,
     @JsonProperty("name") val name: String,
@@ -54,7 +54,15 @@ data class CommentData(
     @JsonProperty("link_id") val linkId: String,
     @JsonProperty("controversiality") val controversiality: Int,
     @JsonProperty("depth") val depth: Int,
-    @JsonProperty("ups") val ups: Int
+    @JsonProperty("ups") val ups: Int,
+    @JsonProperty("collapsed") val collapsed: Boolean
 ) : ThingData()
 
-
+data class MoreCommentsData(
+    @JsonProperty("count") val count: Int,
+    @JsonProperty("name") val name: String,
+    @JsonProperty("id") val id: String,
+    @JsonProperty("parent_id") val parentId: String,
+    @JsonProperty("depth") val depth: Int,
+    @JsonProperty("children") val children: List<String>
+) : ThingData()

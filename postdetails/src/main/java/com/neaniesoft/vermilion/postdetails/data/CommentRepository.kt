@@ -99,13 +99,14 @@ fun CommentResponse.getCommentRecords(clock: Clock): List<CommentRecord> {
 }
 
 fun CommentData.children(): List<CommentData> {
-    return if (replies?.data?.children.isNullOrEmpty()) {
+    val children = replies?.data?.children
+
+    return if (children.isNullOrEmpty()) {
         listOf(this)
     } else {
-        replies?.data?.children?.flatMap {
-            (it as? CommentThing)?.data?.children()
-                ?: throw IllegalStateException("Should not be null here")
-        } ?: throw IllegalStateException("Should not be null here either")
+        listOf(this) + children.filterIsInstance<CommentThing>().flatMap {
+            it.data.children()
+        }
     }
 }
 

@@ -3,6 +3,7 @@ package com.neaniesoft.vermilion.postdetails
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -56,14 +57,19 @@ fun PostDetailsScreen(
         }
 
         items(comments) { item ->
-            Row(Modifier.fillMaxWidth()) {
-                Box(
-                    modifier = Modifier
-                        .background(MaterialTheme.colors.secondary)
-                        .fillMaxHeight()
-                        .width((8 * item.depth.value).dp)
-                )
-                Text(text = item.content.value, style = MaterialTheme.typography.body1)
+            Column(Modifier.fillMaxWidth()) {
+
+                Row(Modifier.fillMaxWidth()) {
+                    Box(
+                        modifier = Modifier
+                            .background(MaterialTheme.colors.secondary)
+                            .fillMaxHeight()
+                            .width((8 * item.depth.value).dp)
+                    )
+                    Text(text = item.content.value, style = MaterialTheme.typography.body1)
+                }
+
+                Box(Modifier.fillMaxWidth().height(1.dp).background(MaterialTheme.colors.onBackground))
             }
         }
 
