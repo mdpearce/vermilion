@@ -64,7 +64,7 @@ fun PostSummary(
             is ImagePostSummary -> {
                 ImageSummary(
                     image = summary.preview ?: UriImage("".toUri(), 0, 0),
-                    isNsfw = if (shouldHideNsfw) {post.isNsfw() } else { false },
+                    isNsfw = if (shouldHideNsfw) { post.isNsfw() } else { false },
                     shouldTruncate = shouldTruncate
                 ) { onMediaClicked(post) }
             }
@@ -72,7 +72,7 @@ fun PostSummary(
             is VideoPostSummary -> {
                 VideoSummary(
                     image = summary.preview ?: UriImage("".toUri(), 0, 0),
-                    isNsfw = if (shouldHideNsfw) {post.isNsfw() } else { false },
+                    isNsfw = if (shouldHideNsfw) { post.isNsfw() } else { false },
                     shouldTruncate = shouldTruncate
                 ) { onMediaClicked(post) }
             }
