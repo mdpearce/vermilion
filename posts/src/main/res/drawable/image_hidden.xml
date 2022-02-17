@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:height="192dp"
+        android:width="256dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/vermilion700" />
+        </shape>
+    </item>
+    <item
+        android:drawable="@drawable/ic_baseline_visibility_off_24"
+        android:height="48dp"
+        android:width="48dp"
+        android:gravity="center" />
+</layer-list>

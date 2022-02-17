@@ -6,4 +6,5 @@
     <string name="post_card_comment_count_many">%1$d comments</string>
     <string name="error_loading_posts_message">An error occurred while loading posts from Reddit.</string>
     <string name="error_retry">Try again</string>
+    <string name="nsfw_content_description">Hidden preview image</string>
 </resources>

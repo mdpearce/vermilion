@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="vermilion200">#FFE8A2A7</color>
+    <color name="vermilion400">#FFE86469</color>
+    <color name="vermilion500">#FFED5755</color>
+    <color name="vermilion700">#FFCC474B</color>
+
+    <color name="teal100">#FF9BE0DE</color>
+    <color name="teal200">#FF47CCC8</color>
+    <color name="teal400">#FF00A59C</color>
+
+    <color name="pink400">#FFCC478E</color>
+    <color name="orange900">#FFCC8547</color>
+    <color name="green400">#FF4BCC47</color>
+
+</resources>
