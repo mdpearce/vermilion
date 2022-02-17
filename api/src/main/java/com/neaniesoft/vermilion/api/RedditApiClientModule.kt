@@ -3,16 +3,12 @@ package com.neaniesoft.vermilion.api
 import android.content.Context
 import android.content.pm.PackageManager
 import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.neaniesoft.vermilion.api.entities.Listing
-import com.neaniesoft.vermilion.api.entities.Thing
 import com.neaniesoft.vermilion.api.interceptors.AuthorizationInterceptor
 import com.neaniesoft.vermilion.api.interceptors.BasicAuthorizationInterceptor
 import com.neaniesoft.vermilion.auth.http.AccessTokenService
@@ -178,22 +174,3 @@ class BooleanDoubleCoercingDeserializer : StdDeserializer<Double>(Double::class.
         return p.valueAsDouble
     }
 }
-//
-// class ListingOrEmptyStringDeserializer : StdDeserializer<Listing?>(Listing::class.java) {
-//     override fun deserialize(p: JsonParser, ctxt: DeserializationContext): Listing? {
-//         // val mapper = p.codec as ObjectMapper
-//
-//         val root = p.readValueAsTree<JsonNode>()
-//
-//         if (root.isEmpty) {
-//             return null
-//         } else {
-//             return Listing(
-//                 root.get("after").textValue(),
-//                 root.get("before").textValue(),
-//                 root.get("children").traverse()
-//                     .readValueAs(object : TypeReference<List<Thing>>() {})
-//             )
-//         }
-//     }
-// }
