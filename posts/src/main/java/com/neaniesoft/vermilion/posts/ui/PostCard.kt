@@ -31,6 +31,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.posts.domain.entities.TextPostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.UriImage
 import com.neaniesoft.vermilion.posts.domain.entities.VideoPostSummary
+import com.neaniesoft.vermilion.posts.domain.entities.isNsfw
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import java.net.URL
 import java.time.Instant
@@ -43,7 +44,7 @@ fun PostCard(
     modifier: Modifier = Modifier
 ) {
     Card(elevation = 16.dp, modifier = modifier.clickable { onClick(post) }) {
-        PostSummary(post = post, modifier = modifier, shouldTruncate = true, onMediaClicked)
+        PostSummary(post = post, modifier = modifier, shouldTruncate = true, shouldHideNsfw = true, onMediaClicked)
     }
 }
 
@@ -52,6 +53,7 @@ fun PostSummary(
     post: Post,
     modifier: Modifier = Modifier,
     shouldTruncate: Boolean,
+    shouldHideNsfw: Boolean,
     onMediaClicked: (Post) -> Unit
 ) {
     Column(modifier = modifier.padding(16.dp)) {
@@ -62,14 +64,16 @@ fun PostSummary(
             is ImagePostSummary -> {
                 ImageSummary(
                     image = summary.preview ?: UriImage("".toUri(), 0, 0),
-                    shouldTruncate
+                    isNsfw = if (shouldHideNsfw) { post.isNsfw() } else { false },
+                    shouldTruncate = shouldTruncate
                 ) { onMediaClicked(post) }
             }
             is LinkPostSummary -> TODO()
             is VideoPostSummary -> {
                 VideoSummary(
                     image = summary.preview ?: UriImage("".toUri(), 0, 0),
-                    shouldTruncate
+                    isNsfw = if (shouldHideNsfw) { post.isNsfw() } else { false },
+                    shouldTruncate = shouldTruncate
                 ) { onMediaClicked(post) }
             }
         }
