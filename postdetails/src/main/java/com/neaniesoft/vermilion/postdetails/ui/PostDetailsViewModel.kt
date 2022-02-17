@@ -58,7 +58,9 @@ class PostDetailsViewModel @Inject constructor(
         viewModelScope.launch {
             val comments = commentRepository.getFlattenedCommentTreeForPost(id)
 
-            _comments.emit(comments)
+            comments.collect {
+                _comments.emit(it)
+            }
         }
     }
 }
