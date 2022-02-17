@@ -44,7 +44,7 @@ fun PostCard(
     modifier: Modifier = Modifier
 ) {
     Card(elevation = 16.dp, modifier = modifier.clickable { onClick(post) }) {
-        PostSummary(post = post, modifier = modifier, shouldTruncate = true, onMediaClicked)
+        PostSummary(post = post, modifier = modifier, shouldTruncate = true, shouldHideNsfw = true, onMediaClicked)
     }
 }
 
@@ -53,6 +53,7 @@ fun PostSummary(
     post: Post,
     modifier: Modifier = Modifier,
     shouldTruncate: Boolean,
+    shouldHideNsfw: Boolean,
     onMediaClicked: (Post) -> Unit
 ) {
     Column(modifier = modifier.padding(16.dp)) {
@@ -63,7 +64,7 @@ fun PostSummary(
             is ImagePostSummary -> {
                 ImageSummary(
                     image = summary.preview ?: UriImage("".toUri(), 0, 0),
-                    isNsfw = post.isNsfw(),
+                    isNsfw = if (shouldHideNsfw) {post.isNsfw() } else { false },
                     shouldTruncate = shouldTruncate
                 ) { onMediaClicked(post) }
             }
@@ -71,7 +72,7 @@ fun PostSummary(
             is VideoPostSummary -> {
                 VideoSummary(
                     image = summary.preview ?: UriImage("".toUri(), 0, 0),
-                    isNsfw = post.isNsfw(),
+                    isNsfw = if (shouldHideNsfw) {post.isNsfw() } else { false },
                     shouldTruncate = shouldTruncate
                 ) { onMediaClicked(post) }
             }
