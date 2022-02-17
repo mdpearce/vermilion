@@ -37,7 +37,7 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
             "${VermilionScreen.PostDetails.name}/{id}",
             arguments = listOf(navArgument("id") { type = NavType.StringType })
         ) {
-            PostDetailsScreen() {
+            PostDetailsScreen {
                 navController.navigate(customTabRoute(it))
             }
         }
