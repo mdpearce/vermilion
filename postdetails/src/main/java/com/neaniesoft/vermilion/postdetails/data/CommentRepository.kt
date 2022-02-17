@@ -21,14 +21,17 @@ import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.utils.logger
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import org.ocpsoft.prettytime.PrettyTime
 import java.time.Clock
+import java.time.Duration
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 
 interface CommentRepository {
-    suspend fun getFlattenedCommentTreeForPost(postId: PostId): List<Comment>
+    suspend fun getFlattenedCommentTreeForPost(postId: PostId): Flow<List<Comment>>
 }
 
 @Singleton
@@ -39,32 +42,51 @@ class CommentRepositoryImpl @Inject constructor(
     private val clock: Clock,
     private val prettyTime: PrettyTime
 ) : CommentRepository {
+    companion object {
+        private val CACHE_VALID_DURATION = Duration.ofMinutes(1)
+    }
+
     private val logger by logger()
-    override suspend fun getFlattenedCommentTreeForPost(postId: PostId): List<Comment> {
-        val apiResponse = apiService.commentsForArticle(postId.value)
-
-        val commentRecords: List<CommentRecord> = apiResponse[1].getCommentRecords(clock)
-
-        val comments = database.withTransaction {
-            dao.deleteAllForPost(postId.value)
-
-            commentRecords.forEach { record ->
-                dao.insertAll(record)
-                val parentId = record.parentId
-                val parentPath = if (parentId != null) {
-                    dao.getPathForComment(parentId) + "/"
-                } else {
-                    ""
-                }
-                val updatedRecord = record.copy(path = "$parentPath${record.id}")
-                dao.update(updatedRecord)
+    override suspend fun getFlattenedCommentTreeForPost(postId: PostId): Flow<List<Comment>> =
+        flow {
+            val lastInsertedAtTime = database.withTransaction {
+                dao.getLastInsertedAtForPost(postId.value)
             }
 
-            dao.getAllForPost(postId.value)
-        }
+            if (lastInsertedAtTime != null && lastInsertedAtTime >= clock.millis() - CACHE_VALID_DURATION.toMillis()) {
+                // Cache is valid, let's just return the database records
+                emit(dao.getAllForPost(postId.value).map { it.toComment(prettyTime) })
+            } else {
+                // Cache is invalid. First, let's return it so we have something to display
+                emit(dao.getAllForPost(postId.value).map { it.toComment(prettyTime) })
 
-        return comments.map { it.toComment(prettyTime) }
-    }
+                // Then, fetch new comments from the API
+                val apiResponse = apiService.commentsForArticle(postId.value)
+                val newCommentRecords: List<CommentRecord> = apiResponse[1].getCommentRecords(clock)
+
+                // Finally, delete the old entries and insert the new ones and then return the new ones from the DAO
+                val newComments = database.withTransaction {
+                    dao.deleteAllForPost(postId.value)
+
+                    newCommentRecords.forEach { record ->
+                        dao.insertAll(record)
+                        val parentId = record.parentId
+                        val parentPath = if (parentId != null) {
+                            dao.getPathForComment(parentId) + "/"
+                        } else {
+                            ""
+                        }
+                        val updatedRecord = record.copy(path = "$parentPath${record.id}")
+                        dao.update(updatedRecord)
+                    }
+
+                    dao.getAllForPost(postId.value)
+                }
+
+                // Now, emit the new comments
+                emit(newComments.map { it.toComment(prettyTime) })
+            }
+        }
 }
 
 private fun CommentRecord.toComment(prettyTime: PrettyTime): Comment {
