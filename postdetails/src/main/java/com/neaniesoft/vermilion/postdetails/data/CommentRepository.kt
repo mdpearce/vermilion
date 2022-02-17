@@ -21,11 +21,6 @@ import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.utils.logger
-import dagger.Binds
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
 import org.ocpsoft.prettytime.PrettyTime
 import java.time.Clock
 import java.time.Instant
@@ -72,7 +67,7 @@ class CommentRepositoryImpl @Inject constructor(
     }
 }
 
-fun CommentRecord.toComment(prettyTime: PrettyTime): Comment {
+private fun CommentRecord.toComment(prettyTime: PrettyTime): Comment {
     return Comment(
         id = CommentId(commentId),
         content = CommentContent(body),
@@ -90,25 +85,18 @@ fun CommentRecord.toComment(prettyTime: PrettyTime): Comment {
     )
 }
 
-@Module
-@InstallIn(SingletonComponent::class)
-class PrettyTimeModule {
-    @Provides
-    fun providePrettyTime(): PrettyTime = PrettyTime()
-}
-
-fun Long.formatDuration(prettyTime: PrettyTime): DurationString {
+private fun Long.formatDuration(prettyTime: PrettyTime): DurationString {
     return DurationString(prettyTime.format(Instant.ofEpochSecond(this)))
 }
 
-fun CommentRecord.getFlags(): Set<CommentFlags> {
+private fun CommentRecord.getFlags(): Set<CommentFlags> {
     return flags.split(",")
         .filter { it.isNotEmpty() }
         .map { CommentFlags.valueOf(it) }
         .toSet()
 }
 
-fun CommentResponse.getCommentRecords(clock: Clock): List<CommentRecord> {
+private fun CommentResponse.getCommentRecords(clock: Clock): List<CommentRecord> {
     val comments = this.data.children.mapNotNull {
         (it as? CommentThing)?.data
     }.flatMap { it.children() }
@@ -116,7 +104,8 @@ fun CommentResponse.getCommentRecords(clock: Clock): List<CommentRecord> {
     return comments
 }
 
-fun CommentData.children(): List<CommentData> {
+// Naive depth-first traversal of the comment tree
+private fun CommentData.children(): List<CommentData> {
     val children = replies?.data?.children
 
     return if (children.isNullOrEmpty()) {
@@ -128,8 +117,8 @@ fun CommentData.children(): List<CommentData> {
     }
 }
 
-fun CommentData.toCommentRecord(clock: Clock): CommentRecord {
-    val flags = listOfNotNull<CommentFlags>(
+private fun CommentData.toCommentRecord(clock: Clock): CommentRecord {
+    val flags = listOfNotNull(
         if (saved) {
             CommentFlags.SAVED
         } else {
@@ -181,9 +170,3 @@ fun CommentData.toCommentRecord(clock: Clock): CommentRecord {
     )
 }
 
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class CommentRepositoryModule {
-    @Binds
-    abstract fun provideCommentRepository(impl: CommentRepositoryImpl): CommentRepository
-}
