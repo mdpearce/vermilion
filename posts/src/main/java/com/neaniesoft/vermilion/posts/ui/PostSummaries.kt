@@ -37,6 +37,8 @@ private const val MIN_RATIO = 1.0f
 fun ImageSummary(image: UriImage, shouldTruncate: Boolean, isNsfw: Boolean, onClick: () -> Unit) {
     if (isNsfw) {
         Image(
+            modifier = Modifier.fillMaxWidth(),
+            contentScale = ContentScale.FillWidth,
             painter = painterResource(id = R.drawable.image_hidden),
             contentDescription = stringResource(
                 id = R.string.nsfw_content_description
