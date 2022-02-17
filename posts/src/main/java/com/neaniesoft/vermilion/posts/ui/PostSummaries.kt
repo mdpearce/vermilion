@@ -10,6 +10,8 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import coil.compose.rememberImagePainter
 import com.neaniesoft.vermilion.posts.R
@@ -32,29 +34,42 @@ fun TextSummary(content: String, shouldTruncate: Boolean) {
 private const val MIN_RATIO = 1.0f
 
 @Composable
-fun ImageSummary(image: UriImage, shouldTruncate: Boolean, onClick: () -> Unit) {
-    val painter = rememberImagePainter(image.uri.toString()) {
-        placeholder(R.drawable.image_placeholder)
-    }
-
-    BoxWithConstraints(Modifier.fillMaxWidth()) {
-        val ratio = if (shouldTruncate) {
-            kotlin.math.max((image.width.toFloat() / image.height.toFloat()), MIN_RATIO)
-        } else {
-            image.width.toFloat() / image.height.toFloat()
-        }
+fun ImageSummary(image: UriImage, shouldTruncate: Boolean, isNsfw: Boolean, onClick: () -> Unit) {
+    if (isNsfw) {
         Image(
             modifier = Modifier
-                .size(maxWidth, maxWidth.div(ratio))
+                .fillMaxWidth()
                 .clickable { onClick() },
-            painter = painter,
-            contentDescription = "",
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.FillWidth,
+            painter = painterResource(id = R.drawable.image_hidden),
+            contentDescription = stringResource(
+                id = R.string.nsfw_content_description
+            )
         )
+    } else {
+        val painter = rememberImagePainter(image.uri.toString()) {
+            placeholder(R.drawable.image_placeholder)
+        }
+
+        BoxWithConstraints(Modifier.fillMaxWidth()) {
+            val ratio = if (shouldTruncate) {
+                kotlin.math.max((image.width.toFloat() / image.height.toFloat()), MIN_RATIO)
+            } else {
+                image.width.toFloat() / image.height.toFloat()
+            }
+            Image(
+                modifier = Modifier
+                    .size(maxWidth, maxWidth.div(ratio))
+                    .clickable { onClick() },
+                painter = painter,
+                contentDescription = "",
+                contentScale = ContentScale.Crop
+            )
+        }
     }
 }
 
 @Composable
-fun VideoSummary(image: UriImage, shouldTruncate: Boolean, onClick: () -> Unit) {
-    ImageSummary(image = image, shouldTruncate, onClick)
+fun VideoSummary(image: UriImage, shouldTruncate: Boolean, isNsfw: Boolean, onClick: () -> Unit) {
+    ImageSummary(image = image, shouldTruncate, isNsfw, onClick)
 }

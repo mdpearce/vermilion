@@ -39,6 +39,7 @@ fun PostDetailsScreen(
                             PostSummary(
                                 post = currentPostDetailsState.post,
                                 shouldTruncate = false,
+                                shouldHideNsfw = false,
                                 onMediaClicked = { onOpenUri(it.link.toString().toUri()) }
                             )
                         }

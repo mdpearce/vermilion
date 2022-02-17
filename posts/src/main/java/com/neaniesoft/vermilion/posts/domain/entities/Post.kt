@@ -16,3 +16,5 @@ data class Post(
     val flags: Set<PostFlags>,
     val link: URL
 )
+
+fun Post.isNsfw(): Boolean = flags.contains(PostFlags.NSFW)
