@@ -21,30 +21,3 @@ data class Comment(
     val upVotes: UpVotesCount,
     val parentId: CommentId?,
 )
-
-@JvmInline
-value class DurationString(val value: String)
-
-@JvmInline
-value class UpVotesCount(val value: Int)
-
-@JvmInline
-value class ControversialIndex(val value: Int)
-
-@JvmInline
-value class CommentDepth(val value: Int)
-
-@JvmInline
-value class CommentId(val value: String)
-
-@JvmInline
-value class CommentContent(val value: String)
-
-enum class CommentFlags {
-    SAVED,
-    EDITED,
-    IS_OP,
-    STICKIED,
-    SCORE_HIDDEN,
-    LOCKED
-}
