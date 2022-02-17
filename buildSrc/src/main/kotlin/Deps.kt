@@ -1,5 +1,5 @@
 object Deps {
-    const val HILT_COMPILER = "com.google.dagger:hilt-compiler:2.40.5"
+    const val HILT_COMPILER = "com.google.dagger:hilt-compiler:2.41"
     const val HILT_ANDROID = "com.google.dagger:hilt-android:2.40.5"
     const val HILT_ANDROID_TESTING = "com.google.dagger:hilt-android-testing:2.41"
     const val LIFECYCLE_VIEWMODEL_COMPOSE = "androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0-alpha01"
