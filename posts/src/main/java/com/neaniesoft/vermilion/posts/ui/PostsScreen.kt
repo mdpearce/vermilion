@@ -31,6 +31,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import com.neaniesoft.vermilion.posts.R
 import com.neaniesoft.vermilion.posts.domain.entities.Post
+import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.ui.theme.Vermilion500
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import kotlinx.coroutines.flow.flowOf
@@ -39,27 +40,31 @@ import kotlinx.coroutines.flow.flowOf
 @Composable
 fun PostsScreen(
     viewModel: PostsViewModel = hiltViewModel(),
+    onOpenPostDetails: (postId: PostId) -> Unit,
     onOpenUri: (uri: Uri) -> Unit
 ) {
     val pagingItems = viewModel.pageFlow.collectAsLazyPagingItems()
 
     Box {
-        PostsList(posts = pagingItems) { post ->
-            onOpenUri(post.link.toString().toUri())
-        }
+        PostsList(posts = pagingItems, onMediaClicked = {
+            onOpenUri(it.link.toString().toUri())
+        }, onPostClicked = { post ->
+            onOpenPostDetails(post.id)
+        })
     }
 }
 
 @Composable
 fun PostsList(
     posts: LazyPagingItems<Post>,
-    onPostClicked: (Post) -> Unit
+    onPostClicked: (Post) -> Unit,
+    onMediaClicked: (Post) -> Unit
 ) {
     LazyColumn {
         items(posts) { post ->
             Spacer(Modifier.height(12.dp))
             if (post != null) {
-                PostCard(post = post, onPostClicked)
+                PostCard(post = post, onPostClicked, onMediaClicked)
             } else {
                 PostCardPlaceholder()
             }
@@ -177,7 +182,8 @@ fun PostsScreenPreview() {
                         DUMMY_TEXT_POST
                     )
                 )
-            ).collectAsLazyPagingItems()
+            ).collectAsLazyPagingItems(),
+            {}
         ) {}
     }
 }
@@ -194,7 +200,8 @@ fun PostsScreenPreviewDark() {
                         DUMMY_TEXT_POST
                     )
                 )
-            ).collectAsLazyPagingItems()
+            ).collectAsLazyPagingItems(),
+            {}
         ) {}
     }
 }

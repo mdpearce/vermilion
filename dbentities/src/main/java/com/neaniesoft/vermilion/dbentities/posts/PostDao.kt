@@ -18,4 +18,7 @@ interface PostDao {
 
     @Query("SELECT insertedAt FROM posts WHERE `query` == :query ORDER BY insertedAt DESC LIMIT 1")
     suspend fun lastUpdatedAt(query: String): Long?
+
+    @Query("SELECT * from posts WHERE `postId` == :postId ORDER BY insertedAt DESC LIMIT 1")
+    suspend fun postWithId(postId: String): PostRecord?
 }

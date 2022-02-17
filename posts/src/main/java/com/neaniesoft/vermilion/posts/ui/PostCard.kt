@@ -36,58 +36,79 @@ import java.net.URL
 import java.time.Instant
 
 @Composable
-fun PostCard(post: Post, onClick: (Post) -> Unit, modifier: Modifier = Modifier) {
+fun PostCard(
+    post: Post,
+    onClick: (Post) -> Unit,
+    onMediaClicked: (Post) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Card(elevation = 16.dp, modifier = modifier.clickable { onClick(post) }) {
-        Column(modifier = modifier.padding(16.dp)) {
-            when (val summary = post.summary) {
-                is TextPostSummary -> {
-                    TextSummary(content = summary.previewText.value)
-                }
-                is ImagePostSummary -> {
-                    ImageSummary(image = summary.preview ?: UriImage("".toUri(), 0, 0))
-                }
-                is LinkPostSummary -> TODO()
-                is VideoPostSummary -> {
-                    VideoSummary(image = summary.preview ?: UriImage("".toUri(), 0, 0))
-                }
+        PostSummary(post = post, modifier = modifier, shouldTruncate = true, onMediaClicked)
+    }
+}
+
+@Composable
+fun PostSummary(
+    post: Post,
+    modifier: Modifier = Modifier,
+    shouldTruncate: Boolean,
+    onMediaClicked: (Post) -> Unit
+) {
+    Column(modifier = modifier.padding(16.dp)) {
+        when (val summary = post.summary) {
+            is TextPostSummary -> {
+                TextSummary(content = summary.previewText.value, shouldTruncate)
+            }
+            is ImagePostSummary -> {
+                ImageSummary(
+                    image = summary.preview ?: UriImage("".toUri(), 0, 0),
+                    shouldTruncate
+                ) { onMediaClicked(post) }
+            }
+            is LinkPostSummary -> TODO()
+            is VideoPostSummary -> {
+                VideoSummary(
+                    image = summary.preview ?: UriImage("".toUri(), 0, 0),
+                    shouldTruncate
+                ) { onMediaClicked(post) }
+            }
+        }
+        Text(
+            text = post.title.value,
+            style = MaterialTheme.typography.h6,
+            modifier = Modifier.padding(top = 8.dp)
+        )
+        Row(
+            horizontalArrangement = Arrangement.End,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp)
+        ) {
+            Text(
+                text = if (post.community is NamedCommunity) {
+                    post.community.name.value
+                } else {
+                    ""
+                },
+                style = MaterialTheme.typography.caption
+            )
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            val commentString = when (val count = post.commentCount.value) {
+                0 -> stringResource(id = R.string.post_card_comment_count_0)
+                1 -> stringResource(id = R.string.post_card_comment_count_1)
+                else -> stringResource(id = R.string.post_card_comment_count_many, count)
             }
             Text(
-                text = post.title.value,
-                style = MaterialTheme.typography.h6,
-                modifier = Modifier.padding(top = 8.dp)
+                text = commentString,
+                style = MaterialTheme.typography.caption
             )
-            Row(
-                horizontalArrangement = Arrangement.End,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp)
-            ) {
-                Text(
-                    text = if (post.community is NamedCommunity) {
-                        post.community.name.value
-                    } else {
-                        ""
-                    },
-                    style = MaterialTheme.typography.caption
-                )
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                val commentString = when (val count = post.commentCount.value) {
-                    0 -> stringResource(id = R.string.post_card_comment_count_0)
-                    1 -> stringResource(id = R.string.post_card_comment_count_1)
-                    else -> stringResource(id = R.string.post_card_comment_count_many, count)
-                }
-                Text(
-                    text = commentString,
-                    style = MaterialTheme.typography.caption
-                )
-                Text(text = post.score.value.toString(), style = MaterialTheme.typography.caption)
-            }
+            Text(text = post.score.value.toString(), style = MaterialTheme.typography.caption)
         }
     }
 }
@@ -107,7 +128,7 @@ fun PostCardPlaceholder() {
 @Composable
 fun PostCardPreview() {
     VermilionTheme {
-        PostCard(post = DUMMY_TEXT_POST, {})
+        PostCard(post = DUMMY_TEXT_POST, {}, {})
     }
 }
 

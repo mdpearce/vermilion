@@ -1,10 +1,13 @@
-package com.neaniesoft.vermilion.posts.data.entities
+package com.neaniesoft.vermilion.api.entities
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.neaniesoft.vermilion.api.entities.Thing
 
-data class ListingResponse(
+data class Listing(
     @JsonProperty("after") val after: String?,
     @JsonProperty("before") val before: String?,
     @JsonProperty("children") val children: List<Thing>
+)
+
+data class ListingResponse(
+    @JsonProperty("data") val data: Listing
 )

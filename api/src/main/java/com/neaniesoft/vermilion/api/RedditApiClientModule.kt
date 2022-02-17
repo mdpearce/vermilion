@@ -2,8 +2,12 @@ package com.neaniesoft.vermilion.api
 
 import android.content.Context
 import android.content.pm.PackageManager
+import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer
+import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.neaniesoft.vermilion.api.interceptors.AuthorizationInterceptor
 import com.neaniesoft.vermilion.api.interceptors.BasicAuthorizationInterceptor
@@ -106,13 +110,21 @@ class RedditApiClientModule {
         OkHttpClient.Builder()
             .addInterceptor(userAgentInterceptor)
             .addInterceptor(authInterceptor)
-            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS))
+            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
             .build()
 
     @Provides
     fun provideJacksonObjectMapper(): ObjectMapper =
         ObjectMapper().registerModule(KotlinModule.Builder().build())
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true)
+            .configure(DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
+            .registerModule(
+                SimpleModule().addDeserializer(
+                    Double::class.java,
+                    BooleanDoubleCoercingDeserializer()
+                )
+            )
 
     @Provides
     fun provideJacksonConverterFactory(objectMapper: ObjectMapper): Converter.Factory =
@@ -155,4 +167,10 @@ class RedditApiClientModule {
     @Provides
     @Named(DEVELOPER)
     fun provideDeveloperName(): String = "NeaniesoftMichael"
+}
+
+class BooleanDoubleCoercingDeserializer : StdDeserializer<Double>(Double::class.java) {
+    override fun deserialize(p: JsonParser, ctxt: DeserializationContext): Double {
+        return p.valueAsDouble
+    }
 }
