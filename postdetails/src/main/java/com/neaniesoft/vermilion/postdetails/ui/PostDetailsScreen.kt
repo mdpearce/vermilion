@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -23,36 +25,47 @@ fun PostDetailsScreen(
     val postDetailsState by viewModel.post.collectAsState()
     val comments by viewModel.comments.collectAsState()
 
-    LazyColumn {
-        when (val currentPostDetailsState = postDetailsState) {
-            is PostDetails -> {
-                item {
-                    PostSummary(
-                        post = currentPostDetailsState.post,
-                        shouldTruncate = false,
-                        shouldHideNsfw = false,
-                        onMediaClicked = { onOpenUri(it.link.toString().toUri()) }
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        color = MaterialTheme.colors.surface,
+        elevation = 1.dp
+    ) {
+
+        LazyColumn {
+            when (val currentPostDetailsState = postDetailsState) {
+                is PostDetails -> {
+                    item {
+                        Surface(modifier = Modifier.fillMaxWidth(), elevation = 24.dp) {
+                            PostSummary(
+                                post = currentPostDetailsState.post,
+                                shouldTruncate = false,
+                                shouldHideNsfw = false,
+                                onMediaClicked = { onOpenUri(it.link.toString().toUri()) }
+                            )
+                        }
+                    }
+                }
+                Empty -> item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                    )
+                }
+                Error -> item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
                     )
                 }
             }
-            Empty -> item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                )
-            }
-            Error -> item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                )
-            }
-        }
 
-        items(comments) { item ->
-            CommentRow(comment = item, Modifier.fillMaxWidth())
+            items(comments) { item ->
+                Surface(elevation = 8.dp) {
+                    CommentRow(comment = item, Modifier.fillMaxWidth())
+                }
+            }
         }
     }
 }
