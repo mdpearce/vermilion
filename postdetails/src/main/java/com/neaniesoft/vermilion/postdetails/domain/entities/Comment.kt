@@ -1,4 +1,4 @@
-package com.neaniesoft.vermilion.postdetails
+package com.neaniesoft.vermilion.postdetails.domain.entities
 
 import android.net.Uri
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
