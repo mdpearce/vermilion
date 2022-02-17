@@ -7,6 +7,8 @@ import com.neaniesoft.vermilion.api.entities.CommentThing
 import com.neaniesoft.vermilion.db.VermilionDatabase
 import com.neaniesoft.vermilion.dbentities.comments.CommentDao
 import com.neaniesoft.vermilion.dbentities.comments.CommentRecord
+import com.neaniesoft.vermilion.postdetails.data.http.CommentApiService
+import com.neaniesoft.vermilion.postdetails.data.http.CommentResponse
 import com.neaniesoft.vermilion.postdetails.domain.entities.Comment
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentContent
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentDepth
@@ -15,8 +17,6 @@ import com.neaniesoft.vermilion.postdetails.domain.entities.CommentId
 import com.neaniesoft.vermilion.postdetails.domain.entities.ControversialIndex
 import com.neaniesoft.vermilion.postdetails.domain.entities.DurationString
 import com.neaniesoft.vermilion.postdetails.domain.entities.UpVotesCount
-import com.neaniesoft.vermilion.postdetails.data.http.CommentApiService
-import com.neaniesoft.vermilion.postdetails.data.http.CommentResponse
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.Score
@@ -169,4 +169,3 @@ private fun CommentData.toCommentRecord(clock: Clock): CommentRecord {
         upVotes = ups
     )
 }
-

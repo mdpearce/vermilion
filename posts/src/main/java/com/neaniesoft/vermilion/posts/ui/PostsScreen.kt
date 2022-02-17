@@ -182,7 +182,9 @@ fun PostsScreenPreview() {
                         DUMMY_TEXT_POST
                     )
                 )
-            ).collectAsLazyPagingItems(), {}) {}
+            ).collectAsLazyPagingItems(),
+            {}
+        ) {}
     }
 }
 
@@ -198,6 +200,8 @@ fun PostsScreenPreviewDark() {
                         DUMMY_TEXT_POST
                     )
                 )
-            ).collectAsLazyPagingItems(), {}) {}
+            ).collectAsLazyPagingItems(),
+            {}
+        ) {}
     }
 }

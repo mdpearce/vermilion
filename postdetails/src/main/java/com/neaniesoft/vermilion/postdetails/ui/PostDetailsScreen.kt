@@ -30,7 +30,8 @@ fun PostDetailsScreen(
                     PostSummary(
                         post = currentPostDetailsState.post,
                         shouldTruncate = false,
-                        onMediaClicked = { onOpenUri(it.link.toString().toUri()) })
+                        onMediaClicked = { onOpenUri(it.link.toString().toUri()) }
+                    )
                 }
             }
             Empty -> item {
@@ -52,6 +53,5 @@ fun PostDetailsScreen(
         items(comments) { item ->
             CommentRow(comment = item, Modifier.fillMaxWidth())
         }
-
     }
 }

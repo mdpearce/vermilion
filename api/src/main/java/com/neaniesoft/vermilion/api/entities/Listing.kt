@@ -1,7 +1,6 @@
 package com.neaniesoft.vermilion.api.entities
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.neaniesoft.vermilion.api.entities.Thing
 
 data class Listing(
     @JsonProperty("after") val after: String?,
