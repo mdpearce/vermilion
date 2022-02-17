@@ -1,4 +1,4 @@
-package com.neaniesoft.vermilion.postdetails
+package com.neaniesoft.vermilion.postdetails.ui
 
 import android.net.Uri
 import androidx.compose.foundation.background

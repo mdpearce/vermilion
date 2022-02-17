@@ -13,7 +13,7 @@ import com.google.accompanist.navigation.material.bottomSheet
 import com.neaniesoft.vermilion.accounts.adapters.driving.ui.UserAccountScreen
 import com.neaniesoft.vermilion.app.customtabs.customTab
 import com.neaniesoft.vermilion.app.customtabs.customTabRoute
-import com.neaniesoft.vermilion.postdetails.PostDetailsScreen
+import com.neaniesoft.vermilion.postdetails.ui.PostDetailsScreen
 import com.neaniesoft.vermilion.posts.ui.PostsScreen
 
 @ExperimentalMaterialNavigationApi

@@ -1,4 +1,4 @@
-package com.neaniesoft.vermilion.postdetails
+package com.neaniesoft.vermilion.postdetails.ui
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.room.withTransaction
 import com.neaniesoft.vermilion.db.VermilionDatabase
 import com.neaniesoft.vermilion.dbentities.posts.PostDao
+import com.neaniesoft.vermilion.postdetails.Comment
 import com.neaniesoft.vermilion.postdetails.data.CommentRepository
 import com.neaniesoft.vermilion.posts.data.toPost
 import com.neaniesoft.vermilion.posts.domain.entities.Post
