@@ -1,8 +1,6 @@
-package com.neaniesoft.vermilion.postdetails.data
+package com.neaniesoft.vermilion.postdetails.data.http
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import com.neaniesoft.vermilion.api.RedditApiClientModule
-import com.neaniesoft.vermilion.api.entities.Listing
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,11 +15,6 @@ interface CommentApiService {
     @GET("/comments/{articleId}")
     suspend fun commentsForArticle(@Path("articleId") articleId: String): Array<CommentResponse>
 }
-
-data class CommentResponse(
-    @JsonProperty("kind") val kind: String,
-    @JsonProperty("data") val data: Listing
-)
 
 @Module
 @InstallIn(SingletonComponent::class)
