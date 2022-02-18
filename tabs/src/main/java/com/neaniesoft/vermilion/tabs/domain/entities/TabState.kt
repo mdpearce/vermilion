@@ -29,4 +29,4 @@ value class DisplayName(val value: String)
 value class TabSortOrderIndex(val value: Int)
 
 @JvmInline
-value class ScrollPosition(val value: String)
+value class ScrollPosition(val value: Int)
