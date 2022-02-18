@@ -8,8 +8,13 @@ import com.neaniesoft.vermilion.tabs.domain.entities.TabSortOrderIndex
 import com.neaniesoft.vermilion.tabs.domain.entities.TabState
 import com.neaniesoft.vermilion.tabs.domain.entities.TabType
 import com.neaniesoft.vermilion.tabs.domain.ports.TabRepository
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,13 +22,14 @@ import kotlinx.coroutines.launch
 import java.time.Clock
 import java.time.Instant
 import javax.inject.Inject
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Singleton
 class TabSupervisor @Inject constructor(
     private val repository: TabRepository,
     private val clock: Clock,
-    private val dispatcher: CoroutineDispatcher
+    @Named(CoroutinesModule.IO) private val dispatcher: CoroutineDispatcher
 ) {
     private val _currentTabs: MutableStateFlow<List<TabState>> = MutableStateFlow(emptyList())
     val currentTabs: StateFlow<List<TabState>> = _currentTabs.asStateFlow()
@@ -50,4 +56,16 @@ class TabSupervisor @Inject constructor(
         )
         repository.addNewTab(tab)
     }
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+class CoroutinesModule {
+    companion object {
+        const val IO = "io"
+    }
+
+    @Provides
+    @Named(IO)
+    fun provideIODispatcher(): CoroutineDispatcher = Dispatchers.IO
 }
