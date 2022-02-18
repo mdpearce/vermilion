@@ -8,7 +8,7 @@ data class TabStateRecord(
     @PrimaryKey(autoGenerate = true)
     val id: Int,
     val type: String,
-    val route: String,
+    val parentId: String,
     val displayName: String,
     val createdAt: Long,
     val tabSortOrder: Int,

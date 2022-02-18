@@ -1,7 +1,7 @@
 package com.neaniesoft.vermilion.tabs.domain
 
 import com.neaniesoft.vermilion.tabs.domain.entities.DisplayName
-import com.neaniesoft.vermilion.tabs.domain.entities.Route
+import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
 import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
 import com.neaniesoft.vermilion.tabs.domain.entities.TabId
 import com.neaniesoft.vermilion.tabs.domain.entities.TabSortOrderIndex
@@ -44,17 +44,18 @@ class TabSupervisor @Inject constructor(
         }
     }
 
-    suspend fun addNewPostDetailsTab(route: Route, displayName: DisplayName) {
+    suspend fun addNewPostDetailsTabIfNotExists(parentId: ParentId, displayName: DisplayName) {
+
         val tab = TabState(
             TabId(0),
+            parentId,
             TabType.POST_DETAILS,
-            route,
             displayName,
             Instant.ofEpochMilli(clock.millis()),
             TabSortOrderIndex(0),
             ScrollPosition(0)
         )
-        repository.addNewTab(tab)
+        repository.addNewTabIfNotExists(tab)
     }
 }
 

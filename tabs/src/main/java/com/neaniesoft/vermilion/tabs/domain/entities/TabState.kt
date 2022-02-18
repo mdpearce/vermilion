@@ -4,13 +4,16 @@ import java.time.Instant
 
 data class TabState(
     val id: TabId,
+    val parentId: ParentId,
     val type: TabType,
-    val route: Route,
     val displayName: DisplayName,
     val createdAt: Instant,
     val tabSortOrder: TabSortOrderIndex,
     val scrollPosition: ScrollPosition
 )
+
+@JvmInline
+value class ParentId(val value: String)
 
 @JvmInline
 value class TabId(val value: Int)

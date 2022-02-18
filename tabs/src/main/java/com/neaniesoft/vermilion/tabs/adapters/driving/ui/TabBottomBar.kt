@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.neaniesoft.vermilion.tabs.R
 import com.neaniesoft.vermilion.tabs.domain.entities.DisplayName
+import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
 import com.neaniesoft.vermilion.tabs.domain.entities.Route
 import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
 import com.neaniesoft.vermilion.tabs.domain.entities.TabId
@@ -107,8 +108,8 @@ fun TabBottomBarPreviewDark() {
 
 private val DUMMY_TAB = TabState(
     TabId(0),
+    ParentId("id"),
     TabType.POSTS,
-    Route("some route"),
     DisplayName("AskScience"),
     createdAt = Instant.now(),
     TabSortOrderIndex(1),
