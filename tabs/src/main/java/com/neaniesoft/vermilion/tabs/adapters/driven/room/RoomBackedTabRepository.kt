@@ -1,4 +1,4 @@
-package com.neaniesoft.vermilion.tabs.domain.adapters.driven.room
+package com.neaniesoft.vermilion.tabs.adapters.driven.room
 
 import androidx.room.withTransaction
 import com.neaniesoft.vermilion.db.VermilionDatabase
