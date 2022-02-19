@@ -20,16 +20,16 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PostsViewModel @Inject constructor(
-    postRepository: PostRepository,
-    postDao: PostDao,
-    postRemoteKeyDao: PostRemoteKeyDao,
-    database: VermilionDatabase,
-    clock: Clock
+    private val postRepository: PostRepository,
+    private val postDao: PostDao,
+    private val postRemoteKeyDao: PostRemoteKeyDao,
+    private val database: VermilionDatabase,
+    private val clock: Clock
 ) : ViewModel() {
     private val query = requireNotNull(FrontPage::class.simpleName)
 
     @ExperimentalPagingApi
-    val pageFlow = Pager(
+    fun pagingData(query: String) = Pager(
         PagingConfig(pageSize = 20),
         remoteMediator = PostsRemoteMediator(
             query,

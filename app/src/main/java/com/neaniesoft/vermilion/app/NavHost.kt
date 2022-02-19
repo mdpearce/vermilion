@@ -14,6 +14,7 @@ import com.neaniesoft.vermilion.accounts.adapters.driving.ui.UserAccountScreen
 import com.neaniesoft.vermilion.app.customtabs.customTab
 import com.neaniesoft.vermilion.app.customtabs.customTabRoute
 import com.neaniesoft.vermilion.postdetails.ui.PostDetailsScreen
+import com.neaniesoft.vermilion.posts.domain.entities.FrontPage
 import com.neaniesoft.vermilion.posts.ui.PostsScreen
 
 @ExperimentalMaterialNavigationApi
@@ -22,15 +23,18 @@ import com.neaniesoft.vermilion.posts.ui.PostsScreen
 fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
     NavHost(
         navController = navController,
-        startDestination = VermilionScreen.Posts.name,
+        startDestination = VermilionScreen.Home.name,
         modifier = modifier
     ) {
-        composable(VermilionScreen.Posts.name) {
-            PostsScreen(onOpenPostDetails = { postId ->
-                navController.navigate("${VermilionScreen.PostDetails}/${postId.value}")
-            }) { uri ->
-                navController.navigate(customTabRoute(uri))
-            }
+        composable(VermilionScreen.Home.name) {
+            PostsScreen(
+                community = FrontPage,
+                onOpenPostDetails = { postId ->
+                    navController.navigate("${VermilionScreen.PostDetails}/${postId.value}")
+                }, onOpenUri = { uri ->
+                    navController.navigate(customTabRoute(uri))
+                }
+            )
         }
 
         composable(

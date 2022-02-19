@@ -74,8 +74,8 @@ fun VermilionApp(
         LaunchedEffect(key1 = Unit, block = {
             viewModel.routeEvents.collect { route ->
                 navController.navigate(route) {
-                    popUpTo(VermilionScreen.Posts.name) {
-                        inclusive = route.startsWith(VermilionScreen.Posts.name)
+                    popUpTo(VermilionScreen.Home.name) {
+                        inclusive = route.startsWith(VermilionScreen.Home.name)
                     }
                 }
             }
@@ -88,7 +88,7 @@ fun VermilionApp(
                 @Suppress("UnnecessaryVariable")
                 val currentTab = activeTab
                 if (currentTab is ActiveTab.Tab && currentTab.id == clearTab.id) {
-                    navController.popBackStack(VermilionScreen.Posts.name, false)
+                    navController.popBackStack(VermilionScreen.Home.name, false)
                 }
             }
         })

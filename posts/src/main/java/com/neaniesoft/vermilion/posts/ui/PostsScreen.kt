@@ -30,6 +30,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import com.neaniesoft.vermilion.posts.R
+import com.neaniesoft.vermilion.posts.domain.entities.Community
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.ui.theme.Vermilion500
@@ -39,11 +40,12 @@ import kotlinx.coroutines.flow.flowOf
 @ExperimentalPagingApi
 @Composable
 fun PostsScreen(
+    community: Community,
     viewModel: PostsViewModel = hiltViewModel(),
     onOpenPostDetails: (postId: PostId) -> Unit,
     onOpenUri: (uri: Uri) -> Unit
 ) {
-    val pagingItems = viewModel.pageFlow.collectAsLazyPagingItems()
+    val pagingItems = viewModel.pagingData(community.routeName).collectAsLazyPagingItems()
 
     Box {
         PostsList(posts = pagingItems, onMediaClicked = {
