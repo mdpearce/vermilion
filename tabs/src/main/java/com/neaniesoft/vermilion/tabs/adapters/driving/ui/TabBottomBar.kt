@@ -1,13 +1,9 @@
 package com.neaniesoft.vermilion.tabs.adapters.driving.ui
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
@@ -20,15 +16,15 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.neaniesoft.vermilion.tabs.R
 import com.neaniesoft.vermilion.tabs.domain.entities.DisplayName
 import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
 import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
@@ -42,21 +38,25 @@ import java.time.Instant
 @Composable
 fun TabBottomBar(
     tabs: List<TabState>,
+    activeTab: ActiveTab,
+    onHomeButtonClicked: () -> Unit,
     onUserButtonClicked: () -> Unit,
     onTabClicked: (TabState) -> Unit,
     onTabCloseClicked: (TabState) -> Unit
 ) {
-    BottomAppBar(Modifier.height(IntrinsicSize.Max)) {
+    BottomAppBar() {
         LazyRow(
             Modifier
                 .fillMaxWidth()
         ) {
             item {
+                IconButton(onClick = onHomeButtonClicked) {
+                    Icon(Icons.Default.Home, contentDescription = null)
+                }
+            }
+            item {
                 IconButton(onClick = onUserButtonClicked) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_baseline_account_circle_24),
-                        contentDescription = null
-                    )
+                    Icon(Icons.Default.Person, contentDescription = null)
                 }
             }
 
@@ -65,14 +65,22 @@ fun TabBottomBar(
                 Surface(
                     shape = MaterialTheme.shapes.small,
                     modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxHeight()
+                        .padding(end = 4.dp, start = 4.dp)
+                        .wrapContentHeight()
                         .width(140.dp)
                         .clickable { onTabClicked(tab) },
-                    color = MaterialTheme.colors.primaryVariant,
+                    color = if (activeTab is ActiveTab.Tab && tab.id == activeTab.id) {
+                        MaterialTheme.colors.primaryVariant
+                    } else {
+                        MaterialTheme.colors.surface
+                    },
                     elevation = 24.dp
                 ) {
-                    Row(Modifier.fillMaxWidth().padding(start = 8.dp, end = 8.dp)) {
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(start = 8.dp, end = 8.dp)
+                    ) {
                         Text(
                             text = tab.displayName.value,
                             style = MaterialTheme.typography.caption,
@@ -102,7 +110,9 @@ fun TabBottomBarPreview() {
     VermilionTheme {
         TabBottomBar(
             tabs = listOf(DUMMY_TAB, DUMMY_TAB_2),
+            activeTab = ActiveTab.Tab(DUMMY_TAB.id),
             onUserButtonClicked = {},
+            onHomeButtonClicked = {},
             onTabClicked = {},
             onTabCloseClicked = {}
         )
@@ -115,7 +125,9 @@ fun TabBottomBarPreviewDark() {
     VermilionTheme(darkTheme = true) {
         TabBottomBar(
             tabs = listOf(DUMMY_TAB, DUMMY_TAB_2),
+            activeTab = ActiveTab.Tab(DUMMY_TAB.id),
             onUserButtonClicked = {},
+            onHomeButtonClicked = {},
             onTabClicked = {},
             onTabCloseClicked = {}
         )
@@ -138,3 +150,9 @@ private val DUMMY_TAB_2 = DUMMY_TAB.copy(
     type = TabType.POST_DETAILS,
     tabSortOrder = TabSortOrderIndex(2)
 )
+
+sealed class ActiveTab {
+    object None : ActiveTab()
+    data class Tab(val id: TabId) : ActiveTab()
+}
+

@@ -26,10 +26,10 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import com.neaniesoft.vermilion.app.customtabs.CustomTabNavigator
+import com.neaniesoft.vermilion.tabs.adapters.driving.ui.ActiveTab
 import com.neaniesoft.vermilion.tabs.adapters.driving.ui.TabBottomBar
 import com.neaniesoft.vermilion.tabs.domain.TabSupervisor
 import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
-import com.neaniesoft.vermilion.tabs.domain.entities.TabId
 import com.neaniesoft.vermilion.tabs.domain.entities.TabState
 import com.neaniesoft.vermilion.tabs.domain.entities.TabType
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
@@ -77,6 +77,8 @@ fun VermilionApp(
             }
         })
 
+        val activeTab by viewModel.activeTab.collectAsState()
+
         Scaffold(
             scaffoldState = scaffoldState,
             snackbarHost = { scaffoldState.snackbarHostState },
@@ -88,7 +90,13 @@ fun VermilionApp(
             bottomBar = {
                 TabBottomBar(
                     tabs = tabs,
-                    onUserButtonClicked = { /*TODO*/ },
+                    activeTab = activeTab,
+                    onHomeButtonClicked = {
+                        viewModel.onHomeButtonClicked()
+                    },
+                    onUserButtonClicked = {
+                        viewModel.onUserButtonClicked()
+                    },
                     onTabClicked = {
                         viewModel.onTabClicked(it)
                     },
@@ -145,9 +153,12 @@ class VermilionAppViewModel @Inject constructor(
     fun onTabCloseClicked(tab: TabState) {
         viewModelScope.launch { tabSupervisor.removeTab(tab) }
     }
-}
 
-sealed class ActiveTab {
-    object None : ActiveTab()
-    data class Tab(val id: TabId) : ActiveTab()
+    fun onHomeButtonClicked() {
+        viewModelScope.launch { _routeEvents.emit(VermilionScreen.Posts.name) }
+    }
+
+    fun onUserButtonClicked() {
+        viewModelScope.launch { _routeEvents.emit(VermilionScreen.MyAccount.name) }
+    }
 }
