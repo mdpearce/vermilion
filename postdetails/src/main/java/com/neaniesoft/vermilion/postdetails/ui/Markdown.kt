@@ -1,15 +1,19 @@
 package com.neaniesoft.vermilion.postdetails.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberImagePainter
 import org.commonmark.node.BlockQuote
 import org.commonmark.node.BulletList
 import org.commonmark.node.Document
@@ -103,6 +107,10 @@ fun MarkdownIndentedCodeBlock(indentedCodeBlock: IndentedCodeBlock) {
 
 @Composable
 fun MarkdownImage(image: Image) {
+    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        val painter = rememberImagePainter(image.destination)
+        Image(painter = painter, contentDescription = image.title)
+    }
 }
 
 @Composable
