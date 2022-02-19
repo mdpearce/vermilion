@@ -86,7 +86,7 @@ fun MarkdownThematicBreak(thematicBreak: ThematicBreak) {
 }
 
 @Composable
-fun MarkdownHeading(heading: Heading) {
+fun MarkdownHeading(heading: Heading, modifier: Modifier = Modifier) {
     val style = when (heading.level) {
         1 -> MaterialTheme.typography.h1
         2 -> MaterialTheme.typography.h2
@@ -102,7 +102,7 @@ fun MarkdownHeading(heading: Heading) {
     }
 
     val padding = if (heading.parent is Document) 8.dp else 0.dp
-    Box(Modifier.padding(bottom = padding)) {
+    Box(modifier.padding(bottom = padding)) {
         val text = buildAnnotatedString {
             appendMarkdownChildren(heading, MaterialTheme.colors)
         }
