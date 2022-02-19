@@ -72,9 +72,11 @@ fun VermilionApp(
         val tabs by viewModel.tabs.collectAsState()
 
         LaunchedEffect(key1 = Unit, block = {
-            viewModel.routeEvents.collect {
-                navController.navigate(it) {
-                    launchSingleTop = true
+            viewModel.routeEvents.collect { route ->
+                navController.navigate(route) {
+                    popUpTo(VermilionScreen.Posts.name) {
+                        inclusive = route.startsWith(VermilionScreen.Posts.name)
+                    }
                 }
             }
         })
