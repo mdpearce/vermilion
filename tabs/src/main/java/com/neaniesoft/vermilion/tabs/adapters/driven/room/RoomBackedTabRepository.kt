@@ -16,10 +16,6 @@ import com.neaniesoft.vermilion.tabs.domain.entities.TabSortOrderIndex
 import com.neaniesoft.vermilion.tabs.domain.entities.TabState
 import com.neaniesoft.vermilion.tabs.domain.entities.TabType
 import com.neaniesoft.vermilion.tabs.domain.ports.TabRepository
-import dagger.Binds
-import dagger.Module
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -71,7 +67,8 @@ class RoomBackedTabRepository @Inject constructor(
     }
 
     override suspend fun displayNameForPostDetails(postId: PostId): DisplayName {
-        val post = postDao.postWithId(postId.value) ?: throw IllegalStateException("Post ${postId.value} not found in db")
+        val post = postDao.postWithId(postId.value)
+            ?: throw IllegalStateException("Post ${postId.value} not found in db")
 
         return DisplayName(post.title)
     }
@@ -81,23 +78,16 @@ class RoomBackedTabRepository @Inject constructor(
             tabStateDao.deleteTabWithId(tab.id.value)
         }
     }
-}
 
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class TabRepositoryModule {
-    @Binds
-    abstract fun bindTabRepository(impl: RoomBackedTabRepository): TabRepository
-}
-
-internal fun TabStateRecord.toTabState(): TabState {
-    return TabState(
-        TabId(id),
-        ParentId(parentId),
-        TabType.valueOf(type),
-        DisplayName(displayName),
-        Instant.ofEpochMilli(createdAt),
-        TabSortOrderIndex(tabSortOrder),
-        ScrollPosition(scrollPosition)
-    )
+    private fun TabStateRecord.toTabState(): TabState {
+        return TabState(
+            TabId(id),
+            ParentId(parentId),
+            TabType.valueOf(type),
+            DisplayName(displayName),
+            Instant.ofEpochMilli(createdAt),
+            TabSortOrderIndex(tabSortOrder),
+            ScrollPosition(scrollPosition)
+        )
+    }
 }
