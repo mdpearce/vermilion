@@ -6,12 +6,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import org.commonmark.node.BlockQuote
@@ -52,7 +57,28 @@ fun MarkdownBlockChildren(parent: Node) {
 }
 
 @Composable
-fun MarkdownBlockQuote(blockQuote: BlockQuote) {
+fun MarkdownBlockQuote(blockQuote: BlockQuote, modifier: Modifier = Modifier) {
+    val color = MaterialTheme.colors.onBackground
+    Box(modifier = Modifier
+        .drawBehind {
+            drawLine(
+                color = color,
+                strokeWidth = 2f,
+                start = Offset(12.dp.value, 0f),
+                end = Offset(12.dp.value, size.height)
+            )
+        }
+        .padding(start = 16.dp, top = 4.dp, bottom = 4.dp)) {
+        val text = buildAnnotatedString {
+            pushStyle(
+                MaterialTheme.typography.body1.toSpanStyle()
+                    .plus(SpanStyle(fontStyle = FontStyle.Italic))
+            )
+            appendMarkdownChildren(blockQuote, MaterialTheme.colors)
+            pop()
+        }
+        Text(text, modifier)
+    }
 }
 
 @Composable
@@ -89,7 +115,7 @@ fun MarkdownText(text: AnnotatedString, style: TextStyle) {
     TODO("Not yet implemented")
 }
 
-private fun AnnotatedString.Builder.appendMarkdownChildren(heading: Heading, colors: Colors) {
+private fun AnnotatedString.Builder.appendMarkdownChildren(node: Node, colors: Colors) {
     TODO("Not yet implemented")
 }
 
