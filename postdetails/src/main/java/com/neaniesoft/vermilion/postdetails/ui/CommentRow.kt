@@ -28,6 +28,7 @@ import com.neaniesoft.vermilion.postdetails.domain.entities.UpVotesCount
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.Score
+import com.neaniesoft.vermilion.ui.markdown.MarkdownDocument
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import org.commonmark.node.Document
 import java.time.Instant

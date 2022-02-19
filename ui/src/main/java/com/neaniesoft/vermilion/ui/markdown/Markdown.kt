@@ -1,4 +1,4 @@
-package com.neaniesoft.vermilion.postdetails.ui
+package com.neaniesoft.vermilion.ui.markdown
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
