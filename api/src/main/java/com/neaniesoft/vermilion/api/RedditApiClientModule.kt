@@ -110,7 +110,7 @@ class RedditApiClientModule {
         OkHttpClient.Builder()
             .addInterceptor(userAgentInterceptor)
             .addInterceptor(authInterceptor)
-            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS))
             .build()
 
     @Provides
