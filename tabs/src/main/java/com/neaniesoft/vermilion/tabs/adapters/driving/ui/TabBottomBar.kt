@@ -126,7 +126,8 @@ fun TopLevelTab(
                     .align(CenterVertically)
             )
             IconButton(
-                onClick = { onCloseClicked(tabState) }) {
+                onClick = { onCloseClicked(tabState) }
+            ) {
                 Icon(
                     Icons.Default.Close,
                     contentDescription = stringResource(id = R.string.content_description_close_tab)

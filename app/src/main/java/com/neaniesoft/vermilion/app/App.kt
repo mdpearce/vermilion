@@ -21,8 +21,8 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import com.neaniesoft.vermilion.app.customtabs.CustomTabNavigator
-import com.neaniesoft.vermilion.tabs.domain.entities.ActiveTab
 import com.neaniesoft.vermilion.tabs.adapters.driving.ui.TabBottomBar
+import com.neaniesoft.vermilion.tabs.domain.entities.ActiveTab
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import java.time.Clock
 
@@ -77,7 +77,6 @@ fun VermilionApp(
             }
         })
 
-
         Scaffold(
             scaffoldState = scaffoldState,
             snackbarHost = { scaffoldState.snackbarHostState },
@@ -101,7 +100,8 @@ fun VermilionApp(
                     },
                     onTabCloseClicked = {
                         viewModel.onTabCloseClicked(it)
-                    })
+                    }
+                )
             }
         ) { innerPadding ->
             ModalBottomSheetLayout(bottomSheetNavigator) {
@@ -110,4 +110,3 @@ fun VermilionApp(
         }
     }
 }
-

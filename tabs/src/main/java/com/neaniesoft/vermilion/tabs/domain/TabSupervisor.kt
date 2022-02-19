@@ -57,4 +57,3 @@ class TabSupervisor @Inject constructor(
         repository.removeTab(tab)
     }
 }
-
