@@ -43,7 +43,7 @@ fun CommentRow(comment: Comment, modifier: Modifier = Modifier) {
                 modifier = Modifier
                     .fillMaxHeight()
                     .width(16.dp)
-                    .padding(start = 6.dp, end = 6.dp)
+                    .padding(start = 7.dp, end = 7.dp)
                     .background(MaterialTheme.colors.onBackground)
             )
         }
