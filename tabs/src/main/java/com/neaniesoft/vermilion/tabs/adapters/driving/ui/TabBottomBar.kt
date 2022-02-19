@@ -23,10 +23,12 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.neaniesoft.vermilion.tabs.R
 import com.neaniesoft.vermilion.tabs.domain.entities.ActiveTab
 import com.neaniesoft.vermilion.tabs.domain.entities.DisplayName
 import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
@@ -58,7 +60,10 @@ fun TabBottomBar(
 
             item {
                 IconButton(onClick = onUserButtonClicked) {
-                    Icon(Icons.Default.Person, contentDescription = "My account")
+                    Icon(
+                        Icons.Default.Person,
+                        contentDescription = stringResource(id = R.string.content_description_my_account_button)
+                    )
                 }
             }
 
@@ -122,7 +127,10 @@ fun TopLevelTab(
             )
             IconButton(
                 onClick = { onCloseClicked(tabState) }) {
-                Icon(Icons.Default.Close, contentDescription = "close")
+                Icon(
+                    Icons.Default.Close,
+                    contentDescription = stringResource(id = R.string.content_description_close_tab)
+                )
             }
         }
     }
@@ -133,7 +141,8 @@ fun HomeIcon(isActive: Boolean, onClick: () -> Unit) {
     IconButton(onClick = onClick) {
         if (isActive) {
             Icon(
-                Icons.Default.Home, contentDescription = "Home",
+                Icons.Default.Home,
+                contentDescription = stringResource(id = R.string.content_description_home_button),
                 tint = if (MaterialTheme.colors.isLight) {
                     Color.Companion.White
                 } else {
@@ -142,7 +151,8 @@ fun HomeIcon(isActive: Boolean, onClick: () -> Unit) {
             )
         } else {
             Icon(
-                Icons.Default.Home, contentDescription = "Home"
+                Icons.Default.Home,
+                contentDescription = stringResource(id = R.string.content_description_home_button)
             )
         }
     }
