@@ -85,16 +85,18 @@ fun MarkdownBlockChildren(parent: Node, truncateToBlocks: Int = Int.MAX_VALUE) {
 @Composable
 fun MarkdownBlockQuote(blockQuote: BlockQuote, modifier: Modifier = Modifier) {
     val color = MaterialTheme.colors.onBackground
-    Box(modifier = Modifier
-        .drawBehind {
-            drawLine(
-                color = color,
-                strokeWidth = 2f,
-                start = Offset(12.dp.value, 0f),
-                end = Offset(12.dp.value, size.height)
-            )
-        }
-        .padding(start = 16.dp, top = 4.dp, bottom = 8.dp)) {
+    Box(
+        modifier = Modifier
+            .drawBehind {
+                drawLine(
+                    color = color,
+                    strokeWidth = 2f,
+                    start = Offset(12.dp.value, 0f),
+                    end = Offset(12.dp.value, size.height)
+                )
+            }
+            .padding(start = 16.dp, top = 4.dp, bottom = 8.dp)
+    ) {
         val text = buildAnnotatedString {
             pushStyle(
                 MaterialTheme.typography.body1.toSpanStyle()
@@ -142,7 +144,8 @@ fun MarkdownText(text: AnnotatedString, style: TextStyle, modifier: Modifier = M
     val uriHandler = LocalUriHandler.current
     val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
 
-    Text(text = text,
+    Text(
+        text = text,
         modifier = modifier.pointerInput(text) {
             detectTapGestures { pos ->
                 layoutResult.value?.let { layoutResult ->
@@ -156,14 +159,18 @@ fun MarkdownText(text: AnnotatedString, style: TextStyle, modifier: Modifier = M
                         }
                 }
             }
-        }, style = style, inlineContent = mapOf(
+        },
+        style = style,
+        inlineContent = mapOf(
             TAG_IMAGE_URL to InlineTextContent(
                 Placeholder(style.fontSize, style.fontSize, PlaceholderVerticalAlign.Bottom)
             ) { url ->
                 val painter = rememberImagePainter(url)
                 Image(painter, "inline image")
             }
-        ), onTextLayout = { layoutResult.value = it })
+        ),
+        onTextLayout = { layoutResult.value = it }
+    )
 }
 
 private fun AnnotatedString.Builder.appendMarkdownChildren(parent: Node, colors: Colors) {

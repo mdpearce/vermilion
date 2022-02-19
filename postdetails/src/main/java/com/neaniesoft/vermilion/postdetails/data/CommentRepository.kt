@@ -60,12 +60,14 @@ class CommentRepositoryImpl @Inject constructor(
                 // Cache is valid, let's just return the database records
                 emit(
                     dao.getAllForPost(postId.value)
-                        .map { it.toComment(prettyTime, markdownParser) })
+                        .map { it.toComment(prettyTime, markdownParser) }
+                )
             } else {
                 // Cache is invalid. First, let's return it so we have something to display
                 emit(
                     dao.getAllForPost(postId.value)
-                        .map { it.toComment(prettyTime, markdownParser) })
+                        .map { it.toComment(prettyTime, markdownParser) }
+                )
 
                 // Then, fetch new comments from the API
                 val apiResponse = apiService.commentsForArticle(postId.value)
