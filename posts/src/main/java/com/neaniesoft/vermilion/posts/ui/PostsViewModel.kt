@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
 import com.neaniesoft.vermilion.db.VermilionDatabase
@@ -12,8 +13,9 @@ import com.neaniesoft.vermilion.dbentities.posts.PostDao
 import com.neaniesoft.vermilion.dbentities.posts.PostRemoteKeyDao
 import com.neaniesoft.vermilion.posts.data.PostRepository
 import com.neaniesoft.vermilion.posts.data.toPost
-import com.neaniesoft.vermilion.posts.domain.entities.FrontPage
+import com.neaniesoft.vermilion.posts.domain.entities.Post
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.time.Clock
 import javax.inject.Inject
@@ -26,24 +28,28 @@ class PostsViewModel @Inject constructor(
     private val database: VermilionDatabase,
     private val clock: Clock
 ) : ViewModel() {
-    private val query = requireNotNull(FrontPage::class.simpleName)
+    private val pagingDataMap: MutableMap<String, Flow<PagingData<Post>>> = mutableMapOf()
 
     @ExperimentalPagingApi
-    fun pagingData(query: String) = Pager(
-        PagingConfig(pageSize = 20),
-        remoteMediator = PostsRemoteMediator(
-            query,
-            postDao,
-            postRemoteKeyDao,
-            postRepository,
-            database,
-            clock
-        )
-    ) {
-        postDao.pagingSource(query)
-    }.flow.map { pagingData ->
-        pagingData.map {
-            it.toPost()
+    fun pagingData(query: String): Flow<PagingData<Post>> {
+        return pagingDataMap.computeIfAbsent(query) { key ->
+            Pager(
+                PagingConfig(pageSize = 20),
+                remoteMediator = PostsRemoteMediator(
+                    query,
+                    postDao,
+                    postRemoteKeyDao,
+                    postRepository,
+                    database,
+                    clock
+                )
+            ) {
+                postDao.pagingSource(query)
+            }.flow.map { pagingData ->
+                pagingData.map {
+                    it.toPost()
+                }
+            }.cachedIn(viewModelScope)
         }
-    }.cachedIn(viewModelScope)
+    }
 }
