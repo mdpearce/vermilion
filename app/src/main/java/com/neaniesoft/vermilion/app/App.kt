@@ -151,6 +151,8 @@ class VermilionAppViewModel @Inject constructor(
                     val tab = tabSupervisor.addNewPostDetailsTabIfNotExists(ParentId(id))
                     _activeTab.emit(ActiveTab.Tab(tab.id))
                 }
+            } else if (route.startsWith(VermilionScreen.Posts.name)) {
+                viewModelScope.launch { _activeTab.emit(ActiveTab.None) }
             }
         }
     }
