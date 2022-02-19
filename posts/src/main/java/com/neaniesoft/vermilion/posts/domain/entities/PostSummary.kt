@@ -1,6 +1,7 @@
 package com.neaniesoft.vermilion.posts.domain.entities
 
 import android.net.Uri
+import org.commonmark.node.Document
 
 sealed class PostSummary
 
@@ -21,7 +22,8 @@ data class LinkPostSummary(
 ) : PostSummary()
 
 data class TextPostSummary(
-    val previewText: PreviewText
+    val previewText: PreviewText,
+    val previewTextMarkdown: Document
 ) : PostSummary()
 
 data class UriImage(

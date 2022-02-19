@@ -17,12 +17,14 @@ import com.neaniesoft.vermilion.posts.domain.entities.ResultSet
 import com.neaniesoft.vermilion.posts.domain.errors.PostError
 import com.neaniesoft.vermilion.posts.domain.errors.PostsApiError
 import com.neaniesoft.vermilion.utils.logger
+import org.commonmark.parser.Parser
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class PostRepositoryImpl @Inject constructor(
     private val postsService: PostsService,
+    private val markdownParser: Parser
 ) : PostRepository {
 
     private val logger by logger()
@@ -51,7 +53,7 @@ class PostRepositoryImpl @Inject constructor(
         }.map { response ->
             val posts = response.data.children.mapNotNull { child ->
                 if (child is LinkThing) {
-                    child.data.toPost()
+                    child.data.toPost(markdownParser)
                 } else {
                     logger.warnIfEnabled { "Unknown thing type in posts response" }
                     null

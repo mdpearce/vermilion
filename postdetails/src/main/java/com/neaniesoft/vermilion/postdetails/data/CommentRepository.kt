@@ -23,6 +23,8 @@ import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.utils.logger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import org.apache.commons.text.StringEscapeUtils
+import org.commonmark.parser.Parser
 import org.ocpsoft.prettytime.PrettyTime
 import java.time.Clock
 import java.time.Duration
@@ -40,7 +42,8 @@ class CommentRepositoryImpl @Inject constructor(
     private val database: VermilionDatabase,
     private val dao: CommentDao,
     private val clock: Clock,
-    private val prettyTime: PrettyTime
+    private val prettyTime: PrettyTime,
+    private val markdownParser: Parser // TODO replace with a wrapper interface
 ) : CommentRepository {
     companion object {
         private val CACHE_VALID_DURATION = Duration.ofMinutes(1)
@@ -55,10 +58,16 @@ class CommentRepositoryImpl @Inject constructor(
 
             if (lastInsertedAtTime != null && lastInsertedAtTime >= clock.millis() - CACHE_VALID_DURATION.toMillis()) {
                 // Cache is valid, let's just return the database records
-                emit(dao.getAllForPost(postId.value).map { it.toComment(prettyTime) })
+                emit(
+                    dao.getAllForPost(postId.value)
+                        .map { it.toComment(prettyTime, markdownParser) }
+                )
             } else {
                 // Cache is invalid. First, let's return it so we have something to display
-                emit(dao.getAllForPost(postId.value).map { it.toComment(prettyTime) })
+                emit(
+                    dao.getAllForPost(postId.value)
+                        .map { it.toComment(prettyTime, markdownParser) }
+                )
 
                 // Then, fetch new comments from the API
                 val apiResponse = apiService.commentsForArticle(postId.value)
@@ -84,15 +93,16 @@ class CommentRepositoryImpl @Inject constructor(
                 }
 
                 // Now, emit the new comments
-                emit(newComments.map { it.toComment(prettyTime) })
+                emit(newComments.map { it.toComment(prettyTime, markdownParser) })
             }
         }
 }
 
-private fun CommentRecord.toComment(prettyTime: PrettyTime): Comment {
+private fun CommentRecord.toComment(prettyTime: PrettyTime, parser: Parser): Comment {
     return Comment(
         id = CommentId(commentId),
         content = CommentContent(body),
+        contentMarkdown = parser.parse(body),
         flags = getFlags(),
         authorName = AuthorName(author),
         createdAt = Instant.ofEpochMilli(createdAt),
@@ -179,7 +189,7 @@ private fun CommentData.toCommentRecord(clock: Clock): CommentRecord {
         postId = linkId.replace("t3_", ""),
         parentId = parentId.takeIf { !it.startsWith("t3_") }?.replace("t1_", ""),
         path = null,
-        body = body,
+        body = StringEscapeUtils.unescapeHtml4(body),
         flags = flags,
         author = author,
         createdAt = createdUtc.toLong(),

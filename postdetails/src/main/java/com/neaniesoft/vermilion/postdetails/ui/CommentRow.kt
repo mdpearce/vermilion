@@ -28,7 +28,9 @@ import com.neaniesoft.vermilion.postdetails.domain.entities.UpVotesCount
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.Score
+import com.neaniesoft.vermilion.ui.markdown.MarkdownDocument
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
+import org.commonmark.node.Document
 import java.time.Instant
 
 @Composable
@@ -42,7 +44,7 @@ fun CommentRow(comment: Comment, modifier: Modifier = Modifier) {
                 modifier = Modifier
                     .fillMaxHeight()
                     .width(16.dp)
-                    .padding(start = 6.dp, end = 6.dp)
+                    .padding(start = 7.dp, end = 7.dp)
                     .background(MaterialTheme.colors.onBackground)
             )
         }
@@ -71,11 +73,10 @@ fun CommentRow(comment: Comment, modifier: Modifier = Modifier) {
                     modifier = Modifier.alignByBaseline()
                 )
             }
-            Text(
-                modifier = Modifier.padding(top = 8.dp),
-                text = comment.content.value, style = MaterialTheme.typography.body1,
-                color = MaterialTheme.colors.onBackground
-            )
+
+            Box(Modifier.padding(top = 8.dp)) {
+                MarkdownDocument(document = comment.contentMarkdown as Document)
+            }
         }
     }
 }
@@ -99,6 +100,7 @@ fun DeepCommentRowPreview() {
 private val DUMMY_COMMENT = Comment(
     CommentId("id"),
     CommentContent("This is a pretty long comment that might split over several lines. It's got several sentences and goes on for some time. Still going here."),
+    Document(),
     emptySet(),
     AuthorName("Some user"),
     Instant.now(),
