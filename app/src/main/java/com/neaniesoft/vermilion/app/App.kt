@@ -73,7 +73,9 @@ fun VermilionApp(
 
         LaunchedEffect(key1 = Unit, block = {
             viewModel.routeEvents.collect {
-                navController.navigate(it)
+                navController.navigate(it) {
+                    launchSingleTop = true
+                }
             }
         })
 
