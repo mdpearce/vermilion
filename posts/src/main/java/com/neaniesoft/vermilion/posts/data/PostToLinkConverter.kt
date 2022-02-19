@@ -33,7 +33,7 @@ import kotlin.math.roundToLong
 internal fun Link.toPost(): Post {
     return Post(
         PostId(id),
-        PostTitle(title),
+        PostTitle(StringEscapeUtils.unescapeHtml4(title)),
         postSummary(),
         NamedCommunity(CommunityName(subreddit)),
         AuthorName(author),
@@ -65,7 +65,7 @@ internal fun Link.postSummary(): PostSummary {
         }
         hint.endsWith("self") -> {
             TextPostSummary(
-                PreviewText(selfText)
+                PreviewText(StringEscapeUtils.unescapeHtml4(selfText))
             )
         }
         hint.endsWith("video") -> {
