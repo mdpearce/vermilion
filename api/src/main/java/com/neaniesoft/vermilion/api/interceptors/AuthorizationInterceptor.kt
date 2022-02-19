@@ -55,7 +55,10 @@ class AuthorizationInterceptor @Inject constructor(
                         .build()
                 )
             } catch (e: Throwable) {
-                Response.Builder().code(500).body(
+                Response.Builder()
+                    .code(500)
+                    .request(chain.request())
+                    .body(
                     ResponseBody.create(
                         null,
                         "Error obtaining token.\n$e (${e.message}) caused by ${e.cause} (${e.cause?.message})"
@@ -76,6 +79,7 @@ class AuthorizationInterceptor @Inject constructor(
                 val error = tokenResult.getError()
                 Response.Builder()
                     .code(500)
+                    .request(chain.request())
                     .body(ResponseBody.create(null, "$error error caused by ${error?.cause}"))
                     .build()
             }
