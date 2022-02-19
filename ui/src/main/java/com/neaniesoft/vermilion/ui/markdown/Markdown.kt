@@ -263,7 +263,7 @@ fun MarkdownIndentedCodeBlock(indentedCodeBlock: IndentedCodeBlock, modifier: Mo
             style = TextStyle(fontFamily = FontFamily.Monospace),
             modifier = modifier
         )
-    } 
+    }
 }
 
 @Composable

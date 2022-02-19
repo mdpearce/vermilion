@@ -52,7 +52,8 @@ fun PostCard(
             modifier = modifier,
             shouldTruncate = true,
             shouldHideNsfw = true,
-            onMediaClicked
+            onMediaClicked,
+            onSummaryClicked = onClick
         )
     }
 }
@@ -63,12 +64,15 @@ fun PostSummary(
     modifier: Modifier = Modifier,
     shouldTruncate: Boolean,
     shouldHideNsfw: Boolean,
-    onMediaClicked: (Post) -> Unit
+    onMediaClicked: (Post) -> Unit,
+    onSummaryClicked: (Post) -> Unit
 ) {
     Column(modifier = modifier.padding(16.dp)) {
         when (val summary = post.summary) {
             is TextPostSummary -> {
-                TextSummary(content = summary.previewTextMarkdown, shouldTruncate)
+                TextSummary(content = summary.previewTextMarkdown, shouldTruncate) {
+                    onSummaryClicked(post)
+                }
             }
             is ImagePostSummary -> {
                 ImageSummary(

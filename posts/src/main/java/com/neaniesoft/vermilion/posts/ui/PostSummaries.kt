@@ -18,18 +18,8 @@ import com.neaniesoft.vermilion.ui.markdown.MarkdownDocument
 import org.commonmark.node.Document
 
 @Composable
-fun TextSummary(content: Document, shouldTruncate: Boolean) {
-    // Text(
-    //     text = content,
-    //     style = MaterialTheme.typography.body1,
-    //     maxLines = if (shouldTruncate) {
-    //         8
-    //     } else {
-    //         Int.MAX_VALUE
-    //     },
-    //     overflow = TextOverflow.Ellipsis
-    // )
-    Column {
+fun TextSummary(content: Document, shouldTruncate: Boolean, onClick: (() -> Unit)? = null) {
+    Column(if (onClick != null) Modifier.clickable { onClick() } else Modifier) {
         MarkdownDocument(document = content, if (shouldTruncate) 3 else Int.MAX_VALUE)
     }
 }
