@@ -81,6 +81,17 @@ fun VermilionApp(
 
         val activeTab by viewModel.activeTab.collectAsState()
 
+        LaunchedEffect(key1 = activeTab, block = {
+            viewModel.clearTabFromBackstackEvents.collect { clearTab ->
+                @Suppress("UnnecessaryVariable")
+                val currentTab = activeTab
+                if (currentTab is ActiveTab.Tab && currentTab.id == clearTab.id) {
+                    navController.popBackStack(VermilionScreen.Posts.name, false)
+                }
+            }
+        })
+
+
         Scaffold(
             scaffoldState = scaffoldState,
             snackbarHost = { scaffoldState.snackbarHostState },
@@ -123,6 +134,9 @@ class VermilionAppViewModel @Inject constructor(
     private val _routeEvents = MutableSharedFlow<String>()
     val routeEvents: SharedFlow<String> = _routeEvents.asSharedFlow()
 
+    private val _clearTabFromBackstackEvents = MutableSharedFlow<TabState>()
+    val clearTabFromBackstackEvents = _clearTabFromBackstackEvents.asSharedFlow()
+
     private val _activeTab = MutableStateFlow<ActiveTab>(ActiveTab.None)
     val activeTab = _activeTab.asStateFlow()
 
@@ -153,7 +167,10 @@ class VermilionAppViewModel @Inject constructor(
     }
 
     fun onTabCloseClicked(tab: TabState) {
-        viewModelScope.launch { tabSupervisor.removeTab(tab) }
+        viewModelScope.launch {
+            tabSupervisor.removeTab(tab)
+            _clearTabFromBackstackEvents.emit(tab)
+        }
     }
 
     fun onHomeButtonClicked() {
