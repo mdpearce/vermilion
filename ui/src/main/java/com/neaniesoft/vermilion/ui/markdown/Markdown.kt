@@ -54,17 +54,18 @@ import org.commonmark.node.ThematicBreak
 
 // Very heavily inspired/taken from https://www.hellsoft.se/rendering-markdown-with-jetpack-compose/
 @Composable
-fun MarkdownDocument(document: Document) {
+fun MarkdownDocument(document: Document, truncateToBlocks: Int = Int.MAX_VALUE) {
     Column {
-        MarkdownBlockChildren(parent = document)
+        MarkdownBlockChildren(parent = document, truncateToBlocks)
     }
 }
 
 @Composable
-fun MarkdownBlockChildren(parent: Node) {
+fun MarkdownBlockChildren(parent: Node, truncateToBlocks: Int = Int.MAX_VALUE) {
     var child = parent.firstChild
+    var count = 0
 
-    while (child != null) {
+    while (child != null && count < truncateToBlocks) {
         when (child) {
             is BlockQuote -> MarkdownBlockQuote(blockQuote = child)
             is ThematicBreak -> MarkdownThematicBreak(thematicBreak = child)
@@ -76,6 +77,7 @@ fun MarkdownBlockChildren(parent: Node) {
             is BulletList -> MarkdownBulletList(bulletList = child)
             is OrderedList -> MarkdownOrderedList(orderedList = child)
         }
+        count++
         child = child.next
     }
 }

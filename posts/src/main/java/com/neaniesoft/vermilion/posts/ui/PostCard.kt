@@ -33,6 +33,8 @@ import com.neaniesoft.vermilion.posts.domain.entities.UriImage
 import com.neaniesoft.vermilion.posts.domain.entities.VideoPostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.isNsfw
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
+import org.commonmark.node.Document
+import org.commonmark.parser.Parser
 import java.net.URL
 import java.time.Instant
 
@@ -59,7 +61,7 @@ fun PostSummary(
     Column(modifier = modifier.padding(16.dp)) {
         when (val summary = post.summary) {
             is TextPostSummary -> {
-                TextSummary(content = summary.previewText.value, shouldTruncate)
+                TextSummary(content = summary.previewTextMarkdown, shouldTruncate)
             }
             is ImagePostSummary -> {
                 ImageSummary(
@@ -136,10 +138,11 @@ fun PostCardPreview() {
     }
 }
 
+private const val DUMMY_CONTENT = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 internal val DUMMY_TEXT_POST = Post(
     PostId(""),
     PostTitle("Some post with a very long title that is likely to split across multiple lines"),
-    TextPostSummary(PreviewText("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")),
+    TextPostSummary(PreviewText(DUMMY_CONTENT), Parser.builder().build().parse(DUMMY_CONTENT) as Document),
     NamedCommunity(CommunityName("Subreddit")),
     AuthorName("/u/SomeDude"),
     postedAt = Instant.now(),

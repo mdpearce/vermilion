@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import org.commonmark.parser.Parser
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,6 +24,7 @@ class PostDetailsViewModel @Inject constructor(
     private val database: VermilionDatabase,
     private val postDao: PostDao,
     private val commentRepository: CommentRepository,
+    private val markdownParser: Parser,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val _post: MutableStateFlow<PostDetailsState> = MutableStateFlow(Empty)
@@ -49,7 +51,7 @@ class PostDetailsViewModel @Inject constructor(
             if (post == null) {
                 _post.emit(Error)
             } else {
-                _post.emit(PostDetails(post.toPost()))
+                _post.emit(PostDetails(post.toPost(markdownParser)))
             }
         }
     }

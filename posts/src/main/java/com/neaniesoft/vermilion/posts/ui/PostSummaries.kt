@@ -3,32 +3,35 @@ package com.neaniesoft.vermilion.posts.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import coil.compose.rememberImagePainter
 import com.neaniesoft.vermilion.posts.R
 import com.neaniesoft.vermilion.posts.domain.entities.UriImage
+import com.neaniesoft.vermilion.ui.markdown.MarkdownDocument
+import org.commonmark.node.Document
 
 @Composable
-fun TextSummary(content: String, shouldTruncate: Boolean) {
-    Text(
-        text = content,
-        style = MaterialTheme.typography.body1,
-        maxLines = if (shouldTruncate) {
-            8
-        } else {
-            Int.MAX_VALUE
-        },
-        overflow = TextOverflow.Ellipsis
-    )
+fun TextSummary(content: Document, shouldTruncate: Boolean) {
+    // Text(
+    //     text = content,
+    //     style = MaterialTheme.typography.body1,
+    //     maxLines = if (shouldTruncate) {
+    //         8
+    //     } else {
+    //         Int.MAX_VALUE
+    //     },
+    //     overflow = TextOverflow.Ellipsis
+    // )
+    Column {
+        MarkdownDocument(document = content, if (shouldTruncate) 3 else Int.MAX_VALUE)
+    }
 }
 
 private const val MIN_RATIO = 1.0f

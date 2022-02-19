@@ -17,6 +17,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.Post
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import org.commonmark.parser.Parser
 import java.time.Clock
 import javax.inject.Inject
 
@@ -26,7 +27,8 @@ class PostsViewModel @Inject constructor(
     private val postDao: PostDao,
     private val postRemoteKeyDao: PostRemoteKeyDao,
     private val database: VermilionDatabase,
-    private val clock: Clock
+    private val clock: Clock,
+    private val markdownParser: Parser
 ) : ViewModel() {
     private val pagingDataMap: MutableMap<String, Flow<PagingData<Post>>> = mutableMapOf()
 
@@ -47,7 +49,7 @@ class PostsViewModel @Inject constructor(
                 postDao.pagingSource(key)
             }.flow.map { pagingData ->
                 pagingData.map {
-                    it.toPost()
+                    it.toPost(markdownParser)
                 }
             }.cachedIn(viewModelScope)
         }

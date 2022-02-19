@@ -25,16 +25,18 @@ import com.neaniesoft.vermilion.posts.domain.entities.UriImage
 import com.neaniesoft.vermilion.posts.domain.entities.VideoPostSummary
 import com.neaniesoft.vermilion.utils.anonymousLogger
 import org.apache.commons.text.StringEscapeUtils
+import org.commonmark.node.Document
+import org.commonmark.parser.Parser
 import java.net.URL
 import java.time.Instant
 import java.util.Locale
 import kotlin.math.roundToLong
 
-internal fun Link.toPost(): Post {
+internal fun Link.toPost(markdownParser: Parser): Post {
     return Post(
         PostId(id),
         PostTitle(StringEscapeUtils.unescapeHtml4(title)),
-        postSummary(),
+        postSummary(markdownParser),
         NamedCommunity(CommunityName(subreddit)),
         AuthorName(author),
         Instant.ofEpochMilli((created * 1000.0).roundToLong()),
@@ -46,7 +48,7 @@ internal fun Link.toPost(): Post {
     )
 }
 
-internal fun Link.postSummary(): PostSummary {
+internal fun Link.postSummary(markdownParser: Parser): PostSummary {
     val hint = postHint?.lowercase(Locale.ENGLISH) ?: "self"
     return when {
         hint.endsWith("image") -> {
@@ -64,8 +66,10 @@ internal fun Link.postSummary(): PostSummary {
             )
         }
         hint.endsWith("self") -> {
+            val text = StringEscapeUtils.unescapeHtml4(selfText)
             TextPostSummary(
-                PreviewText(StringEscapeUtils.unescapeHtml4(selfText))
+                PreviewText(text),
+                markdownParser.parse(text) as Document
             )
         }
         hint.endsWith("video") -> {
@@ -85,7 +89,7 @@ internal fun Link.postSummary(): PostSummary {
         else -> {
             val logger by anonymousLogger("postSummary()")
             logger.debugIfEnabled { "Unrecognised post hint ($hint), defaulting to text post type" }
-            TextPostSummary(PreviewText(""))
+            TextPostSummary(PreviewText(""), Document())
         }
     }
 }

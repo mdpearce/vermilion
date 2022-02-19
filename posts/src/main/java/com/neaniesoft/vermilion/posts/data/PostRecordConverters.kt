@@ -20,12 +20,14 @@ import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.posts.domain.entities.TextPostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.UriImage
 import com.neaniesoft.vermilion.posts.domain.entities.VideoPostSummary
+import org.commonmark.node.Document
+import org.commonmark.parser.Parser
 import java.net.URL
 import java.time.Clock
 import java.time.Instant
 import java.util.UUID
 
-fun PostRecord.toPost(): Post {
+fun PostRecord.toPost(markdownParser: Parser): Post {
     return Post(
         id = PostId(postId),
         title = PostTitle(title),
@@ -46,7 +48,8 @@ fun PostRecord.toPost(): Post {
             )
             PostType.LINK -> TODO()
             PostType.TEXT -> TextPostSummary(
-                previewText = PreviewText(previewText ?: "")
+                previewText = PreviewText(previewText ?: ""),
+                previewTextMarkdown = markdownParser.parse(previewText ?: "") as Document
             )
             PostType.VIDEO -> VideoPostSummary(
                 LinkHost(linkHost),
