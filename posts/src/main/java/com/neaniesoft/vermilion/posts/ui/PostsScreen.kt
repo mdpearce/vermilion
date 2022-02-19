@@ -33,7 +33,6 @@ import com.neaniesoft.vermilion.posts.R
 import com.neaniesoft.vermilion.posts.domain.entities.Community
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
-import com.neaniesoft.vermilion.ui.theme.Vermilion500
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import kotlinx.coroutines.flow.flowOf
 
@@ -147,7 +146,7 @@ fun ErrorItem(
             text = message,
             modifier = Modifier.weight(1f),
             style = MaterialTheme.typography.h6,
-            color = Vermilion500
+            color = MaterialTheme.colors.error
         )
         OutlinedButton(onClick = onClickRetry) {
             Text(text = stringResource(id = R.string.error_retry))
