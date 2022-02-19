@@ -251,9 +251,19 @@ fun MarkdownFencedCodeBlock(fencedCodeBlock: FencedCodeBlock, modifier: Modifier
 }
 
 @Composable
-fun MarkdownIndentedCodeBlock(indentedCodeBlock: IndentedCodeBlock) {
-    // Ignored
-}
+fun MarkdownIndentedCodeBlock(indentedCodeBlock: IndentedCodeBlock, modifier: Modifier = Modifier) {
+    val padding = if (indentedCodeBlock.parent is Document) {
+        8.dp
+    } else {
+        0.dp
+    }
+    Box(modifier.padding(start = 8.dp, top = padding)) {
+        Text(
+            text = indentedCodeBlock.literal,
+            style = TextStyle(fontFamily = FontFamily.Monospace),
+            modifier = modifier
+        )
+    }}
 
 @Composable
 fun MarkdownImage(image: Image, modifier: Modifier = Modifier) {
@@ -285,7 +295,7 @@ fun MarkdownListItems(
 ) {
     val bottom = if (listBlock.parent is Document) 8.dp else 0.dp
     val start = if (listBlock.parent is Document) 0.dp else 8.dp
-    Box(modifier = modifier.padding(bottom = bottom, start = start)) {
+    Column(modifier = modifier.padding(bottom = bottom, start = start)) {
         var listItem = listBlock.firstChild
         while (listItem != null) {
             var child = listItem.firstChild

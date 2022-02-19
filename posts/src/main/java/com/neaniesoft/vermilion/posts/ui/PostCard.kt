@@ -35,6 +35,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.isNsfw
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import org.commonmark.node.Document
 import org.commonmark.parser.Parser
+import org.intellij.lang.annotations.Language
 import java.net.URL
 import java.time.Instant
 
@@ -46,7 +47,13 @@ fun PostCard(
     modifier: Modifier = Modifier
 ) {
     Card(elevation = 16.dp, modifier = modifier.clickable { onClick(post) }) {
-        PostSummary(post = post, modifier = modifier, shouldTruncate = true, shouldHideNsfw = true, onMediaClicked)
+        PostSummary(
+            post = post,
+            modifier = modifier,
+            shouldTruncate = true,
+            shouldHideNsfw = true,
+            onMediaClicked
+        )
     }
 }
 
@@ -66,7 +73,11 @@ fun PostSummary(
             is ImagePostSummary -> {
                 ImageSummary(
                     image = summary.preview ?: UriImage("".toUri(), 0, 0),
-                    isNsfw = if (shouldHideNsfw) { post.isNsfw() } else { false },
+                    isNsfw = if (shouldHideNsfw) {
+                        post.isNsfw()
+                    } else {
+                        false
+                    },
                     shouldTruncate = shouldTruncate
                 ) { onMediaClicked(post) }
             }
@@ -74,7 +85,11 @@ fun PostSummary(
             is VideoPostSummary -> {
                 VideoSummary(
                     image = summary.preview ?: UriImage("".toUri(), 0, 0),
-                    isNsfw = if (shouldHideNsfw) { post.isNsfw() } else { false },
+                    isNsfw = if (shouldHideNsfw) {
+                        post.isNsfw()
+                    } else {
+                        false
+                    },
                     shouldTruncate = shouldTruncate
                 ) { onMediaClicked(post) }
             }
@@ -138,11 +153,73 @@ fun PostCardPreview() {
     }
 }
 
-private const val DUMMY_CONTENT = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+@Preview(name = "Text Post summary")
+@Composable
+fun TextPostSummaryPreview() {
+    VermilionTheme {
+        TextSummary(
+            content = Parser.builder().build().parse(MIXED_MD) as Document,
+            shouldTruncate = false
+        )
+    }
+}
+
+@Language("Markdown")
+const val MIXED_MD = """
+### Markdown Header
+This is regular text without formatting in a single paragraph.
+![Serious](file:///android_asset/serios.jpg)
+Images can also be inline: ![Serious](file:///android_asset/serios.jpg). [Links](http://hellsoft.se) and `inline code` also work. This *is* text __with__ inline styles for *__bold and italic__*. Those can be nested.
+Here is a code block:
+```javascript
+function codeBlock() {
+    return true;
+}
+```
+
+Here is another clode block (indented):
+
+    fun foo() {
+        bar()
+    }
+
++ Bullet
++ __Lists__
++ Are
++ *Cool*
+1. **First**
+1. *Second*
+1. Third
+1. [Fourth is clickable](https://google.com)  
+   1. And
+   1. Sublists
+1. Mixed
+   - With
+   - Bullet
+   - Lists
+100) Lists
+100) Can
+100) Have
+100) *Custom*
+100) __Start__
+100) Numbers
+- List
+- Of
+- Items
+  - With
+  - Sublist
+> A blockquote is useful for quotes!
+"""
+
+private const val DUMMY_CONTENT =
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 internal val DUMMY_TEXT_POST = Post(
     PostId(""),
     PostTitle("Some post with a very long title that is likely to split across multiple lines"),
-    TextPostSummary(PreviewText(DUMMY_CONTENT), Parser.builder().build().parse(DUMMY_CONTENT) as Document),
+    TextPostSummary(
+        PreviewText(DUMMY_CONTENT),
+        Parser.builder().build().parse(MIXED_MD) as Document
+    ),
     NamedCommunity(CommunityName("Subreddit")),
     AuthorName("/u/SomeDude"),
     postedAt = Instant.now(),
