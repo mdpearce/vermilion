@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -68,13 +69,20 @@ fun TabBottomBar(
                         .padding(end = 4.dp, start = 4.dp)
                         .wrapContentHeight()
                         .width(140.dp)
-                        .clickable { onTabClicked(tab) },
-                    color = if (activeTab is ActiveTab.Tab && tab.id == activeTab.id) {
-                        MaterialTheme.colors.primaryVariant
+                        .clickable { onTabClicked(tab) }
+                        .alpha(
+                            if (activeTab is ActiveTab.Tab && tab.id == activeTab.id) {
+                                1f
+                            } else {
+                                0.5f
+                            }
+                        ),
+                    color = MaterialTheme.colors.surface,
+                    elevation = if (activeTab is ActiveTab.Tab && tab.id == activeTab.id) {
+                        48.dp
                     } else {
-                        MaterialTheme.colors.surface
-                    },
-                    elevation = 24.dp
+                        16.dp
+                    }
                 ) {
                     Row(
                         Modifier
