@@ -21,7 +21,7 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import com.neaniesoft.vermilion.app.customtabs.CustomTabNavigator
-import com.neaniesoft.vermilion.tabs.adapters.driving.ui.ActiveTab
+import com.neaniesoft.vermilion.tabs.domain.entities.ActiveTab
 import com.neaniesoft.vermilion.tabs.adapters.driving.ui.TabBottomBar
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import java.time.Clock

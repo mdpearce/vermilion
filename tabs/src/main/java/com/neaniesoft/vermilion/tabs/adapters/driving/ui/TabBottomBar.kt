@@ -1,6 +1,5 @@
 package com.neaniesoft.vermilion.tabs.adapters.driving.ui
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,6 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.neaniesoft.vermilion.tabs.domain.entities.ActiveTab
 import com.neaniesoft.vermilion.tabs.domain.entities.DisplayName
 import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
 import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
@@ -47,30 +47,15 @@ fun TabBottomBar(
     onTabClicked: (TabState) -> Unit,
     onTabCloseClicked: (TabState) -> Unit
 ) {
-    BottomAppBar() {
+    BottomAppBar {
         LazyRow(
             Modifier
                 .fillMaxWidth()
         ) {
             item {
-                Log.d("TabBottomBar", "active tab: $activeTab")
-                IconButton(onClick = onHomeButtonClicked) {
-                    if (activeTab is ActiveTab.Home) {
-                        Icon(
-                            Icons.Default.Home, contentDescription = "Home",
-                            tint = if (MaterialTheme.colors.isLight) {
-                                Color.Companion.White
-                            } else {
-                                MaterialTheme.colors.primaryVariant
-                            }
-                        )
-                    } else {
-                        Icon(
-                            Icons.Default.Home, contentDescription = "Home"
-                        )
-                    }
-                }
+                HomeIcon(isActive = activeTab is ActiveTab.Home, onClick = onHomeButtonClicked)
             }
+
             item {
                 IconButton(onClick = onUserButtonClicked) {
                     Icon(Icons.Default.Person, contentDescription = "My account")
@@ -80,51 +65,85 @@ fun TabBottomBar(
             items(tabs) { tab ->
                 val isActive = activeTab is ActiveTab.Tab && tab.id == activeTab.id
 
-                Surface(
-                    shape = MaterialTheme.shapes.small,
-                    modifier = Modifier
-                        .padding(end = 4.dp, start = 4.dp)
-                        .wrapContentHeight()
-                        .width(140.dp)
-                        .clickable { onTabClicked(tab) }
-                        .alpha(
-                            if (isActive) {
-                                1f
-                            } else {
-                                0.5f
-                            }
-                        ),
-                    color = MaterialTheme.colors.surface,
-                    elevation = if (isActive) {
-                        64.dp
-                    } else {
-                        16.dp
-                    }
-                ) {
-                    Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(start = 8.dp, end = 8.dp)
-                    ) {
-                        Text(
-                            text = tab.displayName.value,
-                            style = MaterialTheme.typography.caption,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier
-                                .width(104.dp)
-                                .wrapContentHeight()
-                                .align(CenterVertically)
-                        )
-                        IconButton(
-                            onClick = { onTabCloseClicked(tab) }) {
-                            Icon(Icons.Default.Close, contentDescription = "close")
-                        }
-                    }
-                }
-
+                TopLevelTab(
+                    isActive = isActive,
+                    tabState = tab,
+                    onTabClicked = onTabClicked,
+                    onCloseClicked = onTabCloseClicked
+                )
             }
+        }
+    }
+}
+
+@Composable
+fun TopLevelTab(
+    isActive: Boolean,
+    tabState: TabState,
+    onTabClicked: (TabState) -> Unit,
+    onCloseClicked: (TabState) -> Unit
+) {
+    Surface(
+        shape = MaterialTheme.shapes.small,
+        modifier = Modifier
+            .padding(end = 4.dp, start = 4.dp)
+            .wrapContentHeight()
+            .width(140.dp)
+            .clickable { onTabClicked(tabState) }
+            .alpha(
+                if (isActive) {
+                    1f
+                } else {
+                    0.5f
+                }
+            ),
+        color = MaterialTheme.colors.surface,
+        elevation = if (isActive) {
+            64.dp
+        } else {
+            16.dp
+        }
+    ) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(start = 8.dp, end = 8.dp)
+        ) {
+            Text(
+                text = tabState.displayName.value,
+                style = MaterialTheme.typography.caption,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .width(104.dp)
+                    .wrapContentHeight()
+                    .align(CenterVertically)
+            )
+            IconButton(
+                onClick = { onCloseClicked(tabState) }) {
+                Icon(Icons.Default.Close, contentDescription = "close")
+            }
+        }
+    }
+}
+
+@Composable
+fun HomeIcon(isActive: Boolean, onClick: () -> Unit) {
+    IconButton(onClick = onClick) {
+        if (isActive) {
+            Icon(
+                Icons.Default.Home, contentDescription = "Home",
+                tint = if (MaterialTheme.colors.isLight) {
+                    Color.Companion.White
+                } else {
+                    MaterialTheme.colors.primaryVariant
+                }
+            )
+        } else {
+            Icon(
+                Icons.Default.Home, contentDescription = "Home"
+            )
         }
     }
 }
@@ -205,10 +224,3 @@ private val DUMMY_TAB_2 = DUMMY_TAB.copy(
     type = TabType.POST_DETAILS,
     tabSortOrder = TabSortOrderIndex(2)
 )
-
-sealed class ActiveTab {
-    object None : ActiveTab()
-    object Home : ActiveTab()
-    data class Tab(val id: TabId) : ActiveTab()
-}
-
