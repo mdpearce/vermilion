@@ -3,6 +3,7 @@ package com.neaniesoft.vermilion.postdetails.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.InlineTextContent
@@ -54,7 +55,9 @@ import org.commonmark.node.ThematicBreak
 // Very heavily inspired/taken from https://www.hellsoft.se/rendering-markdown-with-jetpack-compose/
 @Composable
 fun MarkdownDocument(document: Document) {
-    MarkdownBlockChildren(parent = document)
+    Column {
+        MarkdownBlockChildren(parent = document)
+    }
 }
 
 @Composable
@@ -89,7 +92,7 @@ fun MarkdownBlockQuote(blockQuote: BlockQuote, modifier: Modifier = Modifier) {
                 end = Offset(12.dp.value, size.height)
             )
         }
-        .padding(start = 16.dp, top = 4.dp, bottom = 4.dp)) {
+        .padding(start = 16.dp, top = 4.dp, bottom = 8.dp)) {
         val text = buildAnnotatedString {
             pushStyle(
                 MaterialTheme.typography.body1.toSpanStyle()
