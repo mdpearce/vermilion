@@ -73,9 +73,11 @@ fun VermilionApp(
 
         LaunchedEffect(key1 = Unit, block = {
             viewModel.routeEvents.collect { route ->
-                navController.navigate(route) {
-                    popUpTo(VermilionScreen.Home.name) {
-                        inclusive = route.startsWith(VermilionScreen.Home.name)
+                if (!navController.popBackStack(route, false)) {
+                    navController.navigate(route) {
+                        popUpTo(VermilionScreen.Home.name) {
+                            inclusive = route.startsWith(VermilionScreen.Home.name)
+                        }
                     }
                 }
             }
