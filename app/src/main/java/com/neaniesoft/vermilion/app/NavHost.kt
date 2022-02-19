@@ -31,7 +31,8 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
                 community = FrontPage,
                 onOpenPostDetails = { postId ->
                     navController.navigate("${VermilionScreen.PostDetails}/${postId.value}")
-                }, onOpenUri = { uri ->
+                },
+                onOpenUri = { uri ->
                     navController.navigate(customTabRoute(uri))
                 }
             )
