@@ -36,7 +36,7 @@ class PostsViewModel @Inject constructor(
             Pager(
                 PagingConfig(pageSize = 20),
                 remoteMediator = PostsRemoteMediator(
-                    query,
+                    key,
                     postDao,
                     postRemoteKeyDao,
                     postRepository,
@@ -44,7 +44,7 @@ class PostsViewModel @Inject constructor(
                     clock
                 )
             ) {
-                postDao.pagingSource(query)
+                postDao.pagingSource(key)
             }.flow.map { pagingData ->
                 pagingData.map {
                     it.toPost()
