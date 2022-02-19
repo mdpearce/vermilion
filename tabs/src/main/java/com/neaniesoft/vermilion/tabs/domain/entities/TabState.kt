@@ -12,6 +12,14 @@ data class TabState(
     val scrollPosition: ScrollPosition
 )
 
+data class NewTabState(
+    val parentId: ParentId,
+    val type: TabType,
+    val displayName: DisplayName,
+    val createdAt: Instant,
+    val scrollPosition: ScrollPosition
+)
+
 @JvmInline
 value class ParentId(val value: String)
 

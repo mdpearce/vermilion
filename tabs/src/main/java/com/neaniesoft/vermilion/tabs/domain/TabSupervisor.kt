@@ -1,10 +1,9 @@
 package com.neaniesoft.vermilion.tabs.domain
 
-import com.neaniesoft.vermilion.tabs.domain.entities.DisplayName
+import com.neaniesoft.vermilion.posts.domain.entities.PostId
+import com.neaniesoft.vermilion.tabs.domain.entities.NewTabState
 import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
 import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
-import com.neaniesoft.vermilion.tabs.domain.entities.TabId
-import com.neaniesoft.vermilion.tabs.domain.entities.TabSortOrderIndex
 import com.neaniesoft.vermilion.tabs.domain.entities.TabState
 import com.neaniesoft.vermilion.tabs.domain.entities.TabType
 import com.neaniesoft.vermilion.tabs.domain.ports.TabRepository
@@ -44,18 +43,22 @@ class TabSupervisor @Inject constructor(
         }
     }
 
-    suspend fun addNewPostDetailsTabIfNotExists(parentId: ParentId, displayName: DisplayName) {
+    suspend fun addNewPostDetailsTabIfNotExists(parentId: ParentId): TabState {
 
-        val tab = TabState(
-            TabId(0),
+        val displayName = repository.displayNameForPostDetails(postId = PostId(parentId.value))
+
+        val tab = NewTabState(
             parentId,
             TabType.POST_DETAILS,
             displayName,
             Instant.ofEpochMilli(clock.millis()),
-            TabSortOrderIndex(0),
             ScrollPosition(0)
         )
-        repository.addNewTabIfNotExists(tab)
+        return repository.addNewTabIfNotExists(tab)
+    }
+
+    suspend fun removeTab(tab: TabState) {
+        repository.removeTab(tab)
     }
 }
 

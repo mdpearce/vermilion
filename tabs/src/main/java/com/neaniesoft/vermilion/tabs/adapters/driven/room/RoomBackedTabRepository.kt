@@ -2,9 +2,13 @@ package com.neaniesoft.vermilion.tabs.adapters.driven.room
 
 import androidx.room.withTransaction
 import com.neaniesoft.vermilion.db.VermilionDatabase
+import com.neaniesoft.vermilion.dbentities.posts.PostDao
+import com.neaniesoft.vermilion.dbentities.tabs.NewTabStateRecord
 import com.neaniesoft.vermilion.dbentities.tabs.TabStateDao
 import com.neaniesoft.vermilion.dbentities.tabs.TabStateRecord
+import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.tabs.domain.entities.DisplayName
+import com.neaniesoft.vermilion.tabs.domain.entities.NewTabState
 import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
 import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
 import com.neaniesoft.vermilion.tabs.domain.entities.TabId
@@ -26,7 +30,8 @@ import javax.inject.Singleton
 @Singleton
 class RoomBackedTabRepository @Inject constructor(
     private val database: VermilionDatabase,
-    private val tabStateDao: TabStateDao
+    private val tabStateDao: TabStateDao,
+    private val postDao: PostDao
 ) : TabRepository {
 
     override val currentTabs: Flow<List<TabState>> =
@@ -36,12 +41,39 @@ class RoomBackedTabRepository @Inject constructor(
             }
         }
 
-    override suspend fun addNewTabIfNotExists(tab: TabState) {
-        database.withTransaction {
-            if (tabStateDao.findByParentAndType(tab.parentId.value, tab.type.name).isEmpty()) {
-                tabStateDao.insertAll(tab.toTabStateRecord())
+    override suspend fun addNewTabIfNotExists(tab: NewTabState): TabState {
+        return database.withTransaction {
+            val existingTab = tabStateDao.findByParentAndType(tab.parentId.value, tab.type.name)
+            if (existingTab.isEmpty()) {
+                val newRecord = tab.toNewTabStateRecord()
+                if (newRecord.tabSortOrder == -1) {
+                    tabStateDao.shiftAllTabsFrom(0)
+                }
+                tabStateDao.insertAll(newRecord)
+                tabStateDao.findByParentAndType(tab.parentId.value, tab.type.name).first()
+                    .toTabState()
+            } else {
+                existingTab.first().toTabState()
             }
         }
+    }
+
+    private suspend fun NewTabState.toNewTabStateRecord(): NewTabStateRecord {
+        val leftMostIndex = tabStateDao.getLeftMostSortIndex() ?: Int.MAX_VALUE
+        return NewTabStateRecord(
+            type.name,
+            parentId.value,
+            displayName.value,
+            createdAt.toEpochMilli(),
+            leftMostIndex - 1,
+            scrollPosition.value
+        )
+    }
+
+    override suspend fun displayNameForPostDetails(postId: PostId): DisplayName {
+        val post = postDao.postWithId(postId.value) ?: throw IllegalStateException("Post ${postId.value} not found in db")
+
+        return DisplayName(post.title)
     }
 
     override suspend fun removeTab(tab: TabState) {
@@ -67,17 +99,5 @@ internal fun TabStateRecord.toTabState(): TabState {
         Instant.ofEpochMilli(createdAt),
         TabSortOrderIndex(tabSortOrder),
         ScrollPosition(scrollPosition)
-    )
-}
-
-internal fun TabState.toTabStateRecord(): TabStateRecord {
-    return TabStateRecord(
-        id.value,
-        type.name,
-        parentId.value,
-        displayName.value,
-        createdAt.toEpochMilli(),
-        tabSortOrder.value,
-        scrollPosition.value
     )
 }

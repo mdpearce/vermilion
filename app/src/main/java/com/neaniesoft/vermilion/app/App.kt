@@ -8,6 +8,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -27,11 +28,18 @@ import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import com.neaniesoft.vermilion.app.customtabs.CustomTabNavigator
 import com.neaniesoft.vermilion.tabs.adapters.driving.ui.TabBottomBar
 import com.neaniesoft.vermilion.tabs.domain.TabSupervisor
-import com.neaniesoft.vermilion.tabs.domain.entities.DisplayName
 import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
+import com.neaniesoft.vermilion.tabs.domain.entities.TabId
+import com.neaniesoft.vermilion.tabs.domain.entities.TabState
+import com.neaniesoft.vermilion.tabs.domain.entities.TabType
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.Clock
 import javax.inject.Inject
@@ -63,6 +71,12 @@ fun VermilionApp(
         val scaffoldState = rememberScaffoldState()
         val tabs by viewModel.tabs.collectAsState()
 
+        LaunchedEffect(key1 = Unit, block = {
+            viewModel.routeEvents.collect {
+                navController.navigate(it)
+            }
+        })
+
         Scaffold(
             scaffoldState = scaffoldState,
             snackbarHost = { scaffoldState.snackbarHostState },
@@ -72,7 +86,15 @@ fun VermilionApp(
                 })
             },
             bottomBar = {
-                TabBottomBar(tabs = tabs, onUserButtonClicked = { /*TODO*/ }, onTabClicked = {})
+                TabBottomBar(
+                    tabs = tabs,
+                    onUserButtonClicked = { /*TODO*/ },
+                    onTabClicked = {
+                        viewModel.onTabClicked(it)
+                    },
+                    onTabCloseClicked = {
+                        viewModel.onTabCloseClicked(it)
+                    })
             }
         ) { innerPadding ->
             ModalBottomSheetLayout(bottomSheetNavigator) {
@@ -88,6 +110,12 @@ class VermilionAppViewModel @Inject constructor(
 ) : ViewModel() {
     val tabs = tabSupervisor.currentTabs
 
+    private val _routeEvents = MutableSharedFlow<String>()
+    val routeEvents: SharedFlow<String> = _routeEvents.asSharedFlow()
+
+    private val _activeTab = MutableStateFlow<ActiveTab>(ActiveTab.None)
+    val activeTab = _activeTab.asStateFlow()
+
     fun onNavigationEvent(destination: NavDestination, args: Bundle?) {
         val route = destination.route
         Log.d("VermilionAppViewModel", "Route: $route; args: $args")
@@ -96,9 +124,30 @@ class VermilionAppViewModel @Inject constructor(
                 val id =
                     requireNotNull(args?.getString("id")) { "Received a post details route with no id" }
                 viewModelScope.launch(Dispatchers.IO) {
-                    tabSupervisor.addNewPostDetailsTabIfNotExists(ParentId(id), DisplayName(id))
+                    val tab = tabSupervisor.addNewPostDetailsTabIfNotExists(ParentId(id))
+                    _activeTab.emit(ActiveTab.Tab(tab.id))
                 }
             }
         }
     }
+
+    fun onTabClicked(tab: TabState) {
+        emitRouteEvent(tab.type, tab.parentId)
+    }
+
+    private fun emitRouteEvent(type: TabType, parentId: ParentId) {
+        if (type == TabType.POST_DETAILS) {
+            val route = "${VermilionScreen.PostDetails}/${parentId.value}"
+            viewModelScope.launch { _routeEvents.emit(route) }
+        }
+    }
+
+    fun onTabCloseClicked(tab: TabState) {
+        viewModelScope.launch { tabSupervisor.removeTab(tab) }
+    }
+}
+
+sealed class ActiveTab {
+    object None : ActiveTab()
+    data class Tab(val id: TabId) : ActiveTab()
 }

@@ -13,9 +13,18 @@ interface TabStateDao {
     @Insert
     suspend fun insertAll(vararg tabs: TabStateRecord)
 
+    @Insert(entity = TabStateRecord::class)
+    suspend fun insertAll(vararg newTabs: NewTabStateRecord)
+
     @Query("DELETE FROM tabs WHERE id == :id")
     suspend fun deleteTabWithId(id: Int)
 
     @Query("SELECT * FROM tabs WHERE parentId == :parentId AND type == :type")
     suspend fun findByParentAndType(parentId: String, type: String): List<TabStateRecord>
+
+    @Query("SELECT tabSortOrder FROM tabs ORDER BY tabSortOrder ASC LIMIT 1")
+    suspend fun getLeftMostSortIndex(): Int?
+
+    @Query("UPDATE tabs SET tabSortOrder = tabSortOrder + 1 WHERE tabSortOrder >= :from")
+    suspend fun shiftAllTabsFrom(from: Int)
 }

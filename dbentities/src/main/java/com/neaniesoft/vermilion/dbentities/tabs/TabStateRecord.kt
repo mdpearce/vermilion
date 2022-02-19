@@ -14,3 +14,12 @@ data class TabStateRecord(
     val tabSortOrder: Int,
     val scrollPosition: Int
 )
+
+data class NewTabStateRecord(
+    val type: String,
+    val parentId: String,
+    val displayName: String,
+    val createdAt: Long,
+    val tabSortOrder: Int,
+    val scrollPosition: Int
+)

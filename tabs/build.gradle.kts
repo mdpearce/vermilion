@@ -8,6 +8,7 @@ dependencies {
     implementation(Deps.COMPOSE_MATERIAL)
     implementation(Deps.COMPOSE_UI_TOOLING_PREVIEW)
     implementation(project(":ui"))
+    implementation(project(":posts"))
     implementation(project(":utils"))
     implementation(project(":dbentities"))
     implementation(project(":db"))
