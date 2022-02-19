@@ -78,6 +78,7 @@ dependencies {
     implementation(project(":ui"))
     implementation(project(":accounts"))
     implementation(project(":utils"))
+    implementation(project(":tabs"))
     testImplementation(Deps.JUNIT)
     androidTestImplementation(Deps.ANDROIDX_TEST_EXT)
     androidTestImplementation(Deps.ANDROIDX_TEST_ESPRESSO)

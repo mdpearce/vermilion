@@ -8,16 +8,19 @@ import com.neaniesoft.vermilion.dbentities.posts.PostDao
 import com.neaniesoft.vermilion.dbentities.posts.PostRecord
 import com.neaniesoft.vermilion.dbentities.posts.PostRemoteKey
 import com.neaniesoft.vermilion.dbentities.posts.PostRemoteKeyDao
+import com.neaniesoft.vermilion.dbentities.tabs.TabStateDao
+import com.neaniesoft.vermilion.dbentities.tabs.TabStateRecord
 import com.neaniesoft.vermilion.dbentities.useraccount.UserAccountDao
 import com.neaniesoft.vermilion.dbentities.useraccount.UserAccountRecord
 
 @Database(
-    entities = [UserAccountRecord::class, PostRecord::class, PostRemoteKey::class, CommentRecord::class],
-    version = 4
+    entities = [UserAccountRecord::class, PostRecord::class, PostRemoteKey::class, CommentRecord::class, TabStateRecord::class],
+    version = 7
 )
 abstract class VermilionDatabase : RoomDatabase() {
     abstract fun userAccountDao(): UserAccountDao
     abstract fun postDao(): PostDao
     abstract fun postRemoteKeysDao(): PostRemoteKeyDao
     abstract fun commentDao(): CommentDao
+    abstract fun tabStateDao(): TabStateDao
 }

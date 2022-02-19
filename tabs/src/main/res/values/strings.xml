@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="content_description_home_button">Home</string>
+    <string name="content_description_my_account_button">My account</string>
+    <string name="content_description_close_tab">Close tab</string>
+</resources>

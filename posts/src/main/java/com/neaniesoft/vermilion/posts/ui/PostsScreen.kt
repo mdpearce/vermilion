@@ -30,20 +30,21 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import com.neaniesoft.vermilion.posts.R
+import com.neaniesoft.vermilion.posts.domain.entities.Community
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
-import com.neaniesoft.vermilion.ui.theme.Vermilion500
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import kotlinx.coroutines.flow.flowOf
 
 @ExperimentalPagingApi
 @Composable
 fun PostsScreen(
+    community: Community,
     viewModel: PostsViewModel = hiltViewModel(),
     onOpenPostDetails: (postId: PostId) -> Unit,
     onOpenUri: (uri: Uri) -> Unit
 ) {
-    val pagingItems = viewModel.pageFlow.collectAsLazyPagingItems()
+    val pagingItems = viewModel.pagingData(community.routeName).collectAsLazyPagingItems()
 
     Box {
         PostsList(posts = pagingItems, onMediaClicked = {
@@ -145,7 +146,7 @@ fun ErrorItem(
             text = message,
             modifier = Modifier.weight(1f),
             style = MaterialTheme.typography.h6,
-            color = Vermilion500
+            color = MaterialTheme.colors.error
         )
         OutlinedButton(onClick = onClickRetry) {
             Text(text = stringResource(id = R.string.error_retry))

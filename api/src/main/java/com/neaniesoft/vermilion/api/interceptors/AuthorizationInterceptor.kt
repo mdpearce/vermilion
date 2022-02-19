@@ -11,6 +11,7 @@ import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationService
 import net.openid.appauth.ClientSecretBasic
 import okhttp3.Interceptor
+import okhttp3.Protocol
 import okhttp3.Response
 import okhttp3.ResponseBody
 import javax.inject.Inject
@@ -55,12 +56,20 @@ class AuthorizationInterceptor @Inject constructor(
                         .build()
                 )
             } catch (e: Throwable) {
-                Response.Builder().code(500).body(
-                    ResponseBody.create(
-                        null,
-                        "Error obtaining token.\n$e (${e.message}) caused by ${e.cause} (${e.cause?.message})"
+                Response.Builder()
+                    .code(500)
+                    .request(chain.request())
+                    .protocol(Protocol.HTTP_1_1)
+                    .message(
+                        "Error obtaining token.\n" +
+                            "$e (${e.message}) caused by ${e.cause} (${e.cause?.message})"
                     )
-                ).build()
+                    .body(
+                        ResponseBody.create(
+                            null,
+                            "Error obtaining token.\n$e (${e.message}) caused by ${e.cause} (${e.cause?.message})"
+                        )
+                    ).build()
             }
         } else {
             logger.debugIfEnabled { "Not authorized, using device token" }
@@ -76,6 +85,9 @@ class AuthorizationInterceptor @Inject constructor(
                 val error = tokenResult.getError()
                 Response.Builder()
                     .code(500)
+                    .request(chain.request())
+                    .protocol(Protocol.HTTP_1_1)
+                    .message("$error error caused by ${error?.cause}")
                     .body(ResponseBody.create(null, "$error error caused by ${error?.cause}"))
                     .build()
             }
