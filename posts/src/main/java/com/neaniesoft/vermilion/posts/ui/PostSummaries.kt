@@ -20,7 +20,7 @@ import org.commonmark.node.Document
 @Composable
 fun TextSummary(content: Document, shouldTruncate: Boolean, onClick: (() -> Unit)? = null) {
     Column(if (onClick != null) Modifier.clickable { onClick() } else Modifier) {
-        MarkdownDocument(document = content, if (shouldTruncate) 3 else Int.MAX_VALUE)
+        MarkdownDocument(document = content, if (shouldTruncate) 3 else Int.MAX_VALUE, onClick)
     }
 }
 

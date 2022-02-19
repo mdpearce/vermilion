@@ -54,14 +54,22 @@ import org.commonmark.node.ThematicBreak
 
 // Very heavily inspired/taken from https://www.hellsoft.se/rendering-markdown-with-jetpack-compose/
 @Composable
-fun MarkdownDocument(document: Document, truncateToBlocks: Int = Int.MAX_VALUE) {
+fun MarkdownDocument(
+    document: Document,
+    truncateToBlocks: Int = Int.MAX_VALUE,
+    onTextClick: (() -> Unit)? = null
+) {
     Column {
-        MarkdownBlockChildren(parent = document, truncateToBlocks)
+        MarkdownBlockChildren(parent = document, truncateToBlocks, onTextClick)
     }
 }
 
 @Composable
-fun MarkdownBlockChildren(parent: Node, truncateToBlocks: Int = Int.MAX_VALUE) {
+fun MarkdownBlockChildren(
+    parent: Node,
+    truncateToBlocks: Int = Int.MAX_VALUE,
+    onTextClick: (() -> Unit)? = null
+) {
     var child = parent.firstChild
     var count = 0
 
@@ -69,8 +77,8 @@ fun MarkdownBlockChildren(parent: Node, truncateToBlocks: Int = Int.MAX_VALUE) {
         when (child) {
             is BlockQuote -> MarkdownBlockQuote(blockQuote = child)
             is ThematicBreak -> MarkdownThematicBreak(thematicBreak = child)
-            is Heading -> MarkdownHeading(heading = child)
-            is Paragraph -> MarkdownParagraph(paragraph = child)
+            is Heading -> MarkdownHeading(heading = child, onTextClick = onTextClick)
+            is Paragraph -> MarkdownParagraph(paragraph = child, onClick = onTextClick)
             is FencedCodeBlock -> MarkdownFencedCodeBlock(fencedCodeBlock = child)
             is IndentedCodeBlock -> MarkdownIndentedCodeBlock(indentedCodeBlock = child)
             is Image -> MarkdownImage(image = child)
@@ -115,7 +123,11 @@ fun MarkdownThematicBreak(thematicBreak: ThematicBreak) {
 }
 
 @Composable
-fun MarkdownHeading(heading: Heading, modifier: Modifier = Modifier) {
+fun MarkdownHeading(
+    heading: Heading,
+    modifier: Modifier = Modifier,
+    onTextClick: (() -> Unit)? = null
+) {
     val style = when (heading.level) {
         1 -> MaterialTheme.typography.h1
         2 -> MaterialTheme.typography.h2
@@ -135,12 +147,17 @@ fun MarkdownHeading(heading: Heading, modifier: Modifier = Modifier) {
         val text = buildAnnotatedString {
             appendMarkdownChildren(heading, MaterialTheme.colors)
         }
-        MarkdownText(text, style)
+        MarkdownText(text, style, onClick = onTextClick)
     }
 }
 
 @Composable
-fun MarkdownText(text: AnnotatedString, style: TextStyle, modifier: Modifier = Modifier) {
+fun MarkdownText(
+    text: AnnotatedString,
+    style: TextStyle,
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null
+) {
     val uriHandler = LocalUriHandler.current
     val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
 
@@ -150,13 +167,17 @@ fun MarkdownText(text: AnnotatedString, style: TextStyle, modifier: Modifier = M
             detectTapGestures { pos ->
                 layoutResult.value?.let { layoutResult ->
                     val position = layoutResult.getOffsetForPosition(pos)
-                    text.getStringAnnotations(position, position)
+                    val annotation = text.getStringAnnotations(position, position)
                         .firstOrNull()
-                        ?.let { sa ->
-                            if (sa.tag == TAG_URL) {
-                                uriHandler.openUri(sa.item)
-                            }
+                    if (annotation != null) {
+                        if (annotation.tag == TAG_URL) {
+                            uriHandler.openUri(annotation.item)
                         }
+                    } else {
+                        if (onClick != null) {
+                            onClick()
+                        }
+                    }
                 }
             }
         },
@@ -213,7 +234,11 @@ private fun AnnotatedString.Builder.appendMarkdownChildren(parent: Node, colors:
 }
 
 @Composable
-fun MarkdownParagraph(paragraph: Paragraph, modifier: Modifier = Modifier) {
+fun MarkdownParagraph(
+    paragraph: Paragraph,
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null
+) {
     if (paragraph.firstChild is Image && paragraph.firstChild == paragraph.lastChild) {
         // Paragraph with single image
         MarkdownImage(image = paragraph.firstChild as Image, modifier)
@@ -229,7 +254,11 @@ fun MarkdownParagraph(paragraph: Paragraph, modifier: Modifier = Modifier) {
                 appendMarkdownChildren(paragraph, MaterialTheme.colors)
                 pop()
             }
-            MarkdownText(text = styledText, style = MaterialTheme.typography.body1)
+            MarkdownText(
+                text = styledText,
+                style = MaterialTheme.typography.body1,
+                onClick = onClick
+            )
         }
     }
 }
@@ -275,7 +304,11 @@ fun MarkdownImage(image: Image, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun MarkdownBulletList(bulletList: BulletList, modifier: Modifier = Modifier) {
+fun MarkdownBulletList(
+    bulletList: BulletList,
+    modifier: Modifier = Modifier,
+    onTextClick: (() -> Unit)? = null
+) {
     val marker = bulletList.bulletMarker
     MarkdownListItems(listBlock = bulletList, modifier) {
         val text = buildAnnotatedString {
@@ -284,7 +317,7 @@ fun MarkdownBulletList(bulletList: BulletList, modifier: Modifier = Modifier) {
             appendMarkdownChildren(it, MaterialTheme.colors)
             pop()
         }
-        MarkdownText(text = text, style = MaterialTheme.typography.body1, modifier)
+        MarkdownText(text = text, style = MaterialTheme.typography.body1, modifier, onTextClick)
     }
 }
 
@@ -314,7 +347,11 @@ fun MarkdownListItems(
 }
 
 @Composable
-fun MarkdownOrderedList(orderedList: OrderedList, modifier: Modifier = Modifier) {
+fun MarkdownOrderedList(
+    orderedList: OrderedList,
+    modifier: Modifier = Modifier,
+    onTextClick: (() -> Unit)? = null
+) {
     var number = orderedList.startNumber
     val delimiter = orderedList.delimiter
     MarkdownListItems(orderedList, modifier) {
@@ -324,7 +361,7 @@ fun MarkdownOrderedList(orderedList: OrderedList, modifier: Modifier = Modifier)
             appendMarkdownChildren(it, MaterialTheme.colors)
             pop()
         }
-        MarkdownText(text, MaterialTheme.typography.body1, modifier)
+        MarkdownText(text, MaterialTheme.typography.body1, modifier, onTextClick)
     }
 }
 
