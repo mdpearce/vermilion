@@ -23,6 +23,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.utils.logger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import org.apache.commons.text.StringEscapeUtils
 import org.commonmark.parser.Parser
 import org.ocpsoft.prettytime.PrettyTime
 import java.time.Clock
@@ -186,7 +187,7 @@ private fun CommentData.toCommentRecord(clock: Clock): CommentRecord {
         postId = linkId.replace("t3_", ""),
         parentId = parentId.takeIf { !it.startsWith("t3_") }?.replace("t1_", ""),
         path = null,
-        body = body,
+        body = StringEscapeUtils.unescapeHtml4(body),
         flags = flags,
         author = author,
         createdAt = createdUtc.toLong(),
