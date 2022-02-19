@@ -1,19 +1,28 @@
 package com.neaniesoft.vermilion.postdetails.ui
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
@@ -112,8 +121,32 @@ fun MarkdownHeading(heading: Heading, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun MarkdownText(text: AnnotatedString, style: TextStyle) {
-    TODO("Not yet implemented")
+fun MarkdownText(text: AnnotatedString, style: TextStyle, modifier: Modifier = Modifier) {
+    val uriHandler = LocalUriHandler.current
+    val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
+
+    Text(text = text,
+        modifier = modifier.pointerInput(text) {
+            detectTapGestures { pos ->
+                layoutResult.value?.let { layoutResult ->
+                    val position = layoutResult.getOffsetForPosition(pos)
+                    text.getStringAnnotations(position, position)
+                        .firstOrNull()
+                        ?.let { sa ->
+                            if (sa.tag == TAG_URL) {
+                                uriHandler.openUri(sa.item)
+                            }
+                        }
+                }
+            }
+        }, style = style, inlineContent = mapOf(
+            TAG_IMAGE_URL to InlineTextContent(
+                Placeholder(style.fontSize, style.fontSize, PlaceholderVerticalAlign.Bottom)
+            ) { url ->
+                val painter = rememberImagePainter(url)
+                Image(painter, "inline image")
+            }
+        ), onTextLayout = { layoutResult.value = it })
 }
 
 private fun AnnotatedString.Builder.appendMarkdownChildren(node: Node, colors: Colors) {
@@ -147,3 +180,6 @@ fun MarkdownBulletList(bulletList: BulletList) {
 @Composable
 fun MarkdownOrderedList(orderedList: OrderedList) {
 }
+
+private const val TAG_URL = "url"
+private const val TAG_IMAGE_URL = "imageUrl"
