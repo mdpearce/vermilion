@@ -1,5 +1,6 @@
 package com.neaniesoft.vermilion.tabs.adapters.driving.ui
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,17 +53,32 @@ fun TabBottomBar(
                 .fillMaxWidth()
         ) {
             item {
+                Log.d("TabBottomBar", "active tab: $activeTab")
                 IconButton(onClick = onHomeButtonClicked) {
-                    Icon(Icons.Default.Home, contentDescription = null)
+                    if (activeTab is ActiveTab.Home) {
+                        Icon(
+                            Icons.Default.Home, contentDescription = "Home",
+                            tint = if (MaterialTheme.colors.isLight) {
+                                Color.Companion.White
+                            } else {
+                                MaterialTheme.colors.primaryVariant
+                            }
+                        )
+                    } else {
+                        Icon(
+                            Icons.Default.Home, contentDescription = "Home"
+                        )
+                    }
                 }
             }
             item {
                 IconButton(onClick = onUserButtonClicked) {
-                    Icon(Icons.Default.Person, contentDescription = null)
+                    Icon(Icons.Default.Person, contentDescription = "My account")
                 }
             }
 
             items(tabs) { tab ->
+                val isActive = activeTab is ActiveTab.Tab && tab.id == activeTab.id
 
                 Surface(
                     shape = MaterialTheme.shapes.small,
@@ -71,15 +88,15 @@ fun TabBottomBar(
                         .width(140.dp)
                         .clickable { onTabClicked(tab) }
                         .alpha(
-                            if (activeTab is ActiveTab.Tab && tab.id == activeTab.id) {
+                            if (isActive) {
                                 1f
                             } else {
                                 0.5f
                             }
                         ),
                     color = MaterialTheme.colors.surface,
-                    elevation = if (activeTab is ActiveTab.Tab && tab.id == activeTab.id) {
-                        48.dp
+                    elevation = if (isActive) {
+                        64.dp
                     } else {
                         16.dp
                     }
@@ -142,6 +159,36 @@ fun TabBottomBarPreviewDark() {
     }
 }
 
+@Preview(name = "Tab Bottom Bar Home Highlighted")
+@Composable
+fun TabBottomBarHomeHighlighted() {
+    VermilionTheme {
+        TabBottomBar(
+            tabs = listOf(DUMMY_TAB, DUMMY_TAB_2),
+            activeTab = ActiveTab.Home,
+            onHomeButtonClicked = {},
+            onUserButtonClicked = {},
+            onTabClicked = {},
+            onTabCloseClicked = {}
+        )
+    }
+}
+
+@Preview(name = "Tab Bottom Bar Home Highlighted (Dark)")
+@Composable
+fun TabBottomBarHomeHighlightedDark() {
+    VermilionTheme(darkTheme = true) {
+        TabBottomBar(
+            tabs = listOf(DUMMY_TAB, DUMMY_TAB_2),
+            activeTab = ActiveTab.Home,
+            onHomeButtonClicked = {},
+            onUserButtonClicked = {},
+            onTabClicked = {},
+            onTabCloseClicked = {}
+        )
+    }
+}
+
 private val DUMMY_TAB = TabState(
     TabId(0),
     ParentId("id"),
@@ -161,6 +208,7 @@ private val DUMMY_TAB_2 = DUMMY_TAB.copy(
 
 sealed class ActiveTab {
     object None : ActiveTab()
+    object Home : ActiveTab()
     data class Tab(val id: TabId) : ActiveTab()
 }
 

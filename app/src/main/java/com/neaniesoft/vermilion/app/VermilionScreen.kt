@@ -14,7 +14,7 @@ enum class VermilionScreen {
             PostDetails.name -> PostDetails
             MyAccount.name -> MyAccount
             CustomTab.name -> CustomTab
-            null -> Posts
+            null -> Home
             else -> throw IllegalArgumentException("Unrecognized route: $route")
         }
     }

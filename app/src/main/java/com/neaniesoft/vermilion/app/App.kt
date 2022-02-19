@@ -146,15 +146,21 @@ class VermilionAppViewModel @Inject constructor(
         val route = destination.route
         Log.d("VermilionAppViewModel", "Route: $route; args: $args")
         if (route != null) {
-            if (route.startsWith(VermilionScreen.PostDetails.name)) {
-                val id =
-                    requireNotNull(args?.getString("id")) { "Received a post details route with no id" }
-                viewModelScope.launch(Dispatchers.IO) {
-                    val tab = tabSupervisor.addNewPostDetailsTabIfNotExists(ParentId(id))
-                    _activeTab.emit(ActiveTab.Tab(tab.id))
+            when {
+                route.startsWith(VermilionScreen.PostDetails.name) -> {
+                    val id =
+                        requireNotNull(args?.getString("id")) { "Received a post details route with no id" }
+                    viewModelScope.launch(Dispatchers.IO) {
+                        val tab = tabSupervisor.addNewPostDetailsTabIfNotExists(ParentId(id))
+                        _activeTab.emit(ActiveTab.Tab(tab.id))
+                    }
                 }
-            } else if (route.startsWith(VermilionScreen.Posts.name)) {
-                viewModelScope.launch { _activeTab.emit(ActiveTab.None) }
+                route.startsWith(VermilionScreen.Home.name) -> {
+                    viewModelScope.launch { _activeTab.emit(ActiveTab.Home) }
+                }
+                else -> {
+                    viewModelScope.launch { _activeTab.emit(ActiveTab.None) }
+                }
             }
         }
     }
@@ -178,7 +184,7 @@ class VermilionAppViewModel @Inject constructor(
     }
 
     fun onHomeButtonClicked() {
-        viewModelScope.launch { _routeEvents.emit(VermilionScreen.Posts.name) }
+        viewModelScope.launch { _routeEvents.emit(VermilionScreen.Home.name) }
     }
 
     fun onUserButtonClicked() {
