@@ -8,5 +8,7 @@ dependencies {
     implementation(Deps.COMPOSE_MATERIAL)
     implementation(Deps.COMPOSE_UI_TOOLING_PREVIEW)
     implementation(Deps.LIFECYCLE_RUNTIME)
+    implementation(Deps.COMMONMARK)
+    implementation(Deps.COIL_COMPOSE)
     debugImplementation(Deps.COMPOSE_UI_TOOLING)
 }
