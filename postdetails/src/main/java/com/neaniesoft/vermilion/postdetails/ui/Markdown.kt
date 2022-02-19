@@ -83,6 +83,7 @@ fun MarkdownBlockQuote(blockQuote: BlockQuote, modifier: Modifier = Modifier) {
 
 @Composable
 fun MarkdownThematicBreak(thematicBreak: ThematicBreak) {
+    // Ignored
 }
 
 @Composable
