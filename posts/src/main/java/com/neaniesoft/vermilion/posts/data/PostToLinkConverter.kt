@@ -1,8 +1,10 @@
 package com.neaniesoft.vermilion.posts.data
 
 import android.net.Uri
+import androidx.core.net.toUri
 import com.neaniesoft.vermilion.api.entities.Awarding
 import com.neaniesoft.vermilion.api.entities.Link
+import com.neaniesoft.vermilion.api.entities.Preview
 import com.neaniesoft.vermilion.posts.domain.choosePreviewImage
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.Award
@@ -10,8 +12,10 @@ import com.neaniesoft.vermilion.posts.domain.entities.AwardCount
 import com.neaniesoft.vermilion.posts.domain.entities.AwardName
 import com.neaniesoft.vermilion.posts.domain.entities.CommentCount
 import com.neaniesoft.vermilion.posts.domain.entities.CommunityName
+import com.neaniesoft.vermilion.posts.domain.entities.DefaultThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.ImagePostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.LinkHost
+import com.neaniesoft.vermilion.posts.domain.entities.LinkPostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.NamedCommunity
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlags
@@ -20,8 +24,11 @@ import com.neaniesoft.vermilion.posts.domain.entities.PostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.PostTitle
 import com.neaniesoft.vermilion.posts.domain.entities.PreviewText
 import com.neaniesoft.vermilion.posts.domain.entities.Score
+import com.neaniesoft.vermilion.posts.domain.entities.SelfThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.TextPostSummary
+import com.neaniesoft.vermilion.posts.domain.entities.Thumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.UriImage
+import com.neaniesoft.vermilion.posts.domain.entities.UriThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.VideoPostSummary
 import com.neaniesoft.vermilion.utils.anonymousLogger
 import org.apache.commons.text.StringEscapeUtils
@@ -55,13 +62,7 @@ internal fun Link.postSummary(markdownParser: Parser): PostSummary {
             ImagePostSummary(
                 LinkHost(domain),
                 Uri.parse(thumbnail),
-                preview?.images?.first()?.resolutions?.map {
-                    UriImage(
-                        Uri.parse(StringEscapeUtils.unescapeHtml4(it.url)),
-                        it.width,
-                        it.height
-                    )
-                }?.choosePreviewImage(),
+                preview?.uriImage(),
                 Uri.parse(url)
             )
         }
@@ -76,14 +77,15 @@ internal fun Link.postSummary(markdownParser: Parser): PostSummary {
             VideoPostSummary(
                 LinkHost(domain),
                 Uri.parse(thumbnail),
-                preview?.images?.first()?.resolutions?.map {
-                    UriImage(
-                        Uri.parse(StringEscapeUtils.unescapeHtml4(it.url)),
-                        it.width,
-                        it.height
-                    )
-                }?.choosePreviewImage(),
+                preview?.uriImage(),
                 Uri.parse(url)
+            )
+        }
+        hint.endsWith("link") -> {
+            LinkPostSummary(
+                LinkHost(domain),
+                thumbnail.thumbnail(),
+                preview?.uriImage()
             )
         }
         else -> {
@@ -91,6 +93,25 @@ internal fun Link.postSummary(markdownParser: Parser): PostSummary {
             logger.debugIfEnabled { "Unrecognised post hint ($hint), defaulting to text post type" }
             TextPostSummary(PreviewText(""), Document())
         }
+    }
+}
+
+internal fun Preview.uriImage(): UriImage? {
+    return images.firstOrNull()?.resolutions?.map {
+        UriImage(
+            Uri.parse(StringEscapeUtils.unescapeHtml4(it.url)),
+            it.width,
+            it.height
+        )
+    }?.choosePreviewImage()
+}
+
+internal fun String.thumbnail(): Thumbnail {
+    return when {
+        this == "self" -> SelfThumbnail
+        this == "default" -> DefaultThumbnail
+        this.isNotEmpty() -> UriThumbnail(this.toUri())
+        else -> DefaultThumbnail
     }
 }
 

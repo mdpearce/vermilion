@@ -18,7 +18,9 @@ data class GalleryPostSummary(
 )
 
 data class LinkPostSummary(
-    val linkHost: LinkHost
+    val linkHost: LinkHost,
+    val thumbnail: Thumbnail,
+    val preview: UriImage?
 ) : PostSummary()
 
 data class TextPostSummary(

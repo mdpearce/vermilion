@@ -6,6 +6,7 @@ import com.neaniesoft.vermilion.dbentities.posts.PostType
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.CommentCount
 import com.neaniesoft.vermilion.posts.domain.entities.CommunityName
+import com.neaniesoft.vermilion.posts.domain.entities.DefaultThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.FrontPage
 import com.neaniesoft.vermilion.posts.domain.entities.ImagePostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.LinkHost
@@ -46,7 +47,17 @@ fun PostRecord.toPost(markdownParser: Parser): Post {
                 ),
                 fullSizeUri = linkUri.toUri()
             )
-            PostType.LINK -> TODO()
+            PostType.LINK -> LinkPostSummary(
+                linkHost = LinkHost(linkHost),
+                thumbnail = thumbnailUri?.thumbnail() ?: DefaultThumbnail,
+                preview = previewUri?.let { uri ->
+                    UriImage(
+                        uri.toUri(),
+                        previewWidth ?: 0,
+                        previewHeight ?: 0
+                    )
+                }
+            )
             PostType.TEXT -> TextPostSummary(
                 previewText = PreviewText(previewText ?: ""),
                 previewTextMarkdown = markdownParser.parse(previewText ?: "") as Document
