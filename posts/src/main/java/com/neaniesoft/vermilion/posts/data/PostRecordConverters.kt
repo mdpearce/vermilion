@@ -108,21 +108,25 @@ fun Post.toPostRecord(query: String, clock: Clock): PostRecord = PostRecord(
     thumbnailUri = when (summary) {
         is ImagePostSummary -> summary.thumbnailUri.toString()
         is VideoPostSummary -> summary.thumbnailUri.toString()
+        is LinkPostSummary -> null // TODO Fix this
         else -> null
     },
     previewUri = when (summary) {
         is ImagePostSummary -> summary.preview?.uri.toString()
         is VideoPostSummary -> summary.preview?.uri.toString()
+        is LinkPostSummary -> summary.preview?.uri?.toString()
         else -> null
     },
     previewWidth = when (summary) {
         is ImagePostSummary -> summary.preview?.width
         is VideoPostSummary -> summary.preview?.width
+        is LinkPostSummary -> summary.preview?.width
         else -> null
     },
     previewHeight = when (summary) {
         is ImagePostSummary -> summary.preview?.height
         is VideoPostSummary -> summary.preview?.height
+        is LinkPostSummary -> summary.preview?.height
         else -> null
     },
     linkUri = link.toString(),
