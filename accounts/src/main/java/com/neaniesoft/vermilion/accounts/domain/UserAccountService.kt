@@ -52,7 +52,10 @@ class UserAccountService @Inject constructor(
     }
 
     fun handleAuthResponse(authResponse: AuthResponse<*, *>) {
-        scope.launch { authProcessor.updateAuthState(authResponse) }
+        scope.launch {
+            authProcessor.updateAuthState(authResponse)
+            loginAsNewUser()
+        }
     }
 
     fun loginAsNewUser() {
