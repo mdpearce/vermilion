@@ -85,7 +85,19 @@ fun PostSummary(
                     shouldTruncate = shouldTruncate
                 ) { onMediaClicked(post) }
             }
-            is LinkPostSummary -> TODO()
+            is LinkPostSummary -> {
+                ImageSummary(
+                    image = summary.preview ?: UriImage("".toUri(), 0, 0),
+                    shouldTruncate = shouldTruncate,
+                    isNsfw = if (shouldHideNsfw) {
+                        post.isNsfw()
+                    } else {
+                        false
+                    }
+                ) {
+                    onMediaClicked(post)
+                }
+            }
             is VideoPostSummary -> {
                 VideoSummary(
                     image = summary.preview ?: UriImage("".toUri(), 0, 0),

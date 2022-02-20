@@ -6,6 +6,7 @@ import com.neaniesoft.vermilion.dbentities.posts.PostType
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.CommentCount
 import com.neaniesoft.vermilion.posts.domain.entities.CommunityName
+import com.neaniesoft.vermilion.posts.domain.entities.DefaultThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.FrontPage
 import com.neaniesoft.vermilion.posts.domain.entities.ImagePostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.LinkHost
@@ -46,7 +47,17 @@ fun PostRecord.toPost(markdownParser: Parser): Post {
                 ),
                 fullSizeUri = linkUri.toUri()
             )
-            PostType.LINK -> TODO()
+            PostType.LINK -> LinkPostSummary(
+                linkHost = LinkHost(linkHost),
+                thumbnail = thumbnailUri?.thumbnail() ?: DefaultThumbnail,
+                preview = previewUri?.let { uri ->
+                    UriImage(
+                        uri.toUri(),
+                        previewWidth ?: 0,
+                        previewHeight ?: 0
+                    )
+                }
+            )
             PostType.TEXT -> TextPostSummary(
                 previewText = PreviewText(previewText ?: ""),
                 previewTextMarkdown = markdownParser.parse(previewText ?: "") as Document
@@ -97,21 +108,25 @@ fun Post.toPostRecord(query: String, clock: Clock): PostRecord = PostRecord(
     thumbnailUri = when (summary) {
         is ImagePostSummary -> summary.thumbnailUri.toString()
         is VideoPostSummary -> summary.thumbnailUri.toString()
+        is LinkPostSummary -> null // TODO Fix this
         else -> null
     },
     previewUri = when (summary) {
         is ImagePostSummary -> summary.preview?.uri.toString()
         is VideoPostSummary -> summary.preview?.uri.toString()
+        is LinkPostSummary -> summary.preview?.uri?.toString()
         else -> null
     },
     previewWidth = when (summary) {
         is ImagePostSummary -> summary.preview?.width
         is VideoPostSummary -> summary.preview?.width
+        is LinkPostSummary -> summary.preview?.width
         else -> null
     },
     previewHeight = when (summary) {
         is ImagePostSummary -> summary.preview?.height
         is VideoPostSummary -> summary.preview?.height
+        is LinkPostSummary -> summary.preview?.height
         else -> null
     },
     linkUri = link.toString(),
