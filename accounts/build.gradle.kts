@@ -14,6 +14,8 @@ dependencies {
     implementation(Deps.COMPOSE_UI_TOOLING_PREVIEW)
     debugImplementation(Deps.COMPOSE_UI_TOOLING)
 
+    implementation(Deps.KOTLINX_COROUTINES_ANDROID)
+
     implementation(project(":auth"))
     implementation(project(":api"))
     implementation(project(":ui"))

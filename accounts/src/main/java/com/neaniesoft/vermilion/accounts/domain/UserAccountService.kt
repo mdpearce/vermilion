@@ -21,6 +21,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import net.openid.appauth.AuthorizationException
+import net.openid.appauth.AuthorizationResponse
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Named
@@ -58,10 +60,14 @@ class UserAccountService @Inject constructor(
         }
     }
 
-    fun handleAuthResponse(authResponse: AuthResponse<*, *>) {
+    fun handleAuthResponse(authResponse: AuthResponse<AuthorizationResponse, AuthorizationException>) {
         scope.launch {
             authProcessor.updateAuthState(authResponse)
-            loginAsNewUser()
+                .onSuccess {
+                    loginAsNewUser()
+                }.onFailure {
+                    logger.warnIfEnabled(it.cause) { "Auth failure" }
+                }
         }
     }
 
@@ -69,11 +75,15 @@ class UserAccountService @Inject constructor(
         val account = UserAccount(UserAccountId(UUID.randomUUID()), UserName("Not set"))
         // This might lead to a race condition where the account is not saved before it is returned and used
         scope.launch {
-            userAccountRepository.saveUserAccount(account)
-                .onFailure { error -> logger.errorIfEnabled(error.cause) { "Error saving user account to disk. $error" } }
-                .onSuccess { userAccount -> logger.debugIfEnabled { "Saved user account with id ${userAccount.id}" } }
-            authorizationStore.setLoggedInUserId(account.id.value)
-            _currentUserAccount.emit(account)
+            database.withTransaction {
+                postDao.deleteAll()
+                tabRepository.removeAll()
+                userAccountRepository.saveUserAccount(account)
+                    .onFailure { error -> logger.errorIfEnabled(error.cause) { "Error saving user account to disk. $error" } }
+                    .onSuccess { userAccount -> logger.debugIfEnabled { "Saved user account with id ${userAccount.id}" } }
+                authorizationStore.setLoggedInUserId(account.id.value)
+                _currentUserAccount.emit(account)
+            }
         }
     }
 
