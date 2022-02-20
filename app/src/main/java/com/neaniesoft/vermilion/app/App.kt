@@ -1,5 +1,6 @@
 package com.neaniesoft.vermilion.app
 
+import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -39,7 +40,9 @@ fun VermilionApp(
         val currentUser by userAccountService.currentUserAccount.collectAsState()
 
         // TODO Encapsulate this check somewhere else
-        if (currentUser == null) {
+        val isAuthorized = userAccountService.isAuthorized()
+        if (currentUser != null && !isAuthorized) {
+            Log.d("VermilionApp", "currentUser: $currentUser, isAuthenticated: $isAuthorized")
             userAccountService.logout()
         }
 

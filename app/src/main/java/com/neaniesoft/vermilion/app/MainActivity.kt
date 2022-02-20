@@ -3,10 +3,9 @@ package com.neaniesoft.vermilion.app
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.paging.ExperimentalPagingApi
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
+import com.neaniesoft.vermilion.accounts.domain.UserAccountService
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.Clock
 import javax.inject.Inject
@@ -19,18 +18,13 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var clock: Clock
 
+    @Inject
+    lateinit var userAccountService: UserAccountService
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            VermilionApp(clock)
+            VermilionApp(clock, userAccountService)
         }
     }
-}
-
-@ExperimentalPagingApi
-@ExperimentalMaterialNavigationApi
-@Preview(showBackground = true)
-@Composable
-fun VermilionAppPreview() {
-    VermilionApp(Clock.systemUTC())
 }

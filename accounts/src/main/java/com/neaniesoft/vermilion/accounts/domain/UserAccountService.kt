@@ -71,6 +71,10 @@ class UserAccountService @Inject constructor(
         }
     }
 
+    fun isAuthorized(): Boolean {
+        return authProcessor.isAuthorized()
+    }
+
     private fun loginAsNewUser() {
         val account = UserAccount(UserAccountId(UUID.randomUUID()), UserName("Not set"))
         // This might lead to a race condition where the account is not saved before it is returned and used
@@ -88,6 +92,7 @@ class UserAccountService @Inject constructor(
     }
 
     fun logout() {
+        logger.debugIfEnabled { "Logging out" }
         scope.launch {
             database.withTransaction {
                 postDao.deleteAll() // TODO wrap the dao in an adapter to avoid using it directly here
