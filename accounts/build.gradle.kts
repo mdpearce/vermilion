@@ -20,5 +20,6 @@ dependencies {
     implementation(project(":utils"))
     implementation(project(":dbentities"))
     implementation(project(":db"))
+    implementation(project(":tabs"))
     implementation(Deps.APP_AUTH)
 }

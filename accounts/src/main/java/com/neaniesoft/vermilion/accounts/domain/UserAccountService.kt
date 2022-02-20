@@ -12,6 +12,7 @@ import com.neaniesoft.vermilion.accounts.domain.ports.UserAccountRepository
 import com.neaniesoft.vermilion.auth.AuthorizationStore
 import com.neaniesoft.vermilion.db.VermilionDatabase
 import com.neaniesoft.vermilion.dbentities.posts.PostDao
+import com.neaniesoft.vermilion.tabs.domain.ports.TabRepository
 import com.neaniesoft.vermilion.utils.CoroutinesModule
 import com.neaniesoft.vermilion.utils.logger
 import kotlinx.coroutines.CoroutineDispatcher
@@ -32,6 +33,7 @@ class UserAccountService @Inject constructor(
     private val authProcessor: AuthProcessor,
     private val database: VermilionDatabase,
     private val postDao: PostDao,
+    private val tabRepository: TabRepository,
     @Named(CoroutinesModule.IO_DISPATCHER) private val dispatcher: CoroutineDispatcher
 ) {
     private val scope = CoroutineScope(dispatcher)
@@ -79,6 +81,7 @@ class UserAccountService @Inject constructor(
         scope.launch {
             database.withTransaction {
                 postDao.deleteAll() // TODO wrap the dao in an adapter to avoid using it directly here
+                tabRepository.removeAll()
                 authorizationStore.setLoggedInUserId(null)
                 authProcessor.invalidateAuthState()
                 val currentAccount = currentUserAccount.value

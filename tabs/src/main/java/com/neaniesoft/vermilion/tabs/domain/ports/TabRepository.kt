@@ -14,4 +14,6 @@ interface TabRepository {
     suspend fun removeTab(tab: TabState)
 
     suspend fun displayNameForPostDetails(postId: PostId): DisplayName
+
+    suspend fun removeAll()
 }
