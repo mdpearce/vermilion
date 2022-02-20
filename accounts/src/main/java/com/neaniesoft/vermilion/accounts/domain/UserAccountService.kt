@@ -74,6 +74,7 @@ class UserAccountService @Inject constructor(
         scope.launch {
             authorizationStore.setLoggedInUserId(null)
             authProcessor.invalidateAuthState()
+            userAccountRepository.clearAllAccounts()
             _currentUserAccount.emit(null)
         }
     }
