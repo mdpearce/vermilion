@@ -2,12 +2,12 @@ package com.neaniesoft.vermilion.api.interceptors
 
 import com.github.michaelbull.result.get
 import com.github.michaelbull.result.getError
+import com.neaniesoft.vermilion.auth.AuthStateProvider
 import com.neaniesoft.vermilion.auth.AuthorizationStore
 import com.neaniesoft.vermilion.auth.http.AccessTokenService
 import com.neaniesoft.vermilion.utils.logger
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.runBlocking
-import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationService
 import net.openid.appauth.ClientSecretBasic
 import okhttp3.Interceptor
@@ -19,12 +19,13 @@ import javax.inject.Inject
 class AuthorizationInterceptor @Inject constructor(
     private val authorizationStore: AuthorizationStore,
     private val accessTokenService: AccessTokenService,
-    private val authState: AuthState,
+    private val authStateProvider: AuthStateProvider,
     private val authorizationService: AuthorizationService
 ) : Interceptor {
     private val logger by logger()
 
     override fun intercept(chain: Interceptor.Chain): Response {
+        val authState = authStateProvider.authState()
 
         if (authState.isAuthorized) {
             val token: CompletableDeferred<String> = CompletableDeferred()

@@ -10,8 +10,11 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import net.openid.appauth.AuthState
+import net.openid.appauth.AuthorizationException
+import net.openid.appauth.AuthorizationResponse
 import net.openid.appauth.AuthorizationService
 import net.openid.appauth.AuthorizationServiceConfiguration
+import net.openid.appauth.TokenResponse
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -74,6 +77,26 @@ class AuthStateProvider @Inject constructor(
     private var authState: AuthState = AuthState()
 
     fun authState(): AuthState {
+        return authState
+    }
 
+    fun updateAuthState(response: AuthorizationResponse?, exception: AuthorizationException?) {
+        authState.update(response, exception)
+    }
+
+    fun updateAuthState(response: TokenResponse?, exception: AuthorizationException?) {
+        authState.update(response, exception)
+    }
+
+    fun deserializeFrom(serializedState: String) {
+        authState = AuthState.jsonDeserialize(serializedState)
+    }
+
+    fun serialize(): String {
+        return authState.jsonSerializeString()
+    }
+
+    fun invalidateAuthState() {
+        authState = AuthState()
     }
 }

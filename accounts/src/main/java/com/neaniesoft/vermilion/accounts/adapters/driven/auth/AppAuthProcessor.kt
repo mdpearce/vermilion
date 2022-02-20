@@ -2,9 +2,9 @@ package com.neaniesoft.vermilion.accounts.adapters.driven.auth
 
 import com.neaniesoft.vermilion.accounts.domain.entities.AuthResponse
 import com.neaniesoft.vermilion.accounts.domain.ports.AuthProcessor
+import com.neaniesoft.vermilion.auth.AuthStateProvider
 import com.neaniesoft.vermilion.auth.AuthorizationStore
 import com.neaniesoft.vermilion.utils.logger
-import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationException
 import net.openid.appauth.AuthorizationResponse
 import net.openid.appauth.AuthorizationService
@@ -14,7 +14,7 @@ import javax.inject.Singleton
 
 @Singleton
 class AppAuthProcessor @Inject constructor(
-    private val authState: AuthState,
+    private val authStateProvider: AuthStateProvider,
     private val authorizationStore: AuthorizationStore,
     private val authorizationService: AuthorizationService
 ) : AuthProcessor {
@@ -30,7 +30,7 @@ class AppAuthProcessor @Inject constructor(
         val authorizationResponse = authResponse.response as? AuthorizationResponse
         val authorizationException = authResponse.exception as? AuthorizationException
 
-        authState.update(authorizationResponse, authorizationException)
+        authStateProvider.updateAuthState(authorizationResponse, authorizationException)
         val resp =
             requireNotNull(authorizationResponse) { "No exception, but null response" }
 
@@ -39,13 +39,13 @@ class AppAuthProcessor @Inject constructor(
             ClientSecretBasic("")
         ) { tokenResponse, tokenException ->
             logger.debugIfEnabled { "Token response: $tokenResponse ; Token exception: $tokenException" }
-            authState.update(tokenResponse, tokenException)
-            authorizationStore.saveAuthState(authState.jsonSerializeString())
+            authStateProvider.updateAuthState(tokenResponse, tokenException)
+            authorizationStore.saveAuthState(authStateProvider.serialize())
         }
     }
 
     override fun invalidateAuthState() {
-
+        authStateProvider.invalidateAuthState()
         authorizationStore.saveAuthState(null)
     }
 }
