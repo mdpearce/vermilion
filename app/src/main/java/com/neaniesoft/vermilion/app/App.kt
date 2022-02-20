@@ -20,6 +20,7 @@ import androidx.paging.ExperimentalPagingApi
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
+import com.neaniesoft.vermilion.accounts.domain.UserAccountService
 import com.neaniesoft.vermilion.app.customtabs.CustomTabNavigator
 import com.neaniesoft.vermilion.tabs.adapters.driving.ui.TabBottomBar
 import com.neaniesoft.vermilion.tabs.domain.entities.ActiveTab
@@ -31,9 +32,17 @@ import java.time.Clock
 @Composable
 fun VermilionApp(
     clock: Clock,
+    userAccountService: UserAccountService,
     viewModel: VermilionAppViewModel = hiltViewModel()
 ) {
     VermilionTheme {
+        val currentUser by userAccountService.currentUserAccount.collectAsState()
+
+        // TODO Encapsulate this check somewhere else
+        if (currentUser == null) {
+            userAccountService.logout()
+        }
+
         val navController = rememberNavController()
         val bottomSheetNavigator = rememberBottomSheetNavigator()
         val context = LocalContext.current
