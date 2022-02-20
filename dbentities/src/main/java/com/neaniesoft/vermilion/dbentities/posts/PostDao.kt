@@ -21,4 +21,7 @@ interface PostDao {
 
     @Query("SELECT * from posts WHERE `postId` == :postId ORDER BY insertedAt DESC LIMIT 1")
     suspend fun postWithId(postId: String): PostRecord?
+
+    @Query("DELETE FROM posts")
+    suspend fun deleteAll()
 }

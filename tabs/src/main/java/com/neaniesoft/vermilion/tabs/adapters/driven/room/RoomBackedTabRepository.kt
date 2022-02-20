@@ -73,6 +73,12 @@ class RoomBackedTabRepository @Inject constructor(
         return DisplayName(post.title)
     }
 
+    override suspend fun removeAll() {
+        database.withTransaction {
+            tabStateDao.deleteAll()
+        }
+    }
+
     override suspend fun removeTab(tab: TabState) {
         database.withTransaction {
             tabStateDao.deleteTabWithId(tab.id.value)

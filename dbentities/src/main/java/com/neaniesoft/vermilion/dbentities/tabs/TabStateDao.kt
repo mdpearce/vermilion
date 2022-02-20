@@ -27,4 +27,7 @@ interface TabStateDao {
 
     @Query("UPDATE tabs SET tabSortOrder = tabSortOrder + 1 WHERE tabSortOrder >= :from")
     suspend fun shiftAllTabsFrom(from: Int)
+
+    @Query("DELETE FROM tabs")
+    suspend fun deleteAll()
 }
