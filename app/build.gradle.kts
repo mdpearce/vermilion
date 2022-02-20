@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.konan.properties.loadProperties
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -7,6 +9,21 @@ plugins {
 
 apply(plugin = "net.thauvin.erik.gradle.semver")
 
+// TODO This is pretty gross
+fun versionNameFromSemVer(): String {
+    val versionProps = loadProperties("app/version.properties")
+    return versionProps["version.semver"] as String
+}
+
+fun versionCodeFromSemVer(): Int {
+    val versionProps = loadProperties("app/version.properties")
+    val major = versionProps["version.major"] as String
+    val minor = versionProps["version.minor"] as String
+    val patch = versionProps["version.patch"] as String
+
+    return (major + minor.padStart(3, '0') + patch.padStart(3, '0')).toInt()
+}
+
 android {
     compileSdk = 31
 
@@ -14,8 +31,8 @@ android {
         applicationId = "com.neaniesoft.vermilion"
         minSdk = 26
         targetSdk = 31
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = versionCodeFromSemVer()
+        versionName = versionNameFromSemVer()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -27,7 +44,10 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
     compileOptions {
