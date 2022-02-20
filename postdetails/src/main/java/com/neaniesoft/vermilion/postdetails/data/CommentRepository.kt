@@ -4,6 +4,9 @@ import androidx.core.net.toUri
 import androidx.room.withTransaction
 import com.neaniesoft.vermilion.api.entities.CommentData
 import com.neaniesoft.vermilion.api.entities.CommentThing
+import com.neaniesoft.vermilion.api.entities.MoreCommentsData
+import com.neaniesoft.vermilion.api.entities.MoreCommentsThing
+import com.neaniesoft.vermilion.api.entities.ThingData
 import com.neaniesoft.vermilion.db.VermilionDatabase
 import com.neaniesoft.vermilion.dbentities.comments.CommentDao
 import com.neaniesoft.vermilion.dbentities.comments.CommentRecord
@@ -130,11 +133,34 @@ private fun CommentRecord.getFlags(): Set<CommentFlags> {
 
 private fun CommentResponse.getCommentRecords(clock: Clock): List<CommentRecord> {
     val comments = this.data.children.mapNotNull {
-        (it as? CommentThing)?.data
-    }.flatMap { it.children() }
-        .map { it.toCommentRecord(clock) }
+        // (it as? CommentThing)?.data
+
+        when (it) {
+            is CommentThing -> CommentContainer(it.data)
+            is MoreCommentsThing -> CommentStub(it.data)
+            else -> null
+        }
+
+    }.flatMap {
+        when (it) {
+            is CommentContainer -> {
+                it.comment.children()
+            }
+            is CommentStub -> {
+                listOf(it.moreComments)
+            }
+        }
+    }.map { it.toCommentRecord(clock) }
     return comments
 }
+
+private fun ThingData.toCommentRecord(clock: Clock): CommentRecord {
+    TODO()
+}
+
+sealed class CommentOrStub
+data class CommentContainer(val comment: CommentData) : CommentOrStub()
+data class CommentStub(val moreComments: MoreCommentsData) : CommentOrStub()
 
 // Naive depth-first traversal of the comment tree
 private fun CommentData.children(): List<CommentData> {

@@ -23,3 +23,18 @@ data class Comment(
     val upVotes: UpVotesCount,
     val parentId: CommentId?,
 )
+
+data class CommentStub(
+    val id: CommentId,
+    val count: MoreCommentsCount,
+    val parentId: CommentId?,
+    val depth: CommentDepth,
+    val children: List<CommentId>
+)
+
+@JvmInline
+value class MoreCommentsCount(val value: Int)
+
+sealed class CommentKind
+data class FullComment(val comment: Comment) : CommentKind()
+data class MoreCommentsStub(val stub: CommentStub) : CommentKind()
