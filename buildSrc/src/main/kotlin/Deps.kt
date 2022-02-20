@@ -47,4 +47,5 @@ object Deps {
     const val ANDROIDX_BROWSER = "androidx.browser:browser:1.4.0"
     const val PRETTY_TIME = "org.ocpsoft.prettytime:prettytime:5.0.2.Final"
     const val COMMONMARK = "org.commonmark:commonmark:0.18.1"
+    const val SEMVER = "net.thauvin.erik.gradle:semver:1.0.4"
 }
