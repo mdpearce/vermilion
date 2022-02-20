@@ -5,6 +5,8 @@ plugins {
     id("dagger.hilt.android.plugin")
 }
 
+apply(plugin = "net.thauvin.erik.gradle.semver")
+
 android {
     compileSdk = 31
 
