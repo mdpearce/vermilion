@@ -45,6 +45,7 @@ class AppAuthProcessor @Inject constructor(
     }
 
     override fun invalidateAuthState() {
+
         authorizationStore.saveAuthState(null)
     }
 }

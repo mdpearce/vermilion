@@ -30,10 +30,15 @@ import net.openid.appauth.AuthorizationResponse
 fun UserAccountScreen(viewModel: UserAccountViewModel = hiltViewModel()) {
     val currentUserAccount by viewModel.currentUser.collectAsState()
 
-    val loginClicked: MutableState<Boolean> = remember { mutableStateOf(false) }
-    val logoutClicked: MutableState<Boolean> = remember { mutableStateOf(false) }
+    // val loginClicked: MutableState<Boolean> = remember { mutableStateOf(false) }
+    // val logoutClicked: MutableState<Boolean> = remember { mutableStateOf(false) }
 
-    if (loginClicked.value) {
+    if (currentUserAccount == null) {
+        NotLoggedIn {
+            viewModel.onLoginClicked()
+        }
+    }
+    if (loginClicked.value && currentUserAccount != null) {
         val intent = viewModel.onLoginClicked()
         LaunchAuthFlow(
             intent

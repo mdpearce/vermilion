@@ -12,6 +12,7 @@ import dagger.hilt.components.SingletonComponent
 import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationService
 import net.openid.appauth.AuthorizationServiceConfiguration
+import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -54,7 +55,6 @@ class AppAuthModule {
         configuration: AuthorizationServiceConfiguration,
         authorizationStore: AuthorizationStore
     ): AuthState {
-
         val serializedState = authorizationStore.getAuthState()
         return if (serializedState.isEmpty()) {
             logger.debugIfEnabled { "Empty auth state, creating unauthorized state" }
@@ -63,5 +63,17 @@ class AppAuthModule {
             logger.debugIfEnabled { "Got state, deserializing" }
             AuthState.jsonDeserialize(serializedState)
         }
+    }
+}
+
+@Singleton
+class AuthStateProvider @Inject constructor(
+    private val configuration: AuthorizationServiceConfiguration,
+    private val authorizationStore: AuthorizationStore
+) {
+    private var authState: AuthState = AuthState()
+
+    fun authState(): AuthState {
+
     }
 }
