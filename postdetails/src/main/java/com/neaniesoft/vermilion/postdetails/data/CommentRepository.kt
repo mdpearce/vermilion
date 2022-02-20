@@ -163,15 +163,26 @@ data class CommentContainer(val comment: CommentData) : CommentOrStub()
 data class CommentStub(val moreComments: MoreCommentsData) : CommentOrStub()
 
 // Naive depth-first traversal of the comment tree
-private fun CommentData.children(): List<CommentData> {
+private fun CommentData.children(): List<ThingData> {
     val children = replies?.data?.children
 
     return if (children.isNullOrEmpty()) {
         listOf(this)
     } else {
-        listOf(this) + children.filterIsInstance<CommentThing>().flatMap {
-            it.data.children()
+        listOf(this) + children.flatMap { child ->
+            when (child) {
+                is CommentThing -> child.data.children()
+                is MoreCommentsThing -> listOf(child.data)
+                else -> null
+            }
         }
+        //
+        //
+        //
+        //
+        //     children.filterIsInstance<CommentThing>().flatMap {
+        //     it.data.children()
+        // }
     }
 }
 
