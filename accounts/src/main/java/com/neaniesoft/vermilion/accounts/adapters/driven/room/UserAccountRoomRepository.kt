@@ -39,7 +39,10 @@ class UserAccountRoomRepository @Inject constructor(
             .mapError { DatabaseError(it) }
     }
 
-    override suspend fun clearAllAccounts() {
+    override suspend fun clearAccount(account: UserAccount) {
+        database.withTransaction {
+            userAccountDao.delete(account.toRecord())
+        }
     }
 }
 

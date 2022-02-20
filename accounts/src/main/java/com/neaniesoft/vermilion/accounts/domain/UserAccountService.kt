@@ -58,7 +58,7 @@ class UserAccountService @Inject constructor(
         }
     }
 
-    fun loginAsNewUser() {
+    private fun loginAsNewUser() {
         val account = UserAccount(UserAccountId(UUID.randomUUID()), UserName("Not set"))
         // This might lead to a race condition where the account is not saved before it is returned and used
         scope.launch {
@@ -74,7 +74,10 @@ class UserAccountService @Inject constructor(
         scope.launch {
             authorizationStore.setLoggedInUserId(null)
             authProcessor.invalidateAuthState()
-            userAccountRepository.clearAllAccounts()
+            val currentAccount = currentUserAccount.value
+            if (currentAccount != null) {
+                userAccountRepository.clearAccount(currentAccount)
+            }
             _currentUserAccount.emit(null)
         }
     }
