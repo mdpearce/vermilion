@@ -3,6 +3,7 @@ package com.neaniesoft.vermilion.auth
 import android.content.Context
 import android.net.Uri
 import androidx.core.net.toUri
+import com.neaniesoft.vermilion.utils.AndroidLogger
 import com.neaniesoft.vermilion.utils.logger
 import dagger.Module
 import dagger.Provides
@@ -74,10 +75,23 @@ class AuthStateProvider @Inject constructor(
     private val configuration: AuthorizationServiceConfiguration,
     private val authorizationStore: AuthorizationStore
 ) {
-    private var authState: AuthState = AuthState()
+    private var authState: AuthState = buildAuthState()
 
     fun authState(): AuthState {
         return authState
+    }
+
+    private fun buildAuthState(): AuthState {
+        val logger = AndroidLogger("AuthStateProvider")
+
+        val serializedState = authorizationStore.getAuthState()
+        return if (serializedState.isEmpty()) {
+            logger.debugIfEnabled { "Empty auth state, creating unauthorized state" }
+            AuthState(configuration)
+        } else {
+            logger.debugIfEnabled { "Got state, deserializing" }
+            AuthState.jsonDeserialize(serializedState)
+        }
     }
 
     fun updateAuthState(response: AuthorizationResponse?, exception: AuthorizationException?) {
@@ -97,6 +111,6 @@ class AuthStateProvider @Inject constructor(
     }
 
     fun invalidateAuthState() {
-        authState = AuthState()
+        authState = AuthState(configuration)
     }
 }

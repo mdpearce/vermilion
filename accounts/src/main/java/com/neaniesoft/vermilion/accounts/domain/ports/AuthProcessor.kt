@@ -9,6 +9,7 @@ import net.openid.appauth.AuthorizationResponse
 interface AuthProcessor {
     suspend fun updateAuthState(authResponse: AuthResponse<AuthorizationResponse, AuthorizationException>): Result<Updated, AccountError>
     fun invalidateAuthState()
+    fun isAuthorized(): Boolean
 }
 
 object Updated

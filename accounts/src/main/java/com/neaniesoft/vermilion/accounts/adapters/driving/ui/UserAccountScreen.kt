@@ -1,6 +1,5 @@
 package com.neaniesoft.vermilion.accounts.adapters.driving.ui
 
-import android.content.Intent
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -48,9 +47,6 @@ fun UserAccountScreen(viewModel: UserAccountViewModel = hiltViewModel()) {
         }
     }
 
-    // val loginClicked: MutableState<Boolean> = remember { mutableStateOf(false) }
-    // val logoutClicked: MutableState<Boolean> = remember { mutableStateOf(false) }
-
     if (currentUserAccount == null) {
         NotLoggedIn {
             viewModel.onLoginClicked()
@@ -59,51 +55,6 @@ fun UserAccountScreen(viewModel: UserAccountViewModel = hiltViewModel()) {
         LoggedIn {
             viewModel.onLogoutClicked()
         }
-    }
-
-    // if (loginClicked.value && currentUserAccount != null) {
-    //     val intent = viewModel.onLoginClicked()
-    //     LaunchAuthFlow(
-    //         intent
-    //     ) { response, exception -> viewModel.onAuthorizationResponse(response, exception) }
-    // }
-    // if (logoutClicked.value) {
-    //     viewModel.onLogoutClicked()
-    // }
-    //
-    // if (currentUserAccount == null) {
-    //     NotLoggedIn {
-    //         loginClicked.value = true
-    //     }
-    // } else {
-    //     LoggedIn {
-    //         logoutClicked.value = true
-    //     }
-    // }
-}
-
-@Composable
-fun LaunchAuthFlow(
-    intent: Intent,
-    onAuthResponse: (AuthorizationResponse?, AuthorizationException?) -> Unit,
-) {
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult(),
-        onResult = { result ->
-            val data = requireNotNull(result.data)
-            val response = AuthorizationResponse.fromIntent(data)
-            val exception = AuthorizationException.fromIntent(data)
-
-            if (exception != null) {
-                Log.e("LaunchAuthFlow", exception.error.toString())
-                Log.e("LaunchAuthFlow", exception.errorDescription.toString())
-            }
-            onAuthResponse(response, exception)
-        }
-    )
-
-    LaunchedEffect(Unit) {
-        launcher.launch(intent)
     }
 }
 

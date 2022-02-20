@@ -54,11 +54,17 @@ class AppAuthProcessor @Inject constructor(
             }.map { Updated }
             updateResult.complete(authStateResult)
         }
-        return updateResult.await().mapError { AuthorizationError(it) }
+        val completedResult = updateResult.await()
+        logger.debugIfEnabled { "Auth update complete. $completedResult" }
+        return completedResult.mapError { AuthorizationError(it) }
     }
 
     override fun invalidateAuthState() {
         authStateProvider.invalidateAuthState()
         authorizationStore.saveAuthState(null)
+    }
+
+    override fun isAuthorized(): Boolean {
+        return authStateProvider.authState().isAuthorized
     }
 }
