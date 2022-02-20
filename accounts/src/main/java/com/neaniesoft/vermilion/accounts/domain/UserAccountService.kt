@@ -1,5 +1,6 @@
 package com.neaniesoft.vermilion.accounts.domain
 
+import androidx.room.withTransaction
 import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
 import com.neaniesoft.vermilion.accounts.domain.entities.AuthResponse
@@ -9,6 +10,8 @@ import com.neaniesoft.vermilion.accounts.domain.entities.UserName
 import com.neaniesoft.vermilion.accounts.domain.ports.AuthProcessor
 import com.neaniesoft.vermilion.accounts.domain.ports.UserAccountRepository
 import com.neaniesoft.vermilion.auth.AuthorizationStore
+import com.neaniesoft.vermilion.db.VermilionDatabase
+import com.neaniesoft.vermilion.dbentities.posts.PostDao
 import com.neaniesoft.vermilion.utils.CoroutinesModule
 import com.neaniesoft.vermilion.utils.logger
 import kotlinx.coroutines.CoroutineDispatcher
@@ -27,6 +30,8 @@ class UserAccountService @Inject constructor(
     private val userAccountRepository: UserAccountRepository,
     private val authorizationStore: AuthorizationStore,
     private val authProcessor: AuthProcessor,
+    private val database: VermilionDatabase,
+    private val postDao: PostDao,
     @Named(CoroutinesModule.IO_DISPATCHER) private val dispatcher: CoroutineDispatcher
 ) {
     private val scope = CoroutineScope(dispatcher)
@@ -72,13 +77,16 @@ class UserAccountService @Inject constructor(
 
     fun logout() {
         scope.launch {
-            authorizationStore.setLoggedInUserId(null)
-            authProcessor.invalidateAuthState()
-            val currentAccount = currentUserAccount.value
-            if (currentAccount != null) {
-                userAccountRepository.clearAccount(currentAccount)
+            database.withTransaction {
+                postDao.deleteAll() // TODO wrap the dao in an adapter to avoid using it directly here
+                authorizationStore.setLoggedInUserId(null)
+                authProcessor.invalidateAuthState()
+                val currentAccount = currentUserAccount.value
+                if (currentAccount != null) {
+                    userAccountRepository.clearAccount(currentAccount)
+                }
+                _currentUserAccount.emit(null)
             }
-            _currentUserAccount.emit(null)
         }
     }
 }
