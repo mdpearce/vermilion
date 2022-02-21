@@ -17,8 +17,12 @@ import com.neaniesoft.vermilion.postdetails.domain.entities.CommentContent
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentDepth
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentFlags
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentId
+import com.neaniesoft.vermilion.postdetails.domain.entities.CommentKind
 import com.neaniesoft.vermilion.postdetails.domain.entities.ControversialIndex
 import com.neaniesoft.vermilion.postdetails.domain.entities.DurationString
+import com.neaniesoft.vermilion.postdetails.domain.entities.FullComment
+import com.neaniesoft.vermilion.postdetails.domain.entities.MoreCommentsCount
+import com.neaniesoft.vermilion.postdetails.domain.entities.MoreCommentsStub
 import com.neaniesoft.vermilion.postdetails.domain.entities.UpVotesCount
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
@@ -36,7 +40,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 interface CommentRepository {
-    suspend fun getFlattenedCommentTreeForPost(postId: PostId): Flow<List<Comment>>
+    suspend fun getFlattenedCommentTreeForPost(postId: PostId): Flow<List<CommentKind>>
 }
 
 @Singleton
@@ -53,7 +57,7 @@ class CommentRepositoryImpl @Inject constructor(
     }
 
     private val logger by logger()
-    override suspend fun getFlattenedCommentTreeForPost(postId: PostId): Flow<List<Comment>> =
+    override suspend fun getFlattenedCommentTreeForPost(postId: PostId): Flow<List<CommentKind>> =
         flow {
             val lastInsertedAtTime = database.withTransaction {
                 dao.getLastInsertedAtForPost(postId.value)
@@ -63,13 +67,13 @@ class CommentRepositoryImpl @Inject constructor(
                 // Cache is valid, let's just return the database records
                 emit(
                     dao.getAllForPost(postId.value)
-                        .map { it.toComment(prettyTime, markdownParser) }
+                        .map { it.toCommentKind(prettyTime, markdownParser) }
                 )
             } else {
                 // Cache is invalid. First, let's return it so we have something to display
                 emit(
                     dao.getAllForPost(postId.value)
-                        .map { it.toComment(prettyTime, markdownParser) }
+                        .map { it.toCommentKind(prettyTime, markdownParser) }
                 )
 
                 // Then, fetch new comments from the API
@@ -97,9 +101,27 @@ class CommentRepositoryImpl @Inject constructor(
                 }
 
                 // Now, emit the new comments
-                emit(newComments.map { it.toComment(prettyTime, markdownParser) })
+                emit(newComments.map { it.toCommentKind(prettyTime, markdownParser) })
             }
         }
+}
+
+private fun CommentRecord.toCommentKind(prettyTime: PrettyTime, parser: Parser): CommentKind {
+    return if (flags == CommentFlags.MORE_COMMENTS_STUB.name) {
+        MoreCommentsStub(this.toCommentStub())
+    } else {
+        FullComment(this.toComment(prettyTime, parser))
+    }
+}
+
+private fun CommentRecord.toCommentStub(): com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub {
+    return com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub(
+        id = CommentId(commentId),
+        count = MoreCommentsCount(score), // TODO stop using score as a proxy field for child count
+        parentId = parentId?.let { CommentId(it) },
+        depth = CommentDepth(depth),
+        children = body.split(",").map { CommentId((it)) }
+    )
 }
 
 private fun CommentRecord.toComment(prettyTime: PrettyTime, parser: Parser): Comment {
@@ -203,7 +225,7 @@ private fun MoreCommentsData.toCommentRecord(postId: PostId, clock: Clock): Comm
         postId = postId.value,
         parentId = parentId,
         path = null,
-        body = "",
+        body = children.joinToString(",") { it }, // TODO use a proper field for storing children.
         flags = flags.joinToString(",") { it.name },
         author = "",
         createdAt = now,
