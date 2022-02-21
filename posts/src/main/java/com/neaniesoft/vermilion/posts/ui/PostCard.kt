@@ -2,6 +2,7 @@ package com.neaniesoft.vermilion.posts.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -67,7 +68,7 @@ fun PostSummary(
     onMediaClicked: (Post) -> Unit,
     onSummaryClicked: (Post) -> Unit
 ) {
-    Column(modifier = modifier.padding(16.dp)) {
+    Column(modifier = modifier.padding(0.dp)) {
         when (val summary = post.summary) {
             is TextPostSummary -> {
                 TextSummary(content = summary.previewTextMarkdown, shouldTruncate) {
@@ -110,42 +111,44 @@ fun PostSummary(
                 ) { onMediaClicked(post) }
             }
         }
-        Text(
-            text = post.title.value,
-            style = MaterialTheme.typography.h6,
-            modifier = Modifier.padding(top = 8.dp)
-        )
-        Row(
-            horizontalArrangement = Arrangement.End,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp)
-        ) {
+        Column(Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp)) {
             Text(
-                text = if (post.community is NamedCommunity) {
-                    post.community.name.value
-                } else {
-                    ""
-                },
-                style = MaterialTheme.typography.caption
+                text = post.title.value,
+                style = MaterialTheme.typography.h6,
+                modifier = Modifier.padding(top = 8.dp)
             )
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            val commentString = when (val count = post.commentCount.value) {
-                0 -> stringResource(id = R.string.post_card_comment_count_0)
-                1 -> stringResource(id = R.string.post_card_comment_count_1)
-                else -> stringResource(id = R.string.post_card_comment_count_many, count)
+            Row(
+                horizontalArrangement = Arrangement.End,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
+            ) {
+                Text(
+                    text = if (post.community is NamedCommunity) {
+                        post.community.name.value
+                    } else {
+                        ""
+                    },
+                    style = MaterialTheme.typography.caption
+                )
             }
-            Text(
-                text = commentString,
-                style = MaterialTheme.typography.caption
-            )
-            Text(text = post.score.value.toString(), style = MaterialTheme.typography.caption)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                val commentString = when (val count = post.commentCount.value) {
+                    0 -> stringResource(id = R.string.post_card_comment_count_0)
+                    1 -> stringResource(id = R.string.post_card_comment_count_1)
+                    else -> stringResource(id = R.string.post_card_comment_count_many, count)
+                }
+                Text(
+                    text = commentString,
+                    style = MaterialTheme.typography.caption
+                )
+                Text(text = post.score.value.toString(), style = MaterialTheme.typography.caption)
+            }
         }
     }
 }
