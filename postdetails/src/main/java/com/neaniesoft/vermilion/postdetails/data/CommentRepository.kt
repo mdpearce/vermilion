@@ -119,7 +119,6 @@ class CommentRepositoryImpl @Inject constructor(
                 )
             }
 
-
             database.withTransaction {
                 // First, cache all the existing comment entries in memory
                 val allComments = dao.getAllForPost(stub.postId.value)
@@ -134,14 +133,20 @@ class CommentRepositoryImpl @Inject constructor(
                 // Now, insert the newly fetched comments in place of the stub
                 val moreComments = moreCommentsResponse.await().json.data.things
                 logger.debugIfEnabled { "Loaded ${moreComments.size} new comments from api, inserting into db" }
-                dao.insertAll(moreComments.map {
-                    it.data.buildCommentRecord(stub.postId)
-                })
+                dao.insertAll(
+                    moreComments.map {
+                        it.data.buildCommentRecord(stub.postId)
+                    }
+                )
 
                 logger.debugIfEnabled { "Inserting remaining comments" }
                 // Finally, insert all the comments after the stub to recreate the complete list.
-                dao.insertAll(allComments.subList(allComments.indexOfFirst { it.commentId == stub.id.value } + 1,
-                    allComments.size - 1).map { it.copy(id = 0) })
+                dao.insertAll(
+                    allComments.subList(
+                        allComments.indexOfFirst { it.commentId == stub.id.value } + 1,
+                        allComments.size - 1
+                    ).map { it.copy(id = 0) }
+                )
 
                 dao.getAllForPost(stub.postId.value)
             }.map { it.toCommentKind() }
