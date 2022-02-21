@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -40,47 +41,52 @@ import java.time.Instant
 
 @Composable
 fun CommentRow(comment: Comment, modifier: Modifier = Modifier) {
-    Row(
-        modifier.height(intrinsicSize = IntrinsicSize.Min)
-    ) {
-
-        repeat(comment.depth.value) {
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .width(16.dp)
-                    .padding(start = 7.dp, end = 7.dp)
-                    .background(Color.Gray)
-            )
+    Column {
+        if (comment.depth == CommentDepth(0)) {
+            Divider()
         }
+        Row(
+            modifier.height(intrinsicSize = IntrinsicSize.Min)
+        ) {
 
-        Column(Modifier.padding(8.dp)) {
-            Row(Modifier.fillMaxWidth()) {
-                Text(
-                    text = comment.authorName.value,
-                    style = MaterialTheme.typography.caption,
-                    color = MaterialTheme.colors.primary,
-                    modifier = Modifier.alignByBaseline()
-                )
-                Text(
-                    text = comment.score.value.toString(),
-                    style = MaterialTheme.typography.body1,
-                    color = MaterialTheme.colors.secondary,
+            repeat(comment.depth.value) {
+                Box(
                     modifier = Modifier
-                        .alignByBaseline()
-                        .padding(start = 8.dp)
-                )
-                Spacer(modifier = Modifier.weight(1.0f))
-                Text(
-                    text = comment.createdAtDurationString.value,
-                    style = MaterialTheme.typography.caption,
-                    color = MaterialTheme.colors.onBackground,
-                    modifier = Modifier.alignByBaseline()
+                        .fillMaxHeight()
+                        .width(16.dp)
+                        .padding(start = 7.dp, end = 7.dp)
+                        .background(Color.Gray)
                 )
             }
 
-            Box(Modifier.padding(top = 8.dp)) {
-                MarkdownDocument(document = comment.contentMarkdown as Document)
+            Column(Modifier.padding(8.dp)) {
+                Row(Modifier.fillMaxWidth()) {
+                    Text(
+                        text = comment.authorName.value,
+                        style = MaterialTheme.typography.caption,
+                        color = MaterialTheme.colors.primary,
+                        modifier = Modifier.alignByBaseline()
+                    )
+                    Text(
+                        text = comment.score.value.toString(),
+                        style = MaterialTheme.typography.body1,
+                        color = MaterialTheme.colors.secondary,
+                        modifier = Modifier
+                            .alignByBaseline()
+                            .padding(start = 8.dp)
+                    )
+                    Spacer(modifier = Modifier.weight(1.0f))
+                    Text(
+                        text = comment.createdAtDurationString.value,
+                        style = MaterialTheme.typography.caption,
+                        color = MaterialTheme.colors.onBackground,
+                        modifier = Modifier.alignByBaseline()
+                    )
+                }
+
+                Box(Modifier.padding(top = 8.dp)) {
+                    MarkdownDocument(document = comment.contentMarkdown as Document)
+                }
             }
         }
     }
