@@ -46,7 +46,7 @@ fun PostCard(
     onMediaClicked: (Post) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(elevation = 16.dp, modifier = modifier.clickable { onClick(post) }) {
+    Card(elevation = 2.dp, modifier = modifier.clickable { onClick(post) }) {
         PostSummary(
             post = post,
             modifier = modifier,
