@@ -28,6 +28,8 @@ import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.utils.logger
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.apache.commons.text.StringEscapeUtils
@@ -108,9 +110,49 @@ class CommentRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun fetchAndInsertMoreCommentsFor(stub: DomainStub): List<CommentKind> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun fetchAndInsertMoreCommentsFor(stub: DomainStub): List<CommentKind> =
+        coroutineScope {
+            // TODO("Not yet implemented")
+
+            val moreCommentsResponse = async {
+                apiService.moreChildren(
+                    "json",
+                    stub.children.map { it.value }.joinToString(",") { it },
+                    false,
+                    "t3_${stub.postId.value}",
+                    "confidence"
+                )
+            }
+
+
+            database.withTransaction {
+                // First, cache all the existing comment entries in memory
+                val allComments = dao.getAllForPost(stub.postId.value)
+                logger.debugIfEnabled { "Loaded ${allComments.size} records from database" }
+
+                // Then, delete all the entries in the db *after* that
+                val stubId = dao.getIdForComment(stub.id.value)
+                    ?: throw IllegalStateException("Could not find comment with ID ${stub.id.value} in db")
+                logger.debugIfEnabled { "Deleting all from comment stub ID: $stubId" }
+                dao.deleteAllFromId(stubId)
+
+                // Now, insert the newly fetched comments in place of the stub
+                val moreComments = moreCommentsResponse.await().json.data.things
+                logger.debugIfEnabled { "Loaded ${moreComments.size} new comments from api, inserting into db" }
+                dao.insertAll(moreComments.map {
+                    val record = it.data.buildCommentRecord(stub.postId, clock)
+                    logger.debugIfEnabled { "Record: $record" }
+                    record
+                })
+
+                logger.debugIfEnabled { "Inserting remaining comments" }
+                // Finally, insert all the comments after the stub to recreate the complete list.
+                dao.insertAll(allComments.subList(allComments.indexOfFirst { it.commentId == stub.id.value } + 1,
+                    allComments.size - 1).map { it.copy(id = 0) })
+
+                dao.getAllForPost(stub.postId.value)
+            }.map { it.toCommentKind(prettyTime, markdownParser) }
+        }
 }
 
 private fun CommentRecord.toCommentKind(prettyTime: PrettyTime, parser: Parser): CommentKind {
@@ -123,6 +165,7 @@ private fun CommentRecord.toCommentKind(prettyTime: PrettyTime, parser: Parser):
 
 private fun CommentRecord.toCommentStub(): com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub {
     return com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub(
+        postId = PostId(postId),
         id = CommentId(commentId),
         count = MoreCommentsCount(score), // TODO stop using score as a proxy field for child count
         parentId = parentId?.let { CommentId(it) },

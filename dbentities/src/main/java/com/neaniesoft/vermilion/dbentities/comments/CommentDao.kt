@@ -33,4 +33,10 @@ interface CommentDao {
 
     @Query("DELETE FROM comments WHERE postId == :postId")
     suspend fun deleteAllForPost(postId: String): Int
+
+    @Query("DELETE FROM comments WHERE id >= :id")
+    suspend fun deleteAllFromId(id: Int)
+
+    @Query("SELECT id FROM comments WHERE commentId == :commentId LIMIT 1")
+    suspend fun getIdForComment(commentId: String): Int?
 }

@@ -25,6 +25,7 @@ data class Comment(
 )
 
 data class CommentStub(
+    val postId: PostId,
     val id: CommentId,
     val count: MoreCommentsCount,
     val parentId: CommentId?,
