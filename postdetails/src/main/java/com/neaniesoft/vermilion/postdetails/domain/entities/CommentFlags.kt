@@ -6,5 +6,6 @@ enum class CommentFlags {
     IS_OP,
     STICKIED,
     SCORE_HIDDEN,
-    LOCKED
+    LOCKED,
+    MORE_COMMENTS_STUB
 }

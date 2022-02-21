@@ -74,7 +74,8 @@ class CommentRepositoryImpl @Inject constructor(
 
                 // Then, fetch new comments from the API
                 val apiResponse = apiService.commentsForArticle(postId.value)
-                val newCommentRecords: List<CommentRecord> = apiResponse[1].getCommentRecords(clock)
+                val newCommentRecords: List<CommentRecord> =
+                    apiResponse[1].getCommentRecords(postId, clock)
 
                 // Finally, delete the old entries and insert the new ones and then return the new ones from the DAO
                 val newComments = database.withTransaction {
@@ -131,7 +132,7 @@ private fun CommentRecord.getFlags(): Set<CommentFlags> {
         .toSet()
 }
 
-private fun CommentResponse.getCommentRecords(clock: Clock): List<CommentRecord> {
+private fun CommentResponse.getCommentRecords(postId: PostId, clock: Clock): List<CommentRecord> {
     val comments = this.data.children.mapNotNull {
         // (it as? CommentThing)?.data
 
@@ -150,12 +151,18 @@ private fun CommentResponse.getCommentRecords(clock: Clock): List<CommentRecord>
                 listOf(it.moreComments)
             }
         }
-    }.map { it.toCommentRecord(clock) }
+    }.map { it.buildCommentRecord(postId, clock) }
     return comments
 }
 
-private fun ThingData.toCommentRecord(clock: Clock): CommentRecord {
-    TODO()
+private fun ThingData.buildCommentRecord(postId: PostId, clock: Clock): CommentRecord {
+    return when (this) {
+        is CommentData -> this.toCommentRecord(clock)
+        is MoreCommentsData -> this.toCommentRecord(postId, clock)
+        else -> {
+            throw IllegalStateException("Trying to build a comment record from a Thing which isn't a comment")
+        }
+    }
 }
 
 sealed class CommentOrStub
@@ -184,6 +191,29 @@ private fun CommentData.children(): List<ThingData> {
         //     it.data.children()
         // }
     }
+}
+
+private fun MoreCommentsData.toCommentRecord(postId: PostId, clock: Clock): CommentRecord {
+    val flags = listOf(CommentFlags.MORE_COMMENTS_STUB)
+    val now = clock.millis()
+
+    return CommentRecord(
+        id = 0,
+        commentId = id,
+        postId = postId.value,
+        parentId = parentId,
+        path = null,
+        body = "",
+        flags = flags.joinToString(",") { it.name },
+        author = "",
+        createdAt = now,
+        insertedAt = now,
+        score = count, // TODO this is pretty gross, using the score field to store the child count. Should probably modify the schema to allow for this new field instead.
+        link = "",
+        controversialIndex = 0,
+        depth = depth,
+        upVotes = 0
+    )
 }
 
 private fun CommentData.toCommentRecord(clock: Clock): CommentRecord {
