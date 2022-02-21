@@ -1,6 +1,8 @@
 package com.neaniesoft.vermilion.postdetails.data.http
 
 import com.neaniesoft.vermilion.api.RedditApiClientModule
+import com.neaniesoft.vermilion.postdetails.data.http.entities.CommentResponse
+import com.neaniesoft.vermilion.postdetails.data.http.entities.MoreCommentsResponse
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

@@ -11,7 +11,7 @@ import com.neaniesoft.vermilion.db.VermilionDatabase
 import com.neaniesoft.vermilion.dbentities.comments.CommentDao
 import com.neaniesoft.vermilion.dbentities.comments.CommentRecord
 import com.neaniesoft.vermilion.postdetails.data.http.CommentApiService
-import com.neaniesoft.vermilion.postdetails.data.http.CommentResponse
+import com.neaniesoft.vermilion.postdetails.data.http.entities.CommentResponse
 import com.neaniesoft.vermilion.postdetails.domain.entities.Comment
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentContent
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentDepth
