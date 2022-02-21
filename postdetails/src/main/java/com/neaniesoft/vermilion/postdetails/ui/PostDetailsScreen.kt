@@ -15,8 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.neaniesoft.vermilion.postdetails.domain.entities.FullComment
-import com.neaniesoft.vermilion.postdetails.domain.entities.MoreCommentsStub
+import com.neaniesoft.vermilion.postdetails.domain.entities.CommentKind
 import com.neaniesoft.vermilion.posts.ui.PostSummary
 
 @Composable
@@ -67,11 +66,11 @@ fun PostDetailsScreen(
             items(comments) { item ->
                 Surface(elevation = 8.dp) {
                     when (item) {
-                        is FullComment -> CommentRow(
+                        is CommentKind.Full -> CommentRow(
                             comment = item.comment,
                             Modifier.fillMaxWidth()
                         )
-                        is MoreCommentsStub -> MoreCommentsStubRow(
+                        is CommentKind.Stub -> MoreCommentsStubRow(
                             stub = item.stub,
                             Modifier.fillMaxWidth()
                         ) { viewModel.onMoreCommentsClicked(it) }
