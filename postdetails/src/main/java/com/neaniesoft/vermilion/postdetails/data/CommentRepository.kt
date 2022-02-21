@@ -39,8 +39,11 @@ import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 
+typealias DomainStub = com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub
+
 interface CommentRepository {
     suspend fun getFlattenedCommentTreeForPost(postId: PostId): Flow<List<CommentKind>>
+    suspend fun fetchAndInsertMoreCommentsFor(stub: DomainStub): List<CommentKind>
 }
 
 @Singleton
@@ -104,6 +107,10 @@ class CommentRepositoryImpl @Inject constructor(
                 emit(newComments.map { it.toCommentKind(prettyTime, markdownParser) })
             }
         }
+
+    override suspend fun fetchAndInsertMoreCommentsFor(stub: DomainStub): List<CommentKind> {
+        TODO("Not yet implemented")
+    }
 }
 
 private fun CommentRecord.toCommentKind(prettyTime: PrettyTime, parser: Parser): CommentKind {

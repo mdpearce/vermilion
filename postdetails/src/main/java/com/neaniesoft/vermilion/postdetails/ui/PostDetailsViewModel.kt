@@ -68,6 +68,11 @@ class PostDetailsViewModel @Inject constructor(
     }
 
     fun onMoreCommentsClicked(stub: CommentStub) {
+        viewModelScope.launch {
+            val comments: List<CommentKind> = commentRepository.fetchAndInsertMoreCommentsFor(stub)
+
+            _comments.emit(comments)
+        }
     }
 }
 
