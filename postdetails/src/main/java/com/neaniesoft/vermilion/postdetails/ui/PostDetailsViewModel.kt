@@ -8,6 +8,7 @@ import com.neaniesoft.vermilion.db.VermilionDatabase
 import com.neaniesoft.vermilion.dbentities.posts.PostDao
 import com.neaniesoft.vermilion.postdetails.data.CommentRepository
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentKind
+import com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub
 import com.neaniesoft.vermilion.posts.data.toPost
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
@@ -64,6 +65,9 @@ class PostDetailsViewModel @Inject constructor(
                 _comments.emit(it)
             }
         }
+    }
+
+    fun onMoreCommentsClicked(stub: CommentStub) {
     }
 }
 

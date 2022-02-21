@@ -22,7 +22,7 @@ import com.neaniesoft.vermilion.posts.ui.PostSummary
 @Composable
 fun PostDetailsScreen(
     viewModel: PostDetailsViewModel = hiltViewModel(),
-    onOpenUri: (Uri) -> Unit
+    onOpenUri: (Uri) -> Unit,
 ) {
     val postDetailsState by viewModel.post.collectAsState()
     val comments by viewModel.comments.collectAsState()
@@ -74,7 +74,7 @@ fun PostDetailsScreen(
                         is MoreCommentsStub -> MoreCommentsStubRow(
                             stub = item.stub,
                             Modifier.fillMaxWidth()
-                        )
+                        ) { viewModel.onMoreCommentsClicked(it) }
                     }
                 }
             }

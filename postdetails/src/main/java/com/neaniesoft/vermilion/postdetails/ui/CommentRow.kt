@@ -1,6 +1,7 @@
 package com.neaniesoft.vermilion.postdetails.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -85,9 +86,15 @@ fun CommentRow(comment: Comment, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun MoreCommentsStubRow(stub: CommentStub, modifier: Modifier = Modifier) {
+fun MoreCommentsStubRow(
+    stub: CommentStub,
+    modifier: Modifier = Modifier,
+    onClick: (CommentStub) -> Unit
+) {
     Row(
-        modifier.height(intrinsicSize = IntrinsicSize.Min)
+        modifier
+            .height(intrinsicSize = IntrinsicSize.Min)
+            .clickable { onClick(stub) }
     ) {
         repeat(stub.depth.value) {
             Box(
