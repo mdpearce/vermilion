@@ -3,6 +3,7 @@ plugins {
 }
 
 dependencies {
+    implementation(Deps.KOTLINX_COROUTINES_ANDROID)
     implementation(Deps.MATERIAL)
     implementation(Deps.COMPOSE_UI)
     implementation(Deps.COMPOSE_MATERIAL)

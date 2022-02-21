@@ -15,12 +15,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.neaniesoft.vermilion.postdetails.domain.entities.CommentKind
 import com.neaniesoft.vermilion.posts.ui.PostSummary
 
 @Composable
 fun PostDetailsScreen(
     viewModel: PostDetailsViewModel = hiltViewModel(),
-    onOpenUri: (Uri) -> Unit
+    onOpenUri: (Uri) -> Unit,
 ) {
     val postDetailsState by viewModel.post.collectAsState()
     val comments by viewModel.comments.collectAsState()
@@ -64,7 +65,16 @@ fun PostDetailsScreen(
 
             items(comments) { item ->
                 Surface(elevation = 8.dp) {
-                    CommentRow(comment = item, Modifier.fillMaxWidth())
+                    when (item) {
+                        is CommentKind.Full -> CommentRow(
+                            comment = item.comment,
+                            Modifier.fillMaxWidth()
+                        )
+                        is CommentKind.Stub -> MoreCommentsStubRow(
+                            stub = item.stub,
+                            Modifier.fillMaxWidth()
+                        ) { viewModel.onMoreCommentsClicked(it) }
+                    }
                 }
             }
         }

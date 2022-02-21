@@ -1,4 +1,4 @@
-package com.neaniesoft.vermilion.postdetails.data.http
+package com.neaniesoft.vermilion.postdetails.data.http.entities
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.neaniesoft.vermilion.api.entities.Listing

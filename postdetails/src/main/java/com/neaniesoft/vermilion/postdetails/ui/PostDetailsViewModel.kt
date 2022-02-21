@@ -7,7 +7,8 @@ import androidx.room.withTransaction
 import com.neaniesoft.vermilion.db.VermilionDatabase
 import com.neaniesoft.vermilion.dbentities.posts.PostDao
 import com.neaniesoft.vermilion.postdetails.data.CommentRepository
-import com.neaniesoft.vermilion.postdetails.domain.entities.Comment
+import com.neaniesoft.vermilion.postdetails.domain.entities.CommentKind
+import com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub
 import com.neaniesoft.vermilion.posts.data.toPost
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
@@ -30,8 +31,8 @@ class PostDetailsViewModel @Inject constructor(
     private val _post: MutableStateFlow<PostDetailsState> = MutableStateFlow(Empty)
     val post: StateFlow<PostDetailsState> = _post.asStateFlow()
 
-    private val _comments: MutableStateFlow<List<Comment>> = MutableStateFlow(emptyList())
-    val comments: StateFlow<List<Comment>> = _comments.asStateFlow()
+    private val _comments: MutableStateFlow<List<CommentKind>> = MutableStateFlow(emptyList())
+    val comments: StateFlow<List<CommentKind>> = _comments.asStateFlow()
 
     private val postId = PostId(
         savedStateHandle.get<String>("id")
@@ -63,6 +64,14 @@ class PostDetailsViewModel @Inject constructor(
             comments.collect {
                 _comments.emit(it)
             }
+        }
+    }
+
+    fun onMoreCommentsClicked(stub: CommentStub) {
+        viewModelScope.launch {
+            val comments: List<CommentKind> = commentRepository.fetchAndInsertMoreCommentsFor(stub)
+
+            _comments.emit(comments)
         }
     }
 }
