@@ -29,14 +29,14 @@ fun PostDetailsScreen(
     Surface(
         modifier = Modifier.fillMaxWidth(),
         color = MaterialTheme.colors.surface,
-        elevation = 1.dp
+        elevation = 0.dp
     ) {
 
         LazyColumn {
             when (val currentPostDetailsState = postDetailsState) {
                 is PostDetails -> {
                     item {
-                        Surface(modifier = Modifier.fillMaxWidth(), elevation = 24.dp) {
+                        Surface(modifier = Modifier.fillMaxWidth(), elevation = 16.dp) {
                             PostSummary(
                                 post = currentPostDetailsState.post,
                                 shouldTruncate = false,
@@ -64,17 +64,15 @@ fun PostDetailsScreen(
             }
 
             items(comments) { item ->
-                Surface(elevation = 8.dp) {
-                    when (item) {
-                        is CommentKind.Full -> CommentRow(
-                            comment = item.comment,
-                            Modifier.fillMaxWidth()
-                        )
-                        is CommentKind.Stub -> MoreCommentsStubRow(
-                            stub = item.stub,
-                            Modifier.fillMaxWidth()
-                        ) { viewModel.onMoreCommentsClicked(it) }
-                    }
+                when (item) {
+                    is CommentKind.Full -> CommentRow(
+                        comment = item.comment,
+                        Modifier.fillMaxWidth()
+                    )
+                    is CommentKind.Stub -> MoreCommentsStubRow(
+                        stub = item.stub,
+                        Modifier.fillMaxWidth()
+                    ) { viewModel.onMoreCommentsClicked(it) }
                 }
             }
         }

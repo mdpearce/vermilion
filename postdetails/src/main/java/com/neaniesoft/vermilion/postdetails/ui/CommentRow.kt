@@ -16,6 +16,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -49,7 +50,7 @@ fun CommentRow(comment: Comment, modifier: Modifier = Modifier) {
                     .fillMaxHeight()
                     .width(16.dp)
                     .padding(start = 7.dp, end = 7.dp)
-                    .background(MaterialTheme.colors.onBackground)
+                    .background(Color.Gray)
             )
         }
 
