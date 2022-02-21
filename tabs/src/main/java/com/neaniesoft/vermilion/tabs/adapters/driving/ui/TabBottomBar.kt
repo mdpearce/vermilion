@@ -1,8 +1,12 @@
 package com.neaniesoft.vermilion.tabs.adapters.driving.ui
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -21,7 +25,6 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -70,12 +73,14 @@ fun TabBottomBar(
             items(tabs) { tab ->
                 val isActive = activeTab is ActiveTab.Tab && tab.id == activeTab.id
 
-                TopLevelTab(
-                    isActive = isActive,
-                    tabState = tab,
-                    onTabClicked = onTabClicked,
-                    onCloseClicked = onTabCloseClicked
-                )
+                Box(modifier = Modifier.height(IntrinsicSize.Min)) {
+                    TopLevelTab(
+                        isActive = isActive,
+                        tabState = tab,
+                        onTabClicked = onTabClicked,
+                        onCloseClicked = onTabCloseClicked
+                    )
+                }
             }
         }
     }
@@ -89,24 +94,21 @@ fun TopLevelTab(
     onCloseClicked: (TabState) -> Unit
 ) {
     Surface(
-        shape = MaterialTheme.shapes.small,
         modifier = Modifier
             .padding(end = 4.dp, start = 4.dp)
-            .wrapContentHeight()
+            .fillMaxHeight()
             .width(140.dp)
-            .clickable { onTabClicked(tabState) }
-            .alpha(
-                if (isActive) {
-                    1f
-                } else {
-                    0.5f
-                }
-            ),
-        color = MaterialTheme.colors.surface,
+            .clickable { onTabClicked(tabState) },
+
         elevation = if (isActive) {
             64.dp
         } else {
-            16.dp
+            0.dp
+        },
+        color = if (isActive) {
+            MaterialTheme.colors.surface
+        } else {
+            Color.Transparent
         }
     ) {
         Row(
