@@ -49,7 +49,7 @@ fun TabBottomBar(
     onTabClicked: (TabState) -> Unit,
     onTabCloseClicked: (TabState) -> Unit
 ) {
-    BottomAppBar {
+    BottomAppBar(elevation = 16.dp) {
         LazyRow(
             Modifier
                 .fillMaxWidth()
