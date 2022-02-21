@@ -15,13 +15,16 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import com.neaniesoft.vermilion.postdetails.R
 import com.neaniesoft.vermilion.postdetails.domain.entities.Comment
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentContent
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentDepth
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentId
+import com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub
 import com.neaniesoft.vermilion.postdetails.domain.entities.ControversialIndex
 import com.neaniesoft.vermilion.postdetails.domain.entities.DurationString
 import com.neaniesoft.vermilion.postdetails.domain.entities.UpVotesCount
@@ -78,6 +81,31 @@ fun CommentRow(comment: Comment, modifier: Modifier = Modifier) {
                 MarkdownDocument(document = comment.contentMarkdown as Document)
             }
         }
+    }
+}
+
+@Composable
+fun MoreCommentsStubRow(stub: CommentStub, modifier: Modifier = Modifier) {
+    Row(
+        modifier.height(intrinsicSize = IntrinsicSize.Min)
+    ) {
+        repeat(stub.depth.value) {
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(16.dp)
+                    .padding(start = 7.dp, end = 7.dp)
+                    .background(MaterialTheme.colors.onBackground)
+            )
+        }
+        Text(
+            text = stringResource(id = R.string.more_comments, stub.count.value),
+            style = MaterialTheme.typography.caption,
+            color = MaterialTheme.colors.primary,
+            modifier = Modifier
+                .alignByBaseline()
+                .padding(8.dp)
+        )
     }
 }
 
