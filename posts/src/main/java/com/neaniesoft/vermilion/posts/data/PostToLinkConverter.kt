@@ -56,7 +56,7 @@ internal fun Link.toPost(markdownParser: Parser): Post {
 }
 
 internal fun Link.postSummary(markdownParser: Parser): PostSummary {
-    val hint = postHint?.lowercase(Locale.ENGLISH) ?: "self"
+    val hint = postHint?.lowercase(Locale.ENGLISH) ?: ""
     return when {
         hint.endsWith("image") -> {
             ImagePostSummary(
@@ -90,8 +90,12 @@ internal fun Link.postSummary(markdownParser: Parser): PostSummary {
         }
         else -> {
             val logger by anonymousLogger("postSummary()")
-            logger.debugIfEnabled { "Unrecognised post hint ($hint), defaulting to text post type" }
-            TextPostSummary(PreviewText(""), Document())
+            logger.debugIfEnabled { "Unrecognised post hint ($hint), defaulting to link post type" }
+            LinkPostSummary(
+                preview?.uriImage(),
+                thumbnail.thumbnail(),
+                LinkHost(domain)
+            )
         }
     }
 }

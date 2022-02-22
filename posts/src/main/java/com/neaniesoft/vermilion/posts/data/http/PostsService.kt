@@ -5,7 +5,7 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface PostsService {
-    @GET("best")
+    @GET("r/castrecordings/best")
     suspend fun frontPageBest(
         @Query("limit") limit: Int,
         @Query("before") before: String?,

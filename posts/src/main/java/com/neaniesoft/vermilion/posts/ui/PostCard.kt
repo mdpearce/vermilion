@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -26,6 +27,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.CommentCount
 import com.neaniesoft.vermilion.posts.domain.entities.CommunityName
 import com.neaniesoft.vermilion.posts.domain.entities.DefaultThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.ImagePostSummary
+import com.neaniesoft.vermilion.posts.domain.entities.LinkHost
 import com.neaniesoft.vermilion.posts.domain.entities.LinkPostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.NamedCommunity
 import com.neaniesoft.vermilion.posts.domain.entities.NoThumbnail
@@ -122,13 +124,17 @@ fun PostContent(
             }
         }
         Column(Modifier.padding(16.dp)) {
-            Row {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 Text(
                     text = post.title.value,
                     style = MaterialTheme.typography.subtitle1,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    modifier = Modifier
+                        .padding(bottom = 8.dp)
+                        .weight(0.1f)
                 )
-
                 val hasPreview = when (post.summary) {
                     is PreviewSummary -> post.summary.preview != null
                     else -> false
@@ -139,8 +145,11 @@ fun PostContent(
                     else -> NoThumbnail
                 }
 
-                if (!hasPreview && thumbnail != NoThumbnail) {
-                    Thumbnail(thumbnail = thumbnail)
+                if (!hasPreview) {
+                    Thumbnail(
+                        thumbnail = thumbnail,
+                        modifier = Modifier.size(72.dp)
+                    ) { onSummaryClicked(post) }
                 }
             }
             if (summary is TextPostSummary) {
@@ -184,13 +193,14 @@ fun PostContent(
 }
 
 @Composable
-fun Thumbnail(thumbnail: Thumbnail) {
+fun Thumbnail(thumbnail: Thumbnail, modifier: Modifier = Modifier, onClick: () -> Unit) {
     val painter = when (thumbnail) {
-        is SelfThumbnail, is DefaultThumbnail -> painterResource(id = R.drawable.ic_baseline_image_72)
+        is SelfThumbnail, is DefaultThumbnail, is NoThumbnail -> painterResource(id = R.drawable.ic_baseline_image_72)
         is UriThumbnail -> rememberImagePainter(thumbnail.uri)
-        NoThumbnail -> null
     }
-    if (painter != null) {
+    Surface(shape = MaterialTheme.shapes.small, elevation = 4.dp, modifier = modifier
+        .size(72.dp)
+        .clickable { onClick() }) {
         Image(modifier = Modifier.size(72.dp), painter = painter, contentDescription = "Thumbnail")
     }
 }
@@ -230,6 +240,14 @@ fun TextPostSummaryPreview() {
             content = Parser.builder().build().parse(MIXED_MD) as Document,
             shouldTruncate = false
         )
+    }
+}
+
+@Preview(name = "Thumbnail Post")
+@Composable
+fun ThumbnailPostPreview() {
+    VermilionTheme(darkTheme = true) {
+        PostCard(post = DUMMY_LINK_POST, onClick = {}, onMediaClicked = {})
     }
 }
 
@@ -288,6 +306,24 @@ internal val DUMMY_TEXT_POST = Post(
     TextPostSummary(
         PreviewText(DUMMY_CONTENT),
         Parser.builder().build().parse(MIXED_MD) as Document
+    ),
+    NamedCommunity(CommunityName("Subreddit")),
+    AuthorName("/u/SomeDude"),
+    postedAt = Instant.now(),
+    awardCounts = emptyMap(),
+    CommentCount(123),
+    Score(1024),
+    flags = emptySet(),
+    "http://reddit.com/".toUri()
+)
+
+internal val DUMMY_LINK_POST = Post(
+    PostId(""),
+    PostTitle("Some post with a very long title that is likely to split across multiple lines"),
+    LinkPostSummary(
+        null,
+        DefaultThumbnail,
+        LinkHost("somehost")
     ),
     NamedCommunity(CommunityName("Subreddit")),
     AuthorName("/u/SomeDude"),
