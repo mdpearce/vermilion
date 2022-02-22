@@ -36,7 +36,7 @@ fun PostDetailsScreen(
             when (val currentPostDetailsState = postDetailsState) {
                 is PostDetails -> {
                     item {
-                        Surface(modifier = Modifier.fillMaxWidth(), elevation = 16.dp) {
+                        Surface(modifier = Modifier.fillMaxWidth(), elevation = 4.dp) {
                             PostContent(
                                 post = currentPostDetailsState.post,
                                 shouldTruncate = false,
