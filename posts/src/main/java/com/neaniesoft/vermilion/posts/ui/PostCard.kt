@@ -46,7 +46,7 @@ fun PostCard(
     onMediaClicked: (Post) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(elevation = 16.dp, modifier = modifier.clickable { onClick(post) }) {
+    Card(elevation = 2.dp, modifier = modifier.clickable { onClick(post) }) {
         PostSummary(
             post = post,
             modifier = modifier,
@@ -67,13 +67,9 @@ fun PostSummary(
     onMediaClicked: (Post) -> Unit,
     onSummaryClicked: (Post) -> Unit
 ) {
-    Column(modifier = modifier.padding(16.dp)) {
-        when (val summary = post.summary) {
-            is TextPostSummary -> {
-                TextSummary(content = summary.previewTextMarkdown, shouldTruncate) {
-                    onSummaryClicked(post)
-                }
-            }
+    Column(modifier = modifier.padding(0.dp)) {
+        val summary = post.summary
+        when (summary) {
             is ImagePostSummary -> {
                 ImageSummary(
                     image = summary.preview ?: UriImage("".toUri(), 0, 0),
@@ -109,43 +105,52 @@ fun PostSummary(
                     shouldTruncate = shouldTruncate
                 ) { onMediaClicked(post) }
             }
-        }
-        Text(
-            text = post.title.value,
-            style = MaterialTheme.typography.h6,
-            modifier = Modifier.padding(top = 8.dp)
-        )
-        Row(
-            horizontalArrangement = Arrangement.End,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp)
-        ) {
-            Text(
-                text = if (post.community is NamedCommunity) {
-                    post.community.name.value
-                } else {
-                    ""
-                },
-                style = MaterialTheme.typography.caption
-            )
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            val commentString = when (val count = post.commentCount.value) {
-                0 -> stringResource(id = R.string.post_card_comment_count_0)
-                1 -> stringResource(id = R.string.post_card_comment_count_1)
-                else -> stringResource(id = R.string.post_card_comment_count_many, count)
+            is TextPostSummary -> {
+                // Do nothing, we draw the text post summary after the header
             }
+        }
+        Column(Modifier.padding(16.dp)) {
             Text(
-                text = commentString,
-                style = MaterialTheme.typography.caption
+                text = post.title.value,
+                style = MaterialTheme.typography.subtitle1,
+                modifier = Modifier.padding(bottom = 8.dp)
             )
-            Text(text = post.score.value.toString(), style = MaterialTheme.typography.caption)
+            if (summary is TextPostSummary) {
+                TextSummary(content = summary.previewTextMarkdown, shouldTruncate) {
+                    onSummaryClicked(post)
+                }
+            }
+            Row(
+                horizontalArrangement = Arrangement.End,
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text = if (post.community is NamedCommunity) {
+                        post.community.name.value
+                    } else {
+                        ""
+                    },
+                    style = MaterialTheme.typography.caption
+                )
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                val commentString = when (val count = post.commentCount.value) {
+                    0 -> stringResource(id = R.string.post_card_comment_count_0)
+                    1 -> stringResource(id = R.string.post_card_comment_count_1)
+                    else -> stringResource(id = R.string.post_card_comment_count_many, count)
+                }
+                Text(
+                    text = commentString,
+                    style = MaterialTheme.typography.caption
+                )
+                Text(text = post.score.value.toString(), style = MaterialTheme.typography.caption)
+            }
         }
     }
 }
@@ -165,6 +170,14 @@ fun PostCardPlaceholder() {
 @Composable
 fun PostCardPreview() {
     VermilionTheme {
+        PostCard(post = DUMMY_TEXT_POST, {}, {})
+    }
+}
+
+@Preview(name = "Text Post card dark")
+@Composable
+fun PostCardPreviewDark() {
+    VermilionTheme(darkTheme = true) {
         PostCard(post = DUMMY_TEXT_POST, {}, {})
     }
 }

@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -61,15 +60,17 @@ fun PostsList(
     onPostClicked: (Post) -> Unit,
     onMediaClicked: (Post) -> Unit
 ) {
-    LazyColumn {
+    LazyColumn(Modifier.padding(start = 16.dp, end = 16.dp)) {
+        item { Spacer(modifier = Modifier.padding(bottom = 16.dp)) }
+
         items(posts) { post ->
-            Spacer(Modifier.height(12.dp))
-            if (post != null) {
-                PostCard(post = post, onPostClicked, onMediaClicked)
-            } else {
-                PostCardPlaceholder()
+            Box(modifier = Modifier.padding(bottom = 32.dp)) {
+                if (post != null) {
+                    PostCard(post = post, onPostClicked, onMediaClicked)
+                } else {
+                    PostCardPlaceholder()
+                }
             }
-            Spacer(Modifier.height(12.dp))
         }
 
         posts.apply {

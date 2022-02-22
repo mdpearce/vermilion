@@ -5,12 +5,15 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import com.neaniesoft.vermilion.posts.R
 import com.neaniesoft.vermilion.posts.domain.entities.UriImage
@@ -18,9 +21,19 @@ import com.neaniesoft.vermilion.ui.markdown.MarkdownDocument
 import org.commonmark.node.Document
 
 @Composable
-fun TextSummary(content: Document, shouldTruncate: Boolean, onClick: (() -> Unit)? = null) {
-    Column(if (onClick != null) Modifier.clickable { onClick() } else Modifier) {
-        MarkdownDocument(document = content, if (shouldTruncate) 3 else Int.MAX_VALUE, onClick)
+fun TextSummary(
+    content: Document,
+    shouldTruncate: Boolean,
+    onClick: (() -> Unit)? = null
+) {
+
+    Column((if (onClick != null) Modifier.clickable { onClick() } else Modifier)) {
+        Divider(Modifier.padding(bottom = 8.dp, top = 8.dp))
+        MarkdownDocument(
+            document = content,
+            if (shouldTruncate) 3 else Int.MAX_VALUE,
+            onClick
+        )
     }
 }
 

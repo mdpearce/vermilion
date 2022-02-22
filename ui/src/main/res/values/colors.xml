@@ -13,4 +13,15 @@
     <color name="orange900">#FFCC8547</color>
     <color name="green400">#FF4BCC47</color>
 
+    <color name="deep_blue">#FF314549</color>
+    <color name="dark_blue">#FF263238</color>
+    <color name="deep_dark_blue">#FF212C31</color>
+
+    <color name="light_yellow">#FFFFCB6B</color>
+    <color name="light_blue">#FF82AAFF</color>
+    <color name="light_red">#FFF78C6C</color>
+    <color name="light_red_variant">#FFFF5370</color>
+    <color name="dark_red">#A12B2F</color>
+
+
 </resources>
