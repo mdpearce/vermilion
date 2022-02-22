@@ -1,5 +1,6 @@
 package com.neaniesoft.vermilion.posts.ui
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -31,6 +32,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.LinkHost
 import com.neaniesoft.vermilion.posts.domain.entities.LinkPostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.NamedCommunity
 import com.neaniesoft.vermilion.posts.domain.entities.NoThumbnail
+import com.neaniesoft.vermilion.posts.domain.entities.NsfwThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.PostTitle
@@ -38,6 +40,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.PreviewSummary
 import com.neaniesoft.vermilion.posts.domain.entities.PreviewText
 import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.posts.domain.entities.SelfThumbnail
+import com.neaniesoft.vermilion.posts.domain.entities.SpoilerThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.TextPostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.Thumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.ThumbnailSummary
@@ -195,8 +198,13 @@ fun PostContent(
 @Composable
 fun Thumbnail(thumbnail: Thumbnail, modifier: Modifier = Modifier, onClick: () -> Unit) {
     val painter = when (thumbnail) {
-        is SelfThumbnail, is DefaultThumbnail, is NoThumbnail -> painterResource(id = R.drawable.ic_baseline_image_72)
-        is UriThumbnail -> rememberImagePainter(thumbnail.uri)
+        is SelfThumbnail, is DefaultThumbnail, is NoThumbnail, is NsfwThumbnail, is SpoilerThumbnail -> painterResource(
+            id = R.drawable.ic_baseline_image_72
+        )
+        is UriThumbnail -> {
+            Log.d("Thumbnail", "loading thumbnail from uri: ${thumbnail.uri}")
+            rememberImagePainter(thumbnail.uri)
+        }
     }
     Surface(
         shape = MaterialTheme.shapes.small, elevation = 4.dp,

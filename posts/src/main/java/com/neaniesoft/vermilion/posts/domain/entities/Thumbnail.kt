@@ -9,4 +9,6 @@ sealed class Thumbnail(
 object NoThumbnail : Thumbnail("none")
 object SelfThumbnail : Thumbnail("self")
 object DefaultThumbnail : Thumbnail("default")
+object SpoilerThumbnail : Thumbnail("spoiler")
+object NsfwThumbnail : Thumbnail("nsfw")
 data class UriThumbnail(val uri: Uri) : Thumbnail(uri.toString())

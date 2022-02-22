@@ -17,6 +17,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.ImagePostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.LinkHost
 import com.neaniesoft.vermilion.posts.domain.entities.LinkPostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.NamedCommunity
+import com.neaniesoft.vermilion.posts.domain.entities.NsfwThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlags
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
@@ -25,6 +26,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.PostTitle
 import com.neaniesoft.vermilion.posts.domain.entities.PreviewText
 import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.posts.domain.entities.SelfThumbnail
+import com.neaniesoft.vermilion.posts.domain.entities.SpoilerThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.TextPostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.Thumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.UriImage
@@ -114,6 +116,8 @@ internal fun String.thumbnail(): Thumbnail {
     return when {
         this == "self" -> SelfThumbnail
         this == "default" -> DefaultThumbnail
+        this == "spoiler" -> SpoilerThumbnail
+        this == "nsfw" -> NsfwThumbnail
         this.isNotEmpty() -> UriThumbnail(this.toUri())
         else -> DefaultThumbnail
     }
