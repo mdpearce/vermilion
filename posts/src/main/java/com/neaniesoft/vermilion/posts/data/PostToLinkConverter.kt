@@ -68,7 +68,7 @@ internal fun Link.postSummary(markdownParser: Parser): PostSummary {
                 Uri.parse(url)
             )
         }
-        hint.endsWith("self") -> {
+        hint.endsWith("self") || selfText.isNotEmpty() -> {
             val text = StringEscapeUtils.unescapeHtml4(selfText)
             TextPostSummary(
                 PreviewText(text),
