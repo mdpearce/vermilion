@@ -4,7 +4,6 @@ import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -61,10 +60,8 @@ fun PostsList(
     onMediaClicked: (Post) -> Unit
 ) {
     LazyColumn(Modifier.padding(start = 16.dp, end = 16.dp)) {
-        item { Spacer(modifier = Modifier.padding(bottom = 16.dp)) }
-
         items(posts) { post ->
-            Box(modifier = Modifier.padding(bottom = 32.dp)) {
+            Box(modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)) {
                 if (post != null) {
                     PostCard(post = post, onPostClicked, onMediaClicked)
                 } else {
