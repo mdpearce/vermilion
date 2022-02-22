@@ -116,7 +116,7 @@ fun PostSummary(
                 modifier = Modifier.padding(bottom = 8.dp)
             )
             if (summary is TextPostSummary) {
-                TextSummary(content = summary.previewTextMarkdown, shouldTruncate, Modifier.padding(bottom = 8.dp)) {
+                TextSummary(content = summary.previewTextMarkdown, shouldTruncate) {
                     onSummaryClicked(post)
                 }
             }
@@ -170,6 +170,14 @@ fun PostCardPlaceholder() {
 @Composable
 fun PostCardPreview() {
     VermilionTheme {
+        PostCard(post = DUMMY_TEXT_POST, {}, {})
+    }
+}
+
+@Preview(name = "Text Post card dark")
+@Composable
+fun PostCardPreviewDark() {
+    VermilionTheme(darkTheme = true) {
         PostCard(post = DUMMY_TEXT_POST, {}, {})
     }
 }
