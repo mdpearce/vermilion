@@ -112,7 +112,7 @@ fun PostSummary(
         Column(Modifier.padding(16.dp)) {
             Text(
                 text = post.title.value,
-                style = MaterialTheme.typography.h6,
+                style = MaterialTheme.typography.subtitle1,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
             if (summary is TextPostSummary) {
