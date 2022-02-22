@@ -151,7 +151,7 @@ fun PostContent(
                     else -> NoThumbnail
                 }
 
-                if (!hasPreview) {
+                if (!hasPreview && thumbnail !is NoThumbnail) {
                     Thumbnail(
                         thumbnail = thumbnail,
                         modifier = Modifier.size(72.dp)
