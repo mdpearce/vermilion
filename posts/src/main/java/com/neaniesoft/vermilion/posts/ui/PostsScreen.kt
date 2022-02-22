@@ -59,7 +59,7 @@ fun PostsList(
     onPostClicked: (Post) -> Unit,
     onMediaClicked: (Post) -> Unit
 ) {
-    LazyColumn(Modifier.padding(start = 16.dp, end = 16.dp)) {
+    LazyColumn(Modifier.padding(start = 8.dp, end = 8.dp)) {
         items(posts) { post ->
             Box(modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)) {
                 if (post != null) {
