@@ -129,13 +129,13 @@ fun PostContent(
         Column(Modifier.padding(16.dp)) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
             ) {
                 Text(
                     text = post.title.value,
                     style = MaterialTheme.typography.subtitle1,
                     modifier = Modifier
-                        .padding(bottom = 8.dp)
+                        .padding(bottom = 8.dp, end = 8.dp)
                         .weight(0.1f)
                 )
                 val hasPreview = when (post.summary) {
