@@ -19,11 +19,11 @@ import com.neaniesoft.vermilion.posts.domain.entities.PostTitle
 import com.neaniesoft.vermilion.posts.domain.entities.PreviewText
 import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.posts.domain.entities.TextPostSummary
+import com.neaniesoft.vermilion.posts.domain.entities.ThumbnailSummary
 import com.neaniesoft.vermilion.posts.domain.entities.UriImage
 import com.neaniesoft.vermilion.posts.domain.entities.VideoPostSummary
 import org.commonmark.node.Document
 import org.commonmark.parser.Parser
-import java.net.URL
 import java.time.Clock
 import java.time.Instant
 import java.util.UUID
@@ -34,9 +34,6 @@ fun PostRecord.toPost(markdownParser: Parser): Post {
         title = PostTitle(title),
         summary = when (postType) {
             PostType.IMAGE -> ImagePostSummary(
-                LinkHost(linkHost),
-                thumbnailUri = thumbnailUri?.toUri()
-                    ?: throw IllegalStateException("Image post with no thumbnail returned from db"),
                 preview =
                 UriImage(
                     previewUri?.toUri()
@@ -45,6 +42,8 @@ fun PostRecord.toPost(markdownParser: Parser): Post {
                     previewHeight ?: 0
 
                 ),
+                thumbnail = thumbnailUri?.thumbnail() ?: DefaultThumbnail,
+                LinkHost(linkHost),
                 fullSizeUri = linkUri.toUri()
             )
             PostType.LINK -> LinkPostSummary(
@@ -63,9 +62,6 @@ fun PostRecord.toPost(markdownParser: Parser): Post {
                 previewTextMarkdown = markdownParser.parse(previewText ?: "") as Document
             )
             PostType.VIDEO -> VideoPostSummary(
-                LinkHost(linkHost),
-                thumbnailUri = thumbnailUri?.toUri()
-                    ?: throw IllegalStateException("Video post with no thumbnail returned from db"),
                 preview =
                 UriImage(
                     previewUri?.toUri()
@@ -74,6 +70,8 @@ fun PostRecord.toPost(markdownParser: Parser): Post {
                     previewHeight ?: 0
 
                 ),
+                thumbnail = thumbnailUri?.thumbnail() ?: DefaultThumbnail,
+                LinkHost(linkHost),
                 linkUri = linkUri.toUri()
             )
         },
@@ -88,7 +86,7 @@ fun PostRecord.toPost(markdownParser: Parser): Post {
         commentCount = CommentCount(commentCount),
         score = Score(score),
         flags = flags.split(",").filter { it.isNotEmpty() }.map { PostFlags.valueOf(it) }.toSet(),
-        link = URL(linkUri)
+        link = linkUri.toUri()
     )
 }
 
@@ -104,11 +102,9 @@ fun Post.toPostRecord(query: String, clock: Clock): PostRecord = PostRecord(
         is LinkPostSummary -> PostType.LINK
         is VideoPostSummary -> PostType.VIDEO
     },
-    linkHost = link.host,
+    linkHost = link.host ?: "",
     thumbnailUri = when (summary) {
-        is ImagePostSummary -> summary.thumbnailUri.toString()
-        is VideoPostSummary -> summary.thumbnailUri.toString()
-        is LinkPostSummary -> null // TODO Fix this
+        is ThumbnailSummary -> summary.thumbnail.identifier
         else -> null
     },
     previewUri = when (summary) {

@@ -1,6 +1,6 @@
 package com.neaniesoft.vermilion.posts.domain.entities
 
-import java.net.URL
+import android.net.Uri
 import java.time.Instant
 
 data class Post(
@@ -14,7 +14,7 @@ data class Post(
     val commentCount: CommentCount,
     val score: Score,
     val flags: Set<PostFlags>,
-    val link: URL
+    val link: Uri
 )
 
 fun Post.isNsfw(): Boolean = flags.contains(PostFlags.NSFW)
