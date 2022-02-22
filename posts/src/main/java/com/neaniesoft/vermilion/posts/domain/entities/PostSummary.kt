@@ -6,11 +6,11 @@ import org.commonmark.node.Document
 sealed class PostSummary
 
 data class ImagePostSummary(
+    override val preview: UriImage?,
+    override val thumbnail: Thumbnail,
     val linkHost: LinkHost,
-    val thumbnailUri: Uri,
-    val preview: UriImage?,
     val fullSizeUri: Uri
-) : PostSummary()
+) : PostSummary(), PreviewSummary, ThumbnailSummary
 
 data class GalleryPostSummary(
     val thumbnailUri: Uri,
@@ -18,10 +18,10 @@ data class GalleryPostSummary(
 )
 
 data class LinkPostSummary(
-    val linkHost: LinkHost,
-    val thumbnail: Thumbnail,
-    val preview: UriImage?
-) : PostSummary()
+    override val preview: UriImage?,
+    override val thumbnail: Thumbnail,
+    val linkHost: LinkHost
+) : PostSummary(), PreviewSummary, ThumbnailSummary
 
 data class TextPostSummary(
     val previewText: PreviewText,
@@ -35,8 +35,16 @@ data class UriImage(
 )
 
 data class VideoPostSummary(
+    override val preview: UriImage?,
+    override val thumbnail: Thumbnail,
     val linkHost: LinkHost,
-    val thumbnailUri: Uri,
-    val preview: UriImage?,
     val linkUri: Uri
-) : PostSummary()
+) : PostSummary(), PreviewSummary, ThumbnailSummary
+
+interface PreviewSummary {
+    val preview: UriImage?
+}
+
+interface ThumbnailSummary {
+    val thumbnail: Thumbnail
+}

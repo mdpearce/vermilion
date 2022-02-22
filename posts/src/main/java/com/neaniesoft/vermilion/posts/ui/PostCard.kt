@@ -1,5 +1,6 @@
 package com.neaniesoft.vermilion.posts.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -7,36 +8,45 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import coil.compose.rememberImagePainter
 import com.neaniesoft.vermilion.posts.R
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.CommentCount
 import com.neaniesoft.vermilion.posts.domain.entities.CommunityName
+import com.neaniesoft.vermilion.posts.domain.entities.DefaultThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.ImagePostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.LinkPostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.NamedCommunity
+import com.neaniesoft.vermilion.posts.domain.entities.NoThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.PostTitle
+import com.neaniesoft.vermilion.posts.domain.entities.PreviewSummary
 import com.neaniesoft.vermilion.posts.domain.entities.PreviewText
 import com.neaniesoft.vermilion.posts.domain.entities.Score
+import com.neaniesoft.vermilion.posts.domain.entities.SelfThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.TextPostSummary
+import com.neaniesoft.vermilion.posts.domain.entities.Thumbnail
+import com.neaniesoft.vermilion.posts.domain.entities.ThumbnailSummary
 import com.neaniesoft.vermilion.posts.domain.entities.UriImage
+import com.neaniesoft.vermilion.posts.domain.entities.UriThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.VideoPostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.isNsfw
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import org.commonmark.node.Document
 import org.commonmark.parser.Parser
 import org.intellij.lang.annotations.Language
-import java.net.URL
 import java.time.Instant
 
 @Composable
@@ -47,7 +57,7 @@ fun PostCard(
     modifier: Modifier = Modifier
 ) {
     Card(elevation = 2.dp, modifier = modifier.clickable { onClick(post) }) {
-        PostSummary(
+        PostContent(
             post = post,
             modifier = modifier,
             shouldTruncate = true,
@@ -59,7 +69,7 @@ fun PostCard(
 }
 
 @Composable
-fun PostSummary(
+fun PostContent(
     post: Post,
     modifier: Modifier = Modifier,
     shouldTruncate: Boolean,
@@ -82,16 +92,18 @@ fun PostSummary(
                 ) { onMediaClicked(post) }
             }
             is LinkPostSummary -> {
-                ImageSummary(
-                    image = summary.preview ?: UriImage("".toUri(), 0, 0),
-                    shouldTruncate = shouldTruncate,
-                    isNsfw = if (shouldHideNsfw) {
-                        post.isNsfw()
-                    } else {
-                        false
+                if (summary.preview != null) {
+                    ImageSummary(
+                        image = summary.preview,
+                        shouldTruncate = shouldTruncate,
+                        isNsfw = if (shouldHideNsfw) {
+                            post.isNsfw()
+                        } else {
+                            false
+                        }
+                    ) {
+                        onMediaClicked(post)
                     }
-                ) {
-                    onMediaClicked(post)
                 }
             }
             is VideoPostSummary -> {
@@ -110,11 +122,27 @@ fun PostSummary(
             }
         }
         Column(Modifier.padding(16.dp)) {
-            Text(
-                text = post.title.value,
-                style = MaterialTheme.typography.subtitle1,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
+            Row {
+                Text(
+                    text = post.title.value,
+                    style = MaterialTheme.typography.subtitle1,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                val hasPreview = when (post.summary) {
+                    is PreviewSummary -> post.summary.preview != null
+                    else -> false
+                }
+
+                val thumbnail = when (post.summary) {
+                    is ThumbnailSummary -> post.summary.thumbnail
+                    else -> NoThumbnail
+                }
+
+                if (!hasPreview && thumbnail != NoThumbnail) {
+                    Thumbnail(thumbnail = thumbnail)
+                }
+            }
             if (summary is TextPostSummary) {
                 TextSummary(content = summary.previewTextMarkdown, shouldTruncate) {
                     onSummaryClicked(post)
@@ -152,6 +180,18 @@ fun PostSummary(
                 Text(text = post.score.value.toString(), style = MaterialTheme.typography.caption)
             }
         }
+    }
+}
+
+@Composable
+fun Thumbnail(thumbnail: Thumbnail) {
+    val painter = when (thumbnail) {
+        is SelfThumbnail, is DefaultThumbnail -> painterResource(id = R.drawable.ic_baseline_image_72)
+        is UriThumbnail -> rememberImagePainter(thumbnail.uri)
+        NoThumbnail -> null
+    }
+    if (painter != null) {
+        Image(modifier = Modifier.size(72.dp), painter = painter, contentDescription = "Thumbnail")
     }
 }
 
@@ -256,5 +296,5 @@ internal val DUMMY_TEXT_POST = Post(
     CommentCount(123),
     Score(1024),
     flags = emptySet(),
-    URL("http://reddit.com/")
+    "http://reddit.com/".toUri()
 )

@@ -51,7 +51,7 @@ internal fun Link.toPost(markdownParser: Parser): Post {
         CommentCount(numComments),
         Score(score),
         flags(),
-        URL(url)
+        url.toUri()
     )
 }
 
@@ -60,9 +60,9 @@ internal fun Link.postSummary(markdownParser: Parser): PostSummary {
     return when {
         hint.endsWith("image") -> {
             ImagePostSummary(
-                LinkHost(domain),
-                Uri.parse(thumbnail),
                 preview?.uriImage(),
+                thumbnail.thumbnail(),
+                LinkHost(domain),
                 Uri.parse(url)
             )
         }
@@ -75,17 +75,17 @@ internal fun Link.postSummary(markdownParser: Parser): PostSummary {
         }
         hint.endsWith("video") -> {
             VideoPostSummary(
-                LinkHost(domain),
-                Uri.parse(thumbnail),
                 preview?.uriImage(),
+                thumbnail.thumbnail(),
+                LinkHost(domain),
                 Uri.parse(url)
             )
         }
         hint.endsWith("link") -> {
             LinkPostSummary(
-                LinkHost(domain),
+                preview?.uriImage(),
                 thumbnail.thumbnail(),
-                preview?.uriImage()
+                LinkHost(domain)
             )
         }
         else -> {
