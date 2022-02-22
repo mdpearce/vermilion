@@ -149,7 +149,7 @@ fun PostContent(
                     Thumbnail(
                         thumbnail = thumbnail,
                         modifier = Modifier.size(72.dp)
-                    ) { onSummaryClicked(post) }
+                    ) { onMediaClicked(post) }
                 }
             }
             if (summary is TextPostSummary) {
