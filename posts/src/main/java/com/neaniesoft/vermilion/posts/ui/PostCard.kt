@@ -16,6 +16,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -129,7 +130,9 @@ fun PostContent(
         Column(Modifier.padding(16.dp)) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp)
             ) {
                 Text(
                     text = post.title.value,
@@ -212,7 +215,12 @@ fun Thumbnail(thumbnail: Thumbnail, modifier: Modifier = Modifier, onClick: () -
             .size(72.dp)
             .clickable { onClick() }
     ) {
-        Image(modifier = Modifier.size(72.dp), painter = painter, contentDescription = "Thumbnail")
+        Image(
+            modifier = Modifier.size(72.dp),
+            contentScale = ContentScale.Crop,
+            painter = painter,
+            contentDescription = "Thumbnail"
+        )
     }
 }
 
