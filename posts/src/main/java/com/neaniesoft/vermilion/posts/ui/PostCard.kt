@@ -198,9 +198,12 @@ fun Thumbnail(thumbnail: Thumbnail, modifier: Modifier = Modifier, onClick: () -
         is SelfThumbnail, is DefaultThumbnail, is NoThumbnail -> painterResource(id = R.drawable.ic_baseline_image_72)
         is UriThumbnail -> rememberImagePainter(thumbnail.uri)
     }
-    Surface(shape = MaterialTheme.shapes.small, elevation = 4.dp, modifier = modifier
-        .size(72.dp)
-        .clickable { onClick() }) {
+    Surface(
+        shape = MaterialTheme.shapes.small, elevation = 4.dp,
+        modifier = modifier
+            .size(72.dp)
+            .clickable { onClick() }
+    ) {
         Image(modifier = Modifier.size(72.dp), painter = painter, contentDescription = "Thumbnail")
     }
 }
