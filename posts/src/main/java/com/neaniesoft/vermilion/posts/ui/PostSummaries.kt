@@ -2,11 +2,14 @@ package com.neaniesoft.vermilion.posts.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -20,9 +23,26 @@ import com.neaniesoft.vermilion.ui.markdown.MarkdownDocument
 import org.commonmark.node.Document
 
 @Composable
-fun TextSummary(content: Document, shouldTruncate: Boolean, onClick: (() -> Unit)? = null) {
-    Column((if (onClick != null) Modifier.clickable { onClick() } else Modifier).padding(16.dp)) {
-        MarkdownDocument(document = content, if (shouldTruncate) 3 else Int.MAX_VALUE, onClick)
+fun TextSummary(
+    content: Document,
+    shouldTruncate: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null
+) {
+    Box(modifier) {
+        Surface(
+            elevation = 2.dp,
+            shape = MaterialTheme.shapes.small,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column((if (onClick != null) Modifier.clickable { onClick() } else Modifier).padding(8.dp)) {
+                MarkdownDocument(
+                    document = content,
+                    if (shouldTruncate) 3 else Int.MAX_VALUE,
+                    onClick
+                )
+            }
+        }
     }
 }
 

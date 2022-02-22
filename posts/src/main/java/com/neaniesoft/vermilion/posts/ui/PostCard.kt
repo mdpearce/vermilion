@@ -2,7 +2,6 @@ package com.neaniesoft.vermilion.posts.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -69,12 +68,8 @@ fun PostSummary(
     onSummaryClicked: (Post) -> Unit
 ) {
     Column(modifier = modifier.padding(0.dp)) {
-        when (val summary = post.summary) {
-            is TextPostSummary -> {
-                TextSummary(content = summary.previewTextMarkdown, shouldTruncate) {
-                    onSummaryClicked(post)
-                }
-            }
+        val summary = post.summary
+        when (summary) {
             is ImagePostSummary -> {
                 ImageSummary(
                     image = summary.preview ?: UriImage("".toUri(), 0, 0),
@@ -110,18 +105,25 @@ fun PostSummary(
                     shouldTruncate = shouldTruncate
                 ) { onMediaClicked(post) }
             }
+            is TextPostSummary -> {
+                // Do nothing, we draw the text post summary after the header
+            }
         }
-        Column(Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp)) {
+        Column(Modifier.padding(16.dp)) {
             Text(
                 text = post.title.value,
                 style = MaterialTheme.typography.h6,
-                modifier = Modifier.padding(top = 8.dp)
+                modifier = Modifier.padding(bottom = 8.dp)
             )
+            if (summary is TextPostSummary) {
+                TextSummary(content = summary.previewTextMarkdown, shouldTruncate, Modifier.padding(bottom = 8.dp)) {
+                    onSummaryClicked(post)
+                }
+            }
             Row(
                 horizontalArrangement = Arrangement.End,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp)
             ) {
                 Text(
                     text = if (post.community is NamedCommunity) {
