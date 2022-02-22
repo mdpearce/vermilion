@@ -17,6 +17,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.ImagePostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.LinkHost
 import com.neaniesoft.vermilion.posts.domain.entities.LinkPostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.NamedCommunity
+import com.neaniesoft.vermilion.posts.domain.entities.NsfwThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlags
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
@@ -25,6 +26,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.PostTitle
 import com.neaniesoft.vermilion.posts.domain.entities.PreviewText
 import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.posts.domain.entities.SelfThumbnail
+import com.neaniesoft.vermilion.posts.domain.entities.SpoilerThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.TextPostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.Thumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.UriImage
@@ -51,22 +53,22 @@ internal fun Link.toPost(markdownParser: Parser): Post {
         CommentCount(numComments),
         Score(score),
         flags(),
-        URL(url)
+        url.toUri()
     )
 }
 
 internal fun Link.postSummary(markdownParser: Parser): PostSummary {
-    val hint = postHint?.lowercase(Locale.ENGLISH) ?: "self"
+    val hint = postHint?.lowercase(Locale.ENGLISH) ?: ""
     return when {
         hint.endsWith("image") -> {
             ImagePostSummary(
-                LinkHost(domain),
-                Uri.parse(thumbnail),
                 preview?.uriImage(),
+                thumbnail.thumbnail(),
+                LinkHost(domain),
                 Uri.parse(url)
             )
         }
-        hint.endsWith("self") -> {
+        hint.endsWith("self") || selfText.isNotEmpty() -> {
             val text = StringEscapeUtils.unescapeHtml4(selfText)
             TextPostSummary(
                 PreviewText(text),
@@ -75,23 +77,27 @@ internal fun Link.postSummary(markdownParser: Parser): PostSummary {
         }
         hint.endsWith("video") -> {
             VideoPostSummary(
-                LinkHost(domain),
-                Uri.parse(thumbnail),
                 preview?.uriImage(),
+                thumbnail.thumbnail(),
+                LinkHost(domain),
                 Uri.parse(url)
             )
         }
         hint.endsWith("link") -> {
             LinkPostSummary(
-                LinkHost(domain),
+                preview?.uriImage(),
                 thumbnail.thumbnail(),
-                preview?.uriImage()
+                LinkHost(domain)
             )
         }
         else -> {
             val logger by anonymousLogger("postSummary()")
-            logger.debugIfEnabled { "Unrecognised post hint ($hint), defaulting to text post type" }
-            TextPostSummary(PreviewText(""), Document())
+            logger.debugIfEnabled { "Unrecognised post hint ($hint), defaulting to link post type" }
+            LinkPostSummary(
+                preview?.uriImage(),
+                thumbnail.thumbnail(),
+                LinkHost(domain)
+            )
         }
     }
 }
@@ -110,6 +116,8 @@ internal fun String.thumbnail(): Thumbnail {
     return when {
         this == "self" -> SelfThumbnail
         this == "default" -> DefaultThumbnail
+        this == "spoiler" -> SpoilerThumbnail
+        this == "nsfw" -> NsfwThumbnail
         this.isNotEmpty() -> UriThumbnail(this.toUri())
         else -> DefaultThumbnail
     }

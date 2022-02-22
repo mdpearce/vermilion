@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentKind
-import com.neaniesoft.vermilion.posts.ui.PostSummary
+import com.neaniesoft.vermilion.posts.ui.PostContent
 
 @Composable
 fun PostDetailsScreen(
@@ -36,8 +36,8 @@ fun PostDetailsScreen(
             when (val currentPostDetailsState = postDetailsState) {
                 is PostDetails -> {
                     item {
-                        Surface(modifier = Modifier.fillMaxWidth(), elevation = 16.dp) {
-                            PostSummary(
+                        Surface(modifier = Modifier.fillMaxWidth(), elevation = 4.dp) {
+                            PostContent(
                                 post = currentPostDetailsState.post,
                                 shouldTruncate = false,
                                 shouldHideNsfw = false,
