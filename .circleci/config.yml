@@ -156,16 +156,6 @@ workflows:
       - unit-test:
           requires:
             - debug-build
-      - android/run-ui-tests:
-          requires:
-            - debug-build
-          filters:
-            branches:
-              ignore: main # regular commits
-          executor:
-            name: android/android-machine
-            resource-class: large
-            tag: 2021.12.1
       - android-test:
           requires:
             - debug-build
