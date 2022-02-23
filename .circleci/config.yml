@@ -16,7 +16,7 @@ jobs:
       - run:
           name: Build Google services json file
           command: |
-            - ./gradlew app:buildGoogleServicesJson
+            ./gradlew app:buildGoogleServicesJson
       - android/run-tests:
           test-command: ./gradlew testDebug
       - android/save-gradle-cache
@@ -46,7 +46,7 @@ jobs:
       - run:
           name: Build Google services json file
           command: |
-            - ./gradlew app:buildGoogleServicesJson
+            ./gradlew app:buildGoogleServicesJson
       - android/start-emulator-and-run-tests:
           test-command: ./gradlew connectedDebugAndroidTest
           system-image: << parameters.system-image >>
@@ -86,7 +86,7 @@ jobs:
       - run:
           name: Build Google services json file
           command: |
-            - ./gradlew app:buildGoogleServicesJson
+            ./gradlew app:buildGoogleServicesJson
       - run:
           name: Assemble release build
           command: |
@@ -105,7 +105,7 @@ jobs:
       - run:
           name: Build Google services json file
           command: |
-            - ./gradlew app:buildGoogleServicesJson
+            ./gradlew app:buildGoogleServicesJson
       - run:
           name: Assemble debug build
           command: |
