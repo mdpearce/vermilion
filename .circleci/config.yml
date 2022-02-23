@@ -169,6 +169,18 @@ workflows:
           filters:
             branches:
               only: main # Commits to main branch
+      - android-test:
+          requires:
+            - debug-build
+          matrix:
+            alias: android-test-latest
+            parameters:
+              system-image:
+                - system-images;android-30;google_apis;x86
+          name: android-test-<<matrix.system-image>>
+          filters:
+            branches:
+              ignore: main # Commits to feature branch
       - release-build:
           requires:
             - unit-test
