@@ -11,10 +11,10 @@ import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
+import coil.transform.BlurTransformation
 import com.neaniesoft.vermilion.posts.R
 import com.neaniesoft.vermilion.posts.domain.entities.UriImage
 import com.neaniesoft.vermilion.ui.markdown.MarkdownDocument
@@ -41,37 +41,27 @@ private const val MIN_RATIO = 1.0f
 
 @Composable
 fun ImageSummary(image: UriImage, shouldTruncate: Boolean, isNsfw: Boolean, onClick: () -> Unit) {
-    if (isNsfw) {
+    val painter = rememberImagePainter(data = image.uri.toString()) {
+        placeholder(R.drawable.image_placeholder)
+        if (isNsfw) {
+            transformations(BlurTransformation(LocalContext.current, 25f, 8f))
+        }
+    }
+
+    BoxWithConstraints(Modifier.fillMaxWidth()) {
+        val ratio = if (shouldTruncate) {
+            kotlin.math.max((image.width.toFloat() / image.height.toFloat()), MIN_RATIO)
+        } else {
+            image.width.toFloat() / image.height.toFloat()
+        }
         Image(
             modifier = Modifier
-                .fillMaxWidth()
+                .size(maxWidth, maxWidth.div(ratio))
                 .clickable { onClick() },
-            contentScale = ContentScale.FillWidth,
-            painter = painterResource(id = R.drawable.image_hidden),
-            contentDescription = stringResource(
-                id = R.string.nsfw_content_description
-            )
+            painter = painter,
+            contentDescription = "",
+            contentScale = ContentScale.Crop
         )
-    } else {
-        val painter = rememberImagePainter(image.uri.toString()) {
-            placeholder(R.drawable.image_placeholder)
-        }
-
-        BoxWithConstraints(Modifier.fillMaxWidth()) {
-            val ratio = if (shouldTruncate) {
-                kotlin.math.max((image.width.toFloat() / image.height.toFloat()), MIN_RATIO)
-            } else {
-                image.width.toFloat() / image.height.toFloat()
-            }
-            Image(
-                modifier = Modifier
-                    .size(maxWidth, maxWidth.div(ratio))
-                    .clickable { onClick() },
-                painter = painter,
-                contentDescription = "",
-                contentScale = ContentScale.Crop
-            )
-        }
     }
 }
 
