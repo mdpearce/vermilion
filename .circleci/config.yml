@@ -118,12 +118,28 @@ jobs:
           name: Upgrade dependencies
           command: |
             ./gradlew upgradeDependencies
+  build-google-services-json:
+    executor:
+      name: android/android-machine
+      resource-class: large
+      tag: 2021.12.1
+    steps:
+      - checkout
+      - android/restore-gradle-cache
+      - android/restore-build-cache
+      - run:
+          name: Build google-services.json file
+          command: |
+            ./gradlew app:buildGoogleServicesJson
 
 workflows:
   test-and-build:
     jobs:
       - lint-kotlin
-      - debug-build
+      - build-google-services-json
+      - debug-build:
+          requires:
+            - build-google-services-json
       - unit-test:
           requires:
             - debug-build
