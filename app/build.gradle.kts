@@ -11,6 +11,7 @@ plugins {
 
 apply(plugin = "net.thauvin.erik.gradle.semver")
 apply(plugin = "com.google.gms.google-services")
+apply(plugin = "com.google.firebase.crashlytics")
 
 // TODO This is pretty gross
 fun versionNameFromSemVer(): String {
@@ -139,6 +140,9 @@ dependencies {
     implementation(Deps.PAGING_RUNTIME)
     implementation(Deps.PAGING_COMPOSE)
     implementation(Deps.ANDROIDX_BROWSER)
+    implementation(platform(Deps.FIREBASE_BOM))
+    implementation(Deps.FIREBASE_ANALYTICS)
+    implementation(Deps.FIREBASE_CRASHLYTICS)
     implementation(project(":posts"))
     implementation(project(":postdetails"))
     implementation(project(":ui"))
