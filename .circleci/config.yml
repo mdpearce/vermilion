@@ -13,6 +13,10 @@ jobs:
       - checkout
       - android/restore-gradle-cache
       - android/restore-build-cache
+      - run:
+          name: Build Google services json file
+          command: |
+            - ./gradlew app:buildGoogleServicesJson
       - android/run-tests:
           test-command: ./gradlew testDebug
       - android/save-gradle-cache
@@ -39,6 +43,10 @@ jobs:
       tag: 2021.12.1
     steps:
       - checkout
+      - run:
+          name: Build Google services json file
+          command: |
+            - ./gradlew app:buildGoogleServicesJson
       - android/start-emulator-and-run-tests:
           test-command: ./gradlew connectedDebugAndroidTest
           system-image: << parameters.system-image >>
@@ -76,9 +84,12 @@ jobs:
       - android/restore-gradle-cache
       - android/restore-build-cache
       - run:
+          name: Build Google services json file
+          command: |
+            - ./gradlew app:buildGoogleServicesJson
+      - run:
           name: Assemble release build
           command: |
-            ./gradlew app:buildGoogleServicesJson
             ./gradlew assembleRelease
       - store_artifacts:
           path: app/build/outputs/apk/release/app-release-unsigned.apk
@@ -92,9 +103,12 @@ jobs:
       - android/restore-gradle-cache
       - android/restore-build-cache
       - run:
+          name: Build Google services json file
+          command: |
+            - ./gradlew app:buildGoogleServicesJson
+      - run:
           name: Assemble debug build
           command: |
-            ./gradlew app:buildGoogleServicesJson
             ./gradlew assembleDebug
       - store_artifacts:
           path: app/build/outputs/apk/debug/app-debug-unsigned.apk
