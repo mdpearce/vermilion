@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "<FB_PROJECT_NUMBER>",
+    "project_id": "<FB_PROJECT_ID>",
+    "storage_bucket": "<FB_STORAGE_BUCKET>"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "<FB_MOBILESDK_APP_ID>",
+        "android_client_info": {
+          "package_name": "com.neaniesoft.vermilion"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "<FB_OAUTH_CLIENT_ID>",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "<FB_CURRENT_API_KEY>"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "<FB_APPINVITE_OAUTH_CLIENT_ID>",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

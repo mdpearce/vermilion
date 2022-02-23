@@ -13,6 +13,10 @@ jobs:
       - checkout
       - android/restore-gradle-cache
       - android/restore-build-cache
+      - run:
+          name: Build Google services json file
+          command: |
+            ./gradlew app:buildGoogleServicesJson
       - android/run-tests:
           test-command: ./gradlew testDebug
       - android/save-gradle-cache
@@ -39,6 +43,10 @@ jobs:
       tag: 2021.12.1
     steps:
       - checkout
+      - run:
+          name: Build Google services json file
+          command: |
+            ./gradlew app:buildGoogleServicesJson
       - android/start-emulator-and-run-tests:
           test-command: ./gradlew connectedDebugAndroidTest
           system-image: << parameters.system-image >>
@@ -76,6 +84,10 @@ jobs:
       - android/restore-gradle-cache
       - android/restore-build-cache
       - run:
+          name: Build Google services json file
+          command: |
+            ./gradlew app:buildGoogleServicesJson
+      - run:
           name: Assemble release build
           command: |
             ./gradlew assembleRelease
@@ -90,6 +102,10 @@ jobs:
       - checkout
       - android/restore-gradle-cache
       - android/restore-build-cache
+      - run:
+          name: Build Google services json file
+          command: |
+            ./gradlew app:buildGoogleServicesJson
       - run:
           name: Assemble debug build
           command: |
@@ -118,6 +134,19 @@ jobs:
           name: Upgrade dependencies
           command: |
             ./gradlew upgradeDependencies
+  build-google-services-json:
+    executor:
+      name: android/android-machine
+      resource-class: large
+      tag: 2021.12.1
+    steps:
+      - checkout
+      - android/restore-gradle-cache
+      - android/restore-build-cache
+      - run:
+          name: Build google-services.json file
+          command: |
+            ./gradlew app:buildGoogleServicesJson
 
 workflows:
   test-and-build:
@@ -127,16 +156,6 @@ workflows:
       - unit-test:
           requires:
             - debug-build
-      - android/run-ui-tests:
-          requires:
-            - debug-build
-          filters:
-            branches:
-              ignore: main # regular commits
-          executor:
-            name: android/android-machine
-            resource-class: large
-            tag: 2021.12.1
       - android-test:
           requires:
             - debug-build
@@ -150,6 +169,18 @@ workflows:
           filters:
             branches:
               only: main # Commits to main branch
+      - android-test:
+          requires:
+            - debug-build
+          matrix:
+            alias: android-test-latest
+            parameters:
+              system-image:
+                - system-images;android-30;google_apis;x86
+          name: android-test-<<matrix.system-image>>
+          filters:
+            branches:
+              ignore: main # Commits to feature branch
       - release-build:
           requires:
             - unit-test

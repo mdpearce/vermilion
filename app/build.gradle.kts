@@ -1,4 +1,6 @@
 import org.jetbrains.kotlin.konan.properties.loadProperties
+import java.io.FileInputStream
+import java.util.Properties
 
 plugins {
     id("com.android.application")
@@ -8,6 +10,8 @@ plugins {
 }
 
 apply(plugin = "net.thauvin.erik.gradle.semver")
+apply(plugin = "com.google.gms.google-services")
+apply(plugin = "com.google.firebase.crashlytics")
 
 // TODO This is pretty gross
 fun versionNameFromSemVer(): String {
@@ -23,6 +27,47 @@ fun versionCodeFromSemVer(): Int {
 
     return (major + minor.padStart(3, '0') + patch.padStart(3, '0')).toInt()
 }
+
+
+
+abstract class BuildGoogleServicesJsonTask @Inject constructor() : DefaultTask() {
+    @TaskAction
+    fun buildGoogleServicesJson() {
+        val replaced = project.file("google-services.json.template").readText()
+            .replaceTemplate("FB_PROJECT_NUMBER")
+            .replaceTemplate("FB_PROJECT_ID")
+            .replaceTemplate("FB_STORAGE_BUCKET")
+            .replaceTemplate("FB_MOBILESDK_APP_ID")
+            .replaceTemplate("FB_OAUTH_CLIENT_ID")
+            .replaceTemplate("FB_CURRENT_API_KEY")
+            .replaceTemplate("FB_APPINVITE_OAUTH_CLIENT_ID")
+
+        project.file("google-services.json").writeText(replaced)
+    }
+
+    private fun getLocalProperties(): Properties {
+        val props = Properties()
+        if (project.file("local.properties").exists()) {
+            props.load(FileInputStream(project.file("local.properties")))
+        }
+        return props
+    }
+
+    private fun getEnvVarOrLocalProperty(propertyName: String): String {
+        val envVar = System.getenv(propertyName)
+        return if (envVar == null || envVar.isEmpty()) {
+            getLocalProperties().getProperty(propertyName)
+        } else {
+            envVar
+        }
+    }
+
+    private fun String.replaceTemplate(key: String) =
+        replace("<$key>", getEnvVarOrLocalProperty(key))
+}
+
+// tasks.register<BuildGoogleServicesJsonTask>("buildGoogleServicesJson")
+tasks.register("buildGoogleServicesJson", BuildGoogleServicesJsonTask::class)
 
 android {
     compileSdk = 31
@@ -95,6 +140,9 @@ dependencies {
     implementation(Deps.PAGING_RUNTIME)
     implementation(Deps.PAGING_COMPOSE)
     implementation(Deps.ANDROIDX_BROWSER)
+    implementation(platform(Deps.FIREBASE_BOM))
+    implementation(Deps.FIREBASE_ANALYTICS)
+    implementation(Deps.FIREBASE_CRASHLYTICS)
     implementation(project(":posts"))
     implementation(project(":postdetails"))
     implementation(project(":ui"))
