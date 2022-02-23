@@ -78,6 +78,7 @@ jobs:
       - run:
           name: Assemble release build
           command: |
+            ./gradlew app:buildGoogleServicesJson
             ./gradlew assembleRelease
       - store_artifacts:
           path: app/build/outputs/apk/release/app-release-unsigned.apk
@@ -93,6 +94,7 @@ jobs:
       - run:
           name: Assemble debug build
           command: |
+            ./gradlew app:buildGoogleServicesJson
             ./gradlew assembleDebug
       - store_artifacts:
           path: app/build/outputs/apk/debug/app-debug-unsigned.apk
@@ -136,10 +138,7 @@ workflows:
   test-and-build:
     jobs:
       - lint-kotlin
-      - build-google-services-json
-      - debug-build:
-          requires:
-            - build-google-services-json
+      - debug-build
       - unit-test:
           requires:
             - debug-build
