@@ -1,4 +1,6 @@
 import org.jetbrains.kotlin.konan.properties.loadProperties
+import java.io.FileInputStream
+import java.util.Properties
 
 plugins {
     id("com.android.application")
@@ -23,6 +25,47 @@ fun versionCodeFromSemVer(): Int {
 
     return (major + minor.padStart(3, '0') + patch.padStart(3, '0')).toInt()
 }
+
+
+
+abstract class BuildGoogleServicesJsonTask @Inject constructor() : DefaultTask() {
+    @TaskAction
+    fun buildGoogleServicesJson() {
+        val replaced = project.file("google-services.json.template").readText()
+            .replaceTemplate("FB_PROJECT_NUMBER")
+            .replaceTemplate("FB_PROJECT_ID")
+            .replaceTemplate("FB_STORAGE_BUCKET")
+            .replaceTemplate("FB_MOBILESDK_APP_ID")
+            .replaceTemplate("FB_OAUTH_CLIENT_ID")
+            .replaceTemplate("FB_CURRENT_API_KEY")
+            .replaceTemplate("FB_APPINVITE_OAUTH_CLIENT_ID")
+
+        project.file("google-services.json").writeText(replaced)
+    }
+
+    private fun getLocalProperties(): Properties {
+        val props = Properties()
+        if (project.file("local.properties").exists()) {
+            props.load(FileInputStream(project.file("local.properties")))
+        }
+        return props
+    }
+
+    private fun getEnvVarOrLocalProperty(propertyName: String): String {
+        val envVar = System.getenv(propertyName)
+        return if (envVar == null || envVar.isEmpty()) {
+            getLocalProperties().getProperty(propertyName)
+        } else {
+            envVar
+        }
+    }
+
+    private fun String.replaceTemplate(key: String) =
+        replace("<$key>", getEnvVarOrLocalProperty(key))
+}
+
+// tasks.register<BuildGoogleServicesJsonTask>("buildGoogleServicesJson")
+tasks.register("buildGoogleServicesJson", BuildGoogleServicesJsonTask::class)
 
 android {
     compileSdk = 31
