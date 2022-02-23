@@ -11,6 +11,7 @@ buildscript {
         classpath(Deps.HILT_ANDROID_GRADLE_PLUGIN)
         classpath(Deps.KOTLINTER_GRADLE_PLUGIN)
         classpath(Deps.SEMVER)
+        classpath(Deps.GOOGLE_SERVICES_PLUGIN)
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files

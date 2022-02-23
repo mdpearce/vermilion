@@ -10,6 +10,7 @@ plugins {
 }
 
 apply(plugin = "net.thauvin.erik.gradle.semver")
+apply(plugin = "com.google.gms.google-services")
 
 // TODO This is pretty gross
 fun versionNameFromSemVer(): String {

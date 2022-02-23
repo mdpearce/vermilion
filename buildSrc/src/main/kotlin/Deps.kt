@@ -48,4 +48,5 @@ object Deps {
     const val PRETTY_TIME = "org.ocpsoft.prettytime:prettytime:5.0.2.Final"
     const val COMMONMARK = "org.commonmark:commonmark:0.18.1"
     const val SEMVER = "net.thauvin.erik.gradle:semver:1.0.4"
+    const val GOOGLE_SERVICES_PLUGIN = "com.google.gms:google-services:4.3.10"
 }
