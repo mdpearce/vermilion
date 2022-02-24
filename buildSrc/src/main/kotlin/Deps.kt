@@ -12,7 +12,7 @@ object Deps {
     const val JUNIT = "junit:junit:4.13.2"
     const val ANDROIDX_TEST_EXT = "androidx.test.ext:junit:1.1.3"
     const val ANDROIDX_TEST_ESPRESSO = "androidx.test.espresso:espresso-core:3.4.0"
-    const val COMPOSE_UI = "androidx.compose.ui:ui:1.1.0"
+    const val COMPOSE_UI = "androidx.compose.ui:ui:1.1.1"
     const val ANDROIDX_SECURITY_CRYPTO = "androidx.security:security-crypto:1.0.0"
     const val RETROFIT = "com.squareup.retrofit2:retrofit:2.9.0"
     const val RETROFIT_JACKSON_CONVERTER = "com.squareup.retrofit2:converter-jackson:2.9.0"
