@@ -14,7 +14,9 @@ import com.neaniesoft.vermilion.accounts.adapters.driving.ui.UserAccountScreen
 import com.neaniesoft.vermilion.app.customtabs.customTab
 import com.neaniesoft.vermilion.app.customtabs.customTabRoute
 import com.neaniesoft.vermilion.postdetails.ui.PostDetailsScreen
+import com.neaniesoft.vermilion.posts.domain.entities.CommunityName
 import com.neaniesoft.vermilion.posts.domain.entities.FrontPage
+import com.neaniesoft.vermilion.posts.domain.entities.NamedCommunity
 import com.neaniesoft.vermilion.posts.ui.PostsScreen
 
 @ExperimentalMaterialNavigationApi
@@ -36,6 +38,18 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
                     navController.navigate(customTabRoute(uri))
                 }
             )
+        }
+
+        composable(
+            "${VermilionScreen.Posts}/{communityName}",
+            arguments = listOf(navArgument("communityName") { type = NavType.StringType })
+        ) {
+            val name = it.arguments?.getString("communityName")
+                ?: throw IllegalStateException("Cannot navigate to posts without a community name")
+            val community = NamedCommunity(CommunityName(name))
+            PostsScreen(community = community, onOpenPostDetails = {
+                TODO()
+            }, onOpenUri = { TODO() })
         }
 
         composable(
