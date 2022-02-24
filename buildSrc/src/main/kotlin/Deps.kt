@@ -35,7 +35,7 @@ object Deps {
     const val ROOM_PAGING = "androidx.room:room-paging:2.4.2"
     const val ROOM_COMPILER = "androidx.room:room-compiler:2.4.2"
     const val ROOM_KOTLIN = "androidx.room:room-ktx:2.4.2"
-    const val ROOM_TESTING = "androidx.room:room-testing:2.4.1"
+    const val ROOM_TESTING = "androidx.room:room-testing:2.4.2"
     const val APP_AUTH = "net.openid:appauth:0.11.1"
     const val ACCOMPANIST_NAVIGATION_MATERIAL = "com.google.accompanist:accompanist-navigation-material:0.24.1-alpha"
     const val COIL = "io.coil-kt:coil:1.4.0"
