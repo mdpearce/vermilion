@@ -13,6 +13,7 @@ import com.neaniesoft.vermilion.posts.data.toPost
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.tabs.domain.TabSupervisor
+import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -78,7 +79,12 @@ class PostDetailsViewModel @Inject constructor(
     }
 
     fun onScrollStateUpdated(firstVisibleItemIndex: Int, firstVisibleItemScrollOffset: Int) {
-        tabSupervisor.updateScrollStateForPostDetailsTab()
+        viewModelScope.launch {
+            tabSupervisor.updateScrollStateForPostDetailsTab(
+                postId,
+                ScrollPosition(firstVisibleItemIndex)
+            )
+        }
     }
 }
 

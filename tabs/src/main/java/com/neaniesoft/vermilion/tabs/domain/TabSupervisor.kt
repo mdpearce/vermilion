@@ -72,8 +72,8 @@ class TabSupervisor @Inject constructor(
         return repository.addNewTabIfNotExists(tab)
     }
 
-    suspend fun updateScrollStateForPostDetailsTab(postId: PostId) {
-        val tab = repository.getPostDetailsTab(postId)
+    suspend fun updateScrollStateForPostDetailsTab(postId: PostId, scrollPosition: ScrollPosition) {
+        repository.updateScrollStateForPostDetailsTab(postId, scrollPosition)
 
     }
 }

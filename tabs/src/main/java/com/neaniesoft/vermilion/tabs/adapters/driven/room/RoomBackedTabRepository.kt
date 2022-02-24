@@ -16,6 +16,7 @@ import com.neaniesoft.vermilion.tabs.domain.entities.TabSortOrderIndex
 import com.neaniesoft.vermilion.tabs.domain.entities.TabState
 import com.neaniesoft.vermilion.tabs.domain.entities.TabType
 import com.neaniesoft.vermilion.tabs.domain.ports.TabRepository
+import com.neaniesoft.vermilion.utils.logger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -29,6 +30,8 @@ class RoomBackedTabRepository @Inject constructor(
     private val tabStateDao: TabStateDao,
     private val postDao: PostDao
 ) : TabRepository {
+
+    private val logger by logger()
 
     override val currentTabs: Flow<List<TabState>> =
         tabStateDao.getAllCurrentTabs().distinctUntilChanged().map {
@@ -54,16 +57,23 @@ class RoomBackedTabRepository @Inject constructor(
         }
     }
 
+    private val scrollStateCache: MutableMap<PostId, ScrollPosition> = mutableMapOf()
+
     override suspend fun updateScrollStateForPostDetailsTab(
         postId: PostId,
         scrollPosition: ScrollPosition
     ) {
-        database.withTransaction {
-            tabStateDao.updateTabWithScrollState(
-                postId.value,
-                TabType.POST_DETAILS.name,
-                scrollPosition.value
-            )
+        // This is just best effort, we can still get races where we get the same state being set multiple times
+        if (scrollStateCache[postId] != scrollPosition) {
+            logger.debugIfEnabled { "Updating scroll state for post: ${postId.value} to: ${scrollPosition.value}" }
+            database.withTransaction {
+                tabStateDao.updateTabWithScrollState(
+                    postId.value,
+                    TabType.POST_DETAILS.name,
+                    scrollPosition.value
+                )
+                scrollStateCache[postId] = scrollPosition
+            }
         }
     }
 
