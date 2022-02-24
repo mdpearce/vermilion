@@ -74,6 +74,9 @@ class VermilionAppViewModel @Inject constructor(
         if (type == TabType.POST_DETAILS) {
             val route = "${VermilionScreen.PostDetails}/${parentId.value}"
             viewModelScope.launch { _routeEvents.emit(route) }
+        } else if (type == TabType.POSTS) {
+            val route = "${VermilionScreen.Posts}/${parentId.value}"
+            viewModelScope.launch { _routeEvents.emit(route) }
         }
     }
 
