@@ -32,7 +32,7 @@ object Deps {
     const val HILT_ANDROID_GRADLE_PLUGIN = "com.google.dagger:hilt-android-gradle-plugin:2.41"
     const val KOTLINTER_GRADLE_PLUGIN = "org.jmailen.gradle:kotlinter-gradle:3.9.0"
     const val ROOM_RUNTIME = "androidx.room:room-runtime:2.4.1"
-    const val ROOM_PAGING = "androidx.room:room-paging:2.4.1"
+    const val ROOM_PAGING = "androidx.room:room-paging:2.4.2"
     const val ROOM_COMPILER = "androidx.room:room-compiler:2.4.1"
     const val ROOM_KOTLIN = "androidx.room:room-ktx:2.4.1"
     const val ROOM_TESTING = "androidx.room:room-testing:2.4.1"
