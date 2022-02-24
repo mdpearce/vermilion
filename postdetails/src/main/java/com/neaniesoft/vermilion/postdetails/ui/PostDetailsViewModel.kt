@@ -12,6 +12,7 @@ import com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub
 import com.neaniesoft.vermilion.posts.data.toPost
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
+import com.neaniesoft.vermilion.tabs.domain.TabSupervisor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,6 +27,7 @@ class PostDetailsViewModel @Inject constructor(
     private val postDao: PostDao,
     private val commentRepository: CommentRepository,
     private val markdownParser: Parser,
+    private val tabSupervisor: TabSupervisor,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val _post: MutableStateFlow<PostDetailsState> = MutableStateFlow(Empty)
@@ -73,6 +75,10 @@ class PostDetailsViewModel @Inject constructor(
 
             _comments.emit(comments)
         }
+    }
+
+    fun onScrollStateUpdated(firstVisibleItemIndex: Int, firstVisibleItemScrollOffset: Int) {
+        tabSupervisor.updateScrollStateForPostDetailsTab()
     }
 }
 

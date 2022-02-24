@@ -30,4 +30,7 @@ interface TabStateDao {
 
     @Query("DELETE FROM tabs")
     suspend fun deleteAll()
+
+    @Query("UPDATE tabs SET scrollPosition = scrollPosition WHERE parentId == :parentId AND type == :type")
+    suspend fun updateTabWithScrollState(parentId: String, type: String, scrollPosition: Int)
 }

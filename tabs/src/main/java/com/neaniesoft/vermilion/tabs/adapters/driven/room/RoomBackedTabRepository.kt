@@ -54,6 +54,19 @@ class RoomBackedTabRepository @Inject constructor(
         }
     }
 
+    override suspend fun updateScrollStateForPostDetailsTab(
+        postId: PostId,
+        scrollPosition: ScrollPosition
+    ) {
+        database.withTransaction {
+            tabStateDao.updateTabWithScrollState(
+                postId.value,
+                TabType.POST_DETAILS.name,
+                scrollPosition.value
+            )
+        }
+    }
+
     private suspend fun NewTabState.toNewTabStateRecord(): NewTabStateRecord {
         val leftMostIndex = tabStateDao.getLeftMostSortIndex() ?: Int.MAX_VALUE
         return NewTabStateRecord(

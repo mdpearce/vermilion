@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
@@ -25,6 +26,9 @@ fun PostDetailsScreen(
 ) {
     val postDetailsState by viewModel.post.collectAsState()
     val comments by viewModel.comments.collectAsState()
+    val columnState = rememberLazyListState()
+
+    viewModel.onScrollStateUpdated(columnState.firstVisibleItemIndex, columnState.firstVisibleItemScrollOffset)
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -32,7 +36,7 @@ fun PostDetailsScreen(
         elevation = 0.dp
     ) {
 
-        LazyColumn {
+        LazyColumn(state = columnState) {
             when (val currentPostDetailsState = postDetailsState) {
                 is PostDetails -> {
                     item {
