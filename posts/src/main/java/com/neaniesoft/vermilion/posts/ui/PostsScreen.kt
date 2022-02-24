@@ -49,8 +49,8 @@ fun PostsScreen(
         PostsList(posts = pagingItems, onMediaClicked = {
             onOpenUri(it.link.toString().toUri())
         }, onPostClicked = { post ->
-            onOpenPostDetails(post.id)
-        }, onCommunityClicked = onOpenCommunity)
+                onOpenPostDetails(post.id)
+            }, onCommunityClicked = onOpenCommunity)
     }
 }
 
@@ -184,7 +184,8 @@ fun PostsScreenPreview() {
                     )
                 )
             ).collectAsLazyPagingItems(),
-            {}, {}) {}
+            {}, {}
+        ) {}
     }
 }
 
@@ -201,6 +202,7 @@ fun PostsScreenPreviewDark() {
                     )
                 )
             ).collectAsLazyPagingItems(),
-            {}, {}) {}
+            {}, {}
+        ) {}
     }
 }

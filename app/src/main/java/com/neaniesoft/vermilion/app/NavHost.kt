@@ -52,9 +52,10 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
             val name = it.arguments?.getString("communityName")
                 ?: throw IllegalStateException("Cannot navigate to posts without a community name")
             val community = NamedCommunity(CommunityName(name))
-            PostsScreen(community = community, onOpenPostDetails = {
-                TODO()
-            }, onOpenUri = { TODO() },
+            PostsScreen(
+                community = community, onOpenPostDetails = {
+                    TODO()
+                }, onOpenUri = { TODO() },
                 onOpenCommunity = { communityToOpen ->
                     if (communityToOpen is NamedCommunity) {
                         navController.navigate("${VermilionScreen.Posts}/${communityToOpen.name.value}")
