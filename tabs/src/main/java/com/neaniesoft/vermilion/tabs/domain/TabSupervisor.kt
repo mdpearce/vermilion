@@ -1,6 +1,8 @@
 package com.neaniesoft.vermilion.tabs.domain
 
+import com.neaniesoft.vermilion.posts.domain.entities.CommunityName
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
+import com.neaniesoft.vermilion.tabs.domain.entities.DisplayName
 import com.neaniesoft.vermilion.tabs.domain.entities.NewTabState
 import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
 import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
@@ -55,5 +57,18 @@ class TabSupervisor @Inject constructor(
 
     suspend fun removeTab(tab: TabState) {
         repository.removeTab(tab)
+    }
+
+    suspend fun addNewCommunityTabIfNotExists(communityName: CommunityName): TabState {
+        val displayName = DisplayName(communityName.value)
+
+        val tab = NewTabState(
+            ParentId(communityName.value),
+            TabType.POSTS,
+            displayName,
+            Instant.ofEpochMilli(clock.millis()),
+            ScrollPosition(0)
+        )
+        return repository.addNewTabIfNotExists(tab)
     }
 }

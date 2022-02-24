@@ -46,7 +46,14 @@ class PostRepositoryImpl @Inject constructor(
                         previousCount
                     )
                 }
-                is NamedCommunity -> TODO()
+                is NamedCommunity ->
+                    postsService.subredditBest(
+                        community.name.value,
+                        requestedCount,
+                        null,
+                        afterKey,
+                        previousCount
+                    )
             }
         }.mapError {
             PostsApiError(it)
