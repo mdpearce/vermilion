@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavDestination
+import com.neaniesoft.vermilion.posts.domain.entities.CommunityName
 import com.neaniesoft.vermilion.tabs.domain.TabSupervisor
 import com.neaniesoft.vermilion.tabs.domain.entities.ActiveTab
 import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
@@ -43,6 +44,15 @@ class VermilionAppViewModel @Inject constructor(
                         requireNotNull(args?.getString("id")) { "Received a post details route with no id" }
                     viewModelScope.launch(Dispatchers.IO) {
                         val tab = tabSupervisor.addNewPostDetailsTabIfNotExists(ParentId(id))
+                        _activeTab.emit(ActiveTab.Tab(tab.id))
+                    }
+                }
+                route.startsWith(VermilionScreen.Posts.name) -> {
+                    val communityName =
+                        requireNotNull(args?.getString("communityName")) { "Received a posts route with no name " }
+                    viewModelScope.launch(Dispatchers.IO) {
+                        val tab =
+                            tabSupervisor.addNewCommunityTabIfNotExists(CommunityName(communityName))
                         _activeTab.emit(ActiveTab.Tab(tab.id))
                     }
                 }

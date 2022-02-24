@@ -6,6 +6,7 @@ import com.neaniesoft.vermilion.dbentities.posts.PostDao
 import com.neaniesoft.vermilion.dbentities.tabs.NewTabStateRecord
 import com.neaniesoft.vermilion.dbentities.tabs.TabStateDao
 import com.neaniesoft.vermilion.dbentities.tabs.TabStateRecord
+import com.neaniesoft.vermilion.posts.domain.entities.CommunityName
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.tabs.domain.entities.DisplayName
 import com.neaniesoft.vermilion.tabs.domain.entities.NewTabState
