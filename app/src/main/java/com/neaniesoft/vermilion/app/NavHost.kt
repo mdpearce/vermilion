@@ -36,6 +36,11 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
                 },
                 onOpenUri = { uri ->
                     navController.navigate(customTabRoute(uri))
+                },
+                onOpenCommunity = { community ->
+                    if (community is NamedCommunity) {
+                        navController.navigate("${VermilionScreen.Posts}/${community.name.value}")
+                    }
                 }
             )
         }
@@ -49,7 +54,13 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
             val community = NamedCommunity(CommunityName(name))
             PostsScreen(community = community, onOpenPostDetails = {
                 TODO()
-            }, onOpenUri = { TODO() })
+            }, onOpenUri = { TODO() },
+                onOpenCommunity = { communityToOpen ->
+                    if (communityToOpen is NamedCommunity) {
+                        navController.navigate("${VermilionScreen.Posts}/${communityToOpen.name.value}")
+                    }
+                }
+            )
         }
 
         composable(

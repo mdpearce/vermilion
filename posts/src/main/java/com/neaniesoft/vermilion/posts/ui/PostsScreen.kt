@@ -40,7 +40,8 @@ fun PostsScreen(
     community: Community,
     viewModel: PostsViewModel = hiltViewModel(),
     onOpenPostDetails: (postId: PostId) -> Unit,
-    onOpenUri: (uri: Uri) -> Unit
+    onOpenUri: (uri: Uri) -> Unit,
+    onOpenCommunity: (community: Community) -> Unit
 ) {
     val pagingItems = viewModel.pagingData(community.routeName).collectAsLazyPagingItems()
 
@@ -48,8 +49,8 @@ fun PostsScreen(
         PostsList(posts = pagingItems, onMediaClicked = {
             onOpenUri(it.link.toString().toUri())
         }, onPostClicked = { post ->
-                onOpenPostDetails(post.id)
-            })
+            onOpenPostDetails(post.id)
+        }, onCommunityClicked = onOpenCommunity)
     }
 }
 
@@ -57,13 +58,14 @@ fun PostsScreen(
 fun PostsList(
     posts: LazyPagingItems<Post>,
     onPostClicked: (Post) -> Unit,
-    onMediaClicked: (Post) -> Unit
+    onMediaClicked: (Post) -> Unit,
+    onCommunityClicked: (Community) -> Unit
 ) {
     LazyColumn(Modifier.padding(start = 8.dp, end = 8.dp)) {
         items(posts) { post ->
             Box(modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)) {
                 if (post != null) {
-                    PostCard(post = post, onPostClicked, onMediaClicked)
+                    PostCard(post = post, onPostClicked, onMediaClicked, onCommunityClicked)
                 } else {
                     PostCardPlaceholder()
                 }
@@ -182,8 +184,7 @@ fun PostsScreenPreview() {
                     )
                 )
             ).collectAsLazyPagingItems(),
-            {}
-        ) {}
+            {}, {}) {}
     }
 }
 
@@ -200,7 +201,6 @@ fun PostsScreenPreviewDark() {
                     )
                 )
             ).collectAsLazyPagingItems(),
-            {}
-        ) {}
+            {}, {}) {}
     }
 }

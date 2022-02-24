@@ -42,7 +42,8 @@ fun PostDetailsScreen(
                                 shouldTruncate = false,
                                 shouldHideNsfw = false,
                                 onMediaClicked = { onOpenUri(it.link.toString().toUri()) },
-                                onSummaryClicked = {}
+                                onSummaryClicked = {},
+                                onCommunityClicked = {}
                             )
                         }
                     }

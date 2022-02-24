@@ -26,6 +26,7 @@ import coil.compose.rememberImagePainter
 import com.neaniesoft.vermilion.posts.R
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.CommentCount
+import com.neaniesoft.vermilion.posts.domain.entities.Community
 import com.neaniesoft.vermilion.posts.domain.entities.CommunityName
 import com.neaniesoft.vermilion.posts.domain.entities.DefaultThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.ImagePostSummary
@@ -60,6 +61,7 @@ fun PostCard(
     post: Post,
     onClick: (Post) -> Unit,
     onMediaClicked: (Post) -> Unit,
+    onCommunityClicked: (Community) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(elevation = 2.dp, modifier = modifier.clickable { onClick(post) }) {
@@ -69,7 +71,8 @@ fun PostCard(
             shouldTruncate = true,
             shouldHideNsfw = true,
             onMediaClicked,
-            onSummaryClicked = onClick
+            onSummaryClicked = onClick,
+            onCommunityClicked = onCommunityClicked
         )
     }
 }
@@ -81,7 +84,8 @@ fun PostContent(
     shouldTruncate: Boolean,
     shouldHideNsfw: Boolean,
     onMediaClicked: (Post) -> Unit,
-    onSummaryClicked: (Post) -> Unit
+    onSummaryClicked: (Post) -> Unit,
+    onCommunityClicked: (Community) -> Unit
 ) {
     Column(modifier = modifier.padding(0.dp)) {
         val summary = post.summary
@@ -174,7 +178,8 @@ fun PostContent(
                     } else {
                         ""
                     },
-                    style = MaterialTheme.typography.caption
+                    style = MaterialTheme.typography.caption,
+                    modifier = Modifier.clickable { onCommunityClicked(post.community) }
                 )
             }
             Row(
@@ -239,7 +244,7 @@ fun PostCardPlaceholder() {
 @Composable
 fun PostCardPreview() {
     VermilionTheme {
-        PostCard(post = DUMMY_TEXT_POST, {}, {})
+        PostCard(post = DUMMY_TEXT_POST, {}, {}, {})
     }
 }
 
@@ -247,7 +252,7 @@ fun PostCardPreview() {
 @Composable
 fun PostCardPreviewDark() {
     VermilionTheme(darkTheme = true) {
-        PostCard(post = DUMMY_TEXT_POST, {}, {})
+        PostCard(post = DUMMY_TEXT_POST, {}, {}, {})
     }
 }
 
@@ -266,7 +271,7 @@ fun TextPostSummaryPreview() {
 @Composable
 fun ThumbnailPostPreview() {
     VermilionTheme(darkTheme = true) {
-        PostCard(post = DUMMY_LINK_POST, onClick = {}, onMediaClicked = {})
+        PostCard(post = DUMMY_LINK_POST, onClick = {}, onMediaClicked = {}, {})
     }
 }
 
