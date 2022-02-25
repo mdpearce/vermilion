@@ -43,37 +43,32 @@ class RoomBackedTabRepository @Inject constructor(
     override suspend fun addNewTabIfNotExists(tab: NewTabState): TabState {
         return database.withTransaction {
             val existingTab = tabStateDao.findByParentAndType(tab.parentId.value, tab.type.name)
-            if (existingTab.isEmpty()) {
+            if (existingTab == null) {
                 val newRecord = tab.toNewTabStateRecord()
                 if (newRecord.tabSortOrder == -1) {
                     tabStateDao.shiftAllTabsFrom(0)
                 }
                 tabStateDao.insertAll(newRecord)
-                tabStateDao.findByParentAndType(tab.parentId.value, tab.type.name).first()
-                    .toTabState()
+                tabStateDao.findByParentAndType(tab.parentId.value, tab.type.name)
+                    ?.toTabState() ?: throw IllegalStateException("Could not find saved tab record")
             } else {
-                existingTab.first().toTabState()
+                existingTab.toTabState()
             }
         }
     }
-
-    private val scrollStateCache: MutableMap<PostId, ScrollPosition> = mutableMapOf()
 
     override suspend fun updateScrollStateForPostDetailsTab(
         postId: PostId,
         scrollPosition: ScrollPosition
     ) {
-        // This is just best effort, we can still get races where we get the same state being set multiple times
-        if (scrollStateCache[postId] != scrollPosition) {
-            logger.debugIfEnabled { "Updating scroll state for post: ${postId.value} to: ${scrollPosition.value}" }
-            database.withTransaction {
-                tabStateDao.updateTabWithScrollState(
-                    postId.value,
-                    TabType.POST_DETAILS.name,
-                    scrollPosition.value
-                )
-                scrollStateCache[postId] = scrollPosition
-            }
+        logger.debugIfEnabled { "Updating scroll state for post: ${postId.value} to: ${scrollPosition.value}" }
+        database.withTransaction {
+            tabStateDao.updateTabWithScrollState(
+                postId.value,
+                TabType.POST_DETAILS.name,
+                scrollPosition.value
+            )
+            tabStateDao.findByParentAndType(postId.value, TabType.POST_DETAILS.name)
         }
     }
 

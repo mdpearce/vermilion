@@ -32,7 +32,7 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
             PostsScreen(
                 community = FrontPage,
                 onOpenPostDetails = { postId ->
-                    navController.navigate("${VermilionScreen.PostDetails}/${postId.value}")
+                    navController.navigate("${VermilionScreen.PostDetails}/${postId.value}/0")
                 },
                 onOpenUri = { uri ->
                     navController.navigate(customTabRoute(uri))
@@ -55,7 +55,7 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
             PostsScreen(
                 community = community,
                 onOpenPostDetails = { postId ->
-                    navController.navigate("${VermilionScreen.PostDetails}/${postId.value}")
+                    navController.navigate("${VermilionScreen.PostDetails}/${postId.value}/0")
                 },
                 onOpenUri = { uri ->
                     navController.navigate(customTabRoute(uri))
@@ -69,8 +69,11 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
         }
 
         composable(
-            "${VermilionScreen.PostDetails.name}/{id}",
-            arguments = listOf(navArgument("id") { type = NavType.StringType })
+            "${VermilionScreen.PostDetails.name}/{id}/{initialScrollIndex}",
+            arguments = listOf(
+                navArgument("id") { type = NavType.StringType },
+                navArgument("initialScrollIndex") { type = NavType.IntType }
+            )
         ) {
             PostDetailsScreen {
                 navController.navigate(customTabRoute(it))

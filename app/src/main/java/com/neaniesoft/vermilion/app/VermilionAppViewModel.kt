@@ -8,6 +8,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.CommunityName
 import com.neaniesoft.vermilion.tabs.domain.TabSupervisor
 import com.neaniesoft.vermilion.tabs.domain.entities.ActiveTab
 import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
+import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
 import com.neaniesoft.vermilion.tabs.domain.entities.TabState
 import com.neaniesoft.vermilion.tabs.domain.entities.TabType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -67,12 +68,12 @@ class VermilionAppViewModel @Inject constructor(
     }
 
     fun onTabClicked(tab: TabState) {
-        emitRouteEvent(tab.type, tab.parentId)
+        emitRouteEvent(tab.type, tab.parentId, tab.scrollPosition)
     }
 
-    private fun emitRouteEvent(type: TabType, parentId: ParentId) {
+    private fun emitRouteEvent(type: TabType, parentId: ParentId, scrollPosition: ScrollPosition) {
         if (type == TabType.POST_DETAILS) {
-            val route = "${VermilionScreen.PostDetails}/${parentId.value}"
+            val route = "${VermilionScreen.PostDetails}/${parentId.value}/${scrollPosition.value}"
             viewModelScope.launch { _routeEvents.emit(route) }
         } else if (type == TabType.POSTS) {
             val route = "${VermilionScreen.Posts}/${parentId.value}"

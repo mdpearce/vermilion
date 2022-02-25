@@ -42,9 +42,20 @@ class PostDetailsViewModel @Inject constructor(
             ?: throw IllegalStateException("Could not obtain post ID from saved state")
     )
 
+    private val initialScrollPosition = ScrollPosition(
+        savedStateHandle.get<Int>("initialScrollIndex") ?: 0
+    )
+
+    private val _scrollPosition = MutableStateFlow(initialScrollPosition)
+    val initialScrollPositionState: StateFlow<ScrollPosition> = _scrollPosition.asStateFlow()
+
+    private val _scrollUpdates: MutableStateFlow<Int> = MutableStateFlow(0)
+    private val scrollUpdates = _scrollUpdates.asStateFlow()
+
     init {
         loadPost(postId)
         loadComments(postId)
+        setUpScrollListener()
     }
 
     private fun loadPost(id: PostId) {
@@ -78,13 +89,19 @@ class PostDetailsViewModel @Inject constructor(
         }
     }
 
-    fun onScrollStateUpdated(firstVisibleItemIndex: Int, firstVisibleItemScrollOffset: Int) {
+    private fun setUpScrollListener() {
         viewModelScope.launch {
-            tabSupervisor.updateScrollStateForPostDetailsTab(
-                postId,
-                ScrollPosition(firstVisibleItemIndex)
-            )
+            scrollUpdates.collect {
+                tabSupervisor.updateScrollStateForPostDetailsTab(
+                    postId = postId,
+                    scrollPosition = ScrollPosition(it)
+                )
+            }
         }
+    }
+
+    fun onScrollStateUpdated(firstVisibleItemIndex: Int, firstVisibleItemScrollOffset: Int) {
+        viewModelScope.launch { _scrollUpdates.emit(firstVisibleItemIndex) }
     }
 }
 

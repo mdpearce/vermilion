@@ -1,6 +1,7 @@
 package com.neaniesoft.vermilion.postdetails.ui
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -10,6 +11,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -27,8 +29,12 @@ fun PostDetailsScreen(
     val postDetailsState by viewModel.post.collectAsState()
     val comments by viewModel.comments.collectAsState()
     val columnState = rememberLazyListState()
+    val initialScrollPosition by viewModel.initialScrollPositionState.collectAsState()
 
-    viewModel.onScrollStateUpdated(columnState.firstVisibleItemIndex, columnState.firstVisibleItemScrollOffset)
+    viewModel.onScrollStateUpdated(
+        columnState.firstVisibleItemIndex,
+        columnState.firstVisibleItemScrollOffset
+    )
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -79,6 +85,13 @@ fun PostDetailsScreen(
                         Modifier.fillMaxWidth()
                     ) { viewModel.onMoreCommentsClicked(it) }
                 }
+            }
+        }
+        // Only launch this effect if we have items
+        LaunchedEffect(key1 = columnState.layoutInfo.totalItemsCount > 1) {
+            if (columnState.layoutInfo.totalItemsCount > 1) {
+                Log.d("PostDetailsScreen", "Scrolling to: ${initialScrollPosition.value}")
+                columnState.scrollToItem(initialScrollPosition.value)
             }
         }
     }

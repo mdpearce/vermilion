@@ -19,8 +19,8 @@ interface TabStateDao {
     @Query("DELETE FROM tabs WHERE id == :id")
     suspend fun deleteTabWithId(id: Int)
 
-    @Query("SELECT * FROM tabs WHERE parentId == :parentId AND type == :type")
-    suspend fun findByParentAndType(parentId: String, type: String): List<TabStateRecord>
+    @Query("SELECT * FROM tabs WHERE parentId == :parentId AND type == :type ORDER BY createdAt DESC LIMIT 1")
+    suspend fun findByParentAndType(parentId: String, type: String): TabStateRecord?
 
     @Query("SELECT tabSortOrder FROM tabs ORDER BY tabSortOrder ASC LIMIT 1")
     suspend fun getLeftMostSortIndex(): Int?
