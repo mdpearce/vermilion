@@ -49,13 +49,15 @@ class PostsViewModel @Inject constructor(
     )
 
     private val initialScrollPosition = ScrollPosition(
-        savedStateHandle.get<Int>("initialScrollIndex") ?: 0
+        savedStateHandle.get<Int>("initialScrollIndex") ?: 0,
+        savedStateHandle.get<Int>("initialScrollOffset") ?: 0
     )
 
     private val _scrollPosition = MutableStateFlow(initialScrollPosition)
     val initialScrollPositionState: StateFlow<ScrollPosition> = _scrollPosition.asStateFlow()
 
-    private val _scrollUpdates: MutableStateFlow<Int> = MutableStateFlow(0)
+    private val _scrollUpdates: MutableStateFlow<ScrollPosition> =
+        MutableStateFlow(ScrollPosition(0, 0))
     private val scrollUpdates = _scrollUpdates.asStateFlow()
 
     init {
@@ -92,13 +94,20 @@ class PostsViewModel @Inject constructor(
                     tabSupervisor.updateScrollState(
                         parentId = ParentId(communityName.value),
                         type = TabType.POSTS,
-                        scrollPosition = ScrollPosition(it)
+                        scrollPosition = it
                     )
             }
         }
     }
 
-    fun onScrollStateUpdated(firstVisibleItemIndex: Int) {
-        viewModelScope.launch { _scrollUpdates.emit(firstVisibleItemIndex) }
+    fun onScrollStateUpdated(firstVisibleItemIndex: Int, firstVisibleItemOffset: Int) {
+        viewModelScope.launch {
+            _scrollUpdates.emit(
+                ScrollPosition(
+                    firstVisibleItemIndex,
+                    firstVisibleItemOffset
+                )
+            )
+        }
     }
 }

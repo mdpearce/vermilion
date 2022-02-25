@@ -46,7 +46,7 @@ class TabSupervisor @Inject constructor(
             type,
             displayName,
             Instant.ofEpochMilli(clock.millis()),
-            ScrollPosition(0)
+            ScrollPosition(0, 0)
         )
         return repository.addNewTabIfNotExists(tab)
     }

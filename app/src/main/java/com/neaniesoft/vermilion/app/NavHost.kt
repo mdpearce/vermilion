@@ -29,18 +29,18 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
         modifier = modifier
     ) {
         // Home screen - this is just an instance of PostsScreen hardcoded to the front page
-        composable(VermilionScreen.Home.name) {
+        composable("${VermilionScreen.Home.name}/{initialScrollIndex/{initialScrollOffset}") {
             PostsScreen(
                 community = FrontPage,
                 onOpenPostDetails = { postId ->
-                    navController.navigate("${VermilionScreen.PostDetails}/${postId.value}/0")
+                    navController.navigate("${VermilionScreen.PostDetails}/${postId.value}/0/0")
                 },
                 onOpenUri = { uri ->
                     navController.navigate(customTabRoute(uri))
                 },
                 onOpenCommunity = { community ->
                     if (community is NamedCommunity) {
-                        navController.navigate("${VermilionScreen.Posts}/${community.name.value}/0")
+                        navController.navigate("${VermilionScreen.Posts}/${community.name.value}/0/0")
                     }
                 }
             )
@@ -48,10 +48,11 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
 
         // Individual subreddit listings
         composable(
-            "${VermilionScreen.Posts}/{communityName}/{initialScrollIndex}",
+            "${VermilionScreen.Posts}/{communityName}/{initialScrollIndex}/{initialScrollOffset}",
             arguments = listOf(
                 navArgument("communityName") { type = NavType.StringType },
-                navArgument("initialScrollIndex") { type = NavType.IntType }
+                navArgument("initialScrollIndex") { type = NavType.IntType },
+                navArgument("initialScrollOffset") { type = NavType.IntType }
             )
         ) {
             val name = it.arguments?.getString("communityName")
@@ -60,14 +61,14 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
             PostsScreen(
                 community = community,
                 onOpenPostDetails = { postId ->
-                    navController.navigate("${VermilionScreen.PostDetails}/${postId.value}/0")
+                    navController.navigate("${VermilionScreen.PostDetails}/${postId.value}/0/0")
                 },
                 onOpenUri = { uri ->
                     navController.navigate(customTabRoute(uri))
                 },
                 onOpenCommunity = { communityToOpen ->
                     if (communityToOpen is NamedCommunity) {
-                        navController.navigate("${VermilionScreen.Posts}/${communityToOpen.name.value}/0")
+                        navController.navigate("${VermilionScreen.Posts}/${communityToOpen.name.value}/0/0")
                     }
                 }
             )
@@ -75,10 +76,11 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
 
         // Post with comments
         composable(
-            "${VermilionScreen.PostDetails.name}/{id}/{initialScrollIndex}",
+            "${VermilionScreen.PostDetails.name}/{id}/{initialScrollIndex}/{initialScrollOffset}",
             arguments = listOf(
                 navArgument("id") { type = NavType.StringType },
-                navArgument("initialScrollIndex") { type = NavType.IntType }
+                navArgument("initialScrollIndex") { type = NavType.IntType },
+                navArgument("initialScrollOffset") { type = NavType.IntType }
             )
         ) {
             PostDetailsScreen {

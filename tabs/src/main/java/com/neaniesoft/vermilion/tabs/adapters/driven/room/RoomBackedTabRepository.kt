@@ -61,12 +61,13 @@ class RoomBackedTabRepository @Inject constructor(
         type: TabType,
         scrollPosition: ScrollPosition
     ) {
-        logger.debugIfEnabled { "Updating scroll state for parent: ${parentId.value} to: ${scrollPosition.value}" }
+        logger.debugIfEnabled { "Updating scroll state for parent: ${parentId.value} to: $scrollPosition" }
         database.withTransaction {
             tabStateDao.updateTabWithScrollState(
                 parentId.value,
                 type.name,
-                scrollPosition.value
+                scrollPosition.index,
+                scrollPosition.offset
             )
             tabStateDao.findByParentAndType(parentId.value, TabType.POST_DETAILS.name)
         }
@@ -80,7 +81,8 @@ class RoomBackedTabRepository @Inject constructor(
             displayName.value,
             createdAt.toEpochMilli(),
             leftMostIndex - 1,
-            scrollPosition.value
+            scrollPosition.index,
+            scrollPosition.offset
         )
     }
 
@@ -118,7 +120,7 @@ class RoomBackedTabRepository @Inject constructor(
             DisplayName(displayName),
             Instant.ofEpochMilli(createdAt),
             TabSortOrderIndex(tabSortOrder),
-            ScrollPosition(scrollPosition)
+            ScrollPosition(scrollPosition, scrollOffset)
         )
     }
 }

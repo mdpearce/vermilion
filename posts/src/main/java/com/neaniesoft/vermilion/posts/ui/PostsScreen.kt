@@ -52,22 +52,23 @@ fun PostsScreen(
     val initialScrollPosition by viewModel.initialScrollPositionState.collectAsState()
 
     viewModel.onScrollStateUpdated(
-        listState.firstVisibleItemIndex
+        listState.firstVisibleItemIndex,
+        listState.firstVisibleItemScrollOffset
     )
 
     Box {
         PostsList(listState = listState, posts = pagingItems, onMediaClicked = {
             onOpenUri(it.link.toString().toUri())
         }, onPostClicked = { post ->
-                onOpenPostDetails(post.id)
-            }, onCommunityClicked = onOpenCommunity)
+            onOpenPostDetails(post.id)
+        }, onCommunityClicked = onOpenCommunity)
     }
 
     // Only launch this effect if we have items
     LaunchedEffect(key1 = listState.layoutInfo.totalItemsCount > 1) {
         if (listState.layoutInfo.totalItemsCount > 1) {
-            Log.d("PostsScreen", "Scrolling to: ${initialScrollPosition.value}")
-            listState.scrollToItem(initialScrollPosition.value)
+            Log.d("PostsScreen", "Scrolling to: $initialScrollPosition")
+            listState.scrollToItem(initialScrollPosition.index, initialScrollPosition.offset)
         }
     }
 }
