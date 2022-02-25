@@ -24,4 +24,6 @@ interface TabRepository {
     )
 
     suspend fun displayName(parentId: ParentId, type: TabType): DisplayName
+
+    suspend fun findTab(parentId: ParentId, type: TabType): TabState?
 }

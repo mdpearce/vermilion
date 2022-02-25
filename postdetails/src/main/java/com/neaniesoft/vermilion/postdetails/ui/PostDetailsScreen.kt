@@ -1,7 +1,6 @@
 package com.neaniesoft.vermilion.postdetails.ui
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,7 +19,10 @@ import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentKind
 import com.neaniesoft.vermilion.posts.ui.PostContent
+import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
+import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
 @Composable
 fun PostDetailsScreen(
     viewModel: PostDetailsViewModel = hiltViewModel(),
@@ -29,12 +31,35 @@ fun PostDetailsScreen(
     val postDetailsState by viewModel.post.collectAsState()
     val comments by viewModel.comments.collectAsState()
     val columnState = rememberLazyListState()
-    val initialScrollPosition by viewModel.initialScrollPositionState.collectAsState()
-
-    // Send scroll state updated events to the view model to deal with - these get stored in tabs
-    viewModel.onScrollStateUpdated(
-        columnState.firstVisibleItemIndex
+    val initialScrollPosition = viewModel.restoredScrollPosition.collectAsState(
+        initial = ScrollPosition(
+            0,
+            0
+        )
     )
+    // Send scroll state updated events to the view model to deal with - these get stored in tabs
+    if (!columnState.isScrollInProgress) {
+        val scrollPosition =
+            ScrollPosition(
+                columnState.firstVisibleItemIndex,
+                columnState.firstVisibleItemScrollOffset
+            )
+        LaunchedEffect(key1 = scrollPosition) {
+            viewModel.onScrollStateUpdated(
+                scrollPosition
+            )
+        }
+    }
+
+    // Only launch this effect if we have items
+    LaunchedEffect(key1 = comments.count() > 0) {
+        if (columnState.layoutInfo.totalItemsCount > 1) {
+            columnState.scrollToItem(
+                initialScrollPosition.value.index,
+                initialScrollPosition.value.offset
+            )
+        }
+    }
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -84,14 +109,6 @@ fun PostDetailsScreen(
                         Modifier.fillMaxWidth()
                     ) { viewModel.onMoreCommentsClicked(it) }
                 }
-            }
-        }
-
-        // Wait until we have more than 1 item, then initiate a scroll on launch
-        LaunchedEffect(key1 = columnState.layoutInfo.totalItemsCount > 1) {
-            if (columnState.layoutInfo.totalItemsCount > 1) {
-                Log.d("PostDetailsScreen", "Scrolling to: ${initialScrollPosition.value}")
-                columnState.scrollToItem(initialScrollPosition.value)
             }
         }
     }

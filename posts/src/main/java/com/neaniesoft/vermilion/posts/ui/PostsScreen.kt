@@ -1,7 +1,6 @@
 package com.neaniesoft.vermilion.posts.ui
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -18,7 +17,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -36,8 +34,11 @@ import com.neaniesoft.vermilion.posts.R
 import com.neaniesoft.vermilion.posts.domain.entities.Community
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
+import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
+import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
 @ExperimentalPagingApi
 @Composable
 fun PostsScreen(
@@ -49,12 +50,33 @@ fun PostsScreen(
 ) {
     val pagingItems = viewModel.pagingData(community.routeName).collectAsLazyPagingItems()
     val listState = rememberLazyListState()
-    val initialScrollPosition by viewModel.initialScrollPositionState.collectAsState()
-
-    viewModel.onScrollStateUpdated(
-        listState.firstVisibleItemIndex,
-        listState.firstVisibleItemScrollOffset
+    val initialScrollPosition = viewModel.restoredScrollPosition.collectAsState(
+        initial = ScrollPosition(
+            0,
+            0
+        )
     )
+
+    if (!listState.isScrollInProgress) {
+        val scrollPosition =
+            ScrollPosition(listState.firstVisibleItemIndex, listState.firstVisibleItemScrollOffset)
+        LaunchedEffect(key1 = scrollPosition) {
+            viewModel.onScrollStateUpdated(
+                scrollPosition
+            )
+        }
+    }
+
+    // Only launch this effect if we have items
+    LaunchedEffect(key1 = pagingItems.itemCount > 0) {
+        if (listState.layoutInfo.totalItemsCount > 1) {
+            listState.scrollToItem(
+                initialScrollPosition.value.index,
+                initialScrollPosition.value.offset
+            )
+        }
+    }
+
 
     Box {
         PostsList(listState = listState, posts = pagingItems, onMediaClicked = {
@@ -62,14 +84,6 @@ fun PostsScreen(
         }, onPostClicked = { post ->
             onOpenPostDetails(post.id)
         }, onCommunityClicked = onOpenCommunity)
-    }
-
-    // Only launch this effect if we have items
-    LaunchedEffect(key1 = listState.layoutInfo.totalItemsCount > 1) {
-        if (listState.layoutInfo.totalItemsCount > 1) {
-            Log.d("PostsScreen", "Scrolling to: $initialScrollPosition")
-            listState.scrollToItem(initialScrollPosition.index, initialScrollPosition.offset)
-        }
     }
 }
 

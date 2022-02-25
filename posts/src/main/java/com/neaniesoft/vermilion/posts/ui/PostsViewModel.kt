@@ -20,17 +20,21 @@ import com.neaniesoft.vermilion.tabs.domain.TabSupervisor
 import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
 import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
 import com.neaniesoft.vermilion.tabs.domain.entities.TabType
+import com.neaniesoft.vermilion.utils.logger
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.commonmark.parser.Parser
 import java.time.Clock
 import javax.inject.Inject
 
+@FlowPreview
 @HiltViewModel
 class PostsViewModel @Inject constructor(
     private val postRepository: PostRepository,
@@ -45,23 +49,19 @@ class PostsViewModel @Inject constructor(
     private val pagingDataMap: MutableMap<String, Flow<PagingData<Post>>> = mutableMapOf()
     private val communityName = CommunityName(
         savedStateHandle.get<String>("communityName")
-            ?: ""
+            ?: "Home"
     )
+    private val logger by logger()
 
-    private val initialScrollPosition = ScrollPosition(
-        savedStateHandle.get<Int>("initialScrollIndex") ?: 0,
-        savedStateHandle.get<Int>("initialScrollOffset") ?: 0
-    )
+    private val tabType = if (communityName == CommunityName("Home")) {
+        TabType.HOME
+    } else {
+        TabType.POSTS
+    }
 
-    private val _scrollPosition = MutableStateFlow(initialScrollPosition)
-    val initialScrollPositionState: StateFlow<ScrollPosition> = _scrollPosition.asStateFlow()
-
-    private val _scrollUpdates: MutableStateFlow<ScrollPosition> =
-        MutableStateFlow(ScrollPosition(0, 0))
-    private val scrollUpdates = _scrollUpdates.asStateFlow()
-
-    init {
-        setUpScrollListener()
+    val restoredScrollPosition = flow {
+        val position = tabSupervisor.scrollPositionForTab(ParentId(communityName.value), tabType)
+        emit(position)
     }
 
     @ExperimentalPagingApi
@@ -87,27 +87,21 @@ class PostsViewModel @Inject constructor(
         }
     }
 
-    private fun setUpScrollListener() {
-        viewModelScope.launch {
-            scrollUpdates.collect {
-                if (communityName.value.isNotEmpty())
-                    tabSupervisor.updateScrollState(
-                        parentId = ParentId(communityName.value),
-                        type = TabType.POSTS,
-                        scrollPosition = it
-                    )
-            }
-        }
+    suspend fun onScrollStateUpdated(scrollPosition: ScrollPosition) {
+        scrollStateUpdates.emit(scrollPosition)
     }
 
-    fun onScrollStateUpdated(firstVisibleItemIndex: Int, firstVisibleItemOffset: Int) {
+    private val scrollStateUpdates: MutableSharedFlow<ScrollPosition> = MutableSharedFlow()
+
+    init {
         viewModelScope.launch {
-            _scrollUpdates.emit(
-                ScrollPosition(
-                    firstVisibleItemIndex,
-                    firstVisibleItemOffset
+            scrollStateUpdates.asSharedFlow().debounce(128).collect {
+                tabSupervisor.updateScrollState(
+                    parentId = ParentId(communityName.value),
+                    type = tabType,
+                    scrollPosition = it
                 )
-            )
+            }
         }
     }
 }

@@ -17,13 +17,19 @@ import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
 import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
 import com.neaniesoft.vermilion.tabs.domain.entities.TabType
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import org.commonmark.parser.Parser
 import javax.inject.Inject
 
+@FlowPreview
 @HiltViewModel
 class PostDetailsViewModel @Inject constructor(
     private val database: VermilionDatabase,
@@ -44,20 +50,15 @@ class PostDetailsViewModel @Inject constructor(
             ?: throw IllegalStateException("Could not obtain post ID from saved state")
     )
 
-    private val initialScrollPosition = ScrollPosition(
-        savedStateHandle.get<Int>("initialScrollIndex") ?: 0
-    )
-
-    private val _scrollPosition = MutableStateFlow(initialScrollPosition)
-    val initialScrollPositionState: StateFlow<ScrollPosition> = _scrollPosition.asStateFlow()
-
-    private val _scrollUpdates: MutableStateFlow<Int> = MutableStateFlow(0)
-    private val scrollUpdates = _scrollUpdates.asStateFlow()
+    val restoredScrollPosition = flow {
+        val position =
+            tabSupervisor.scrollPositionForTab(ParentId(postId.value), TabType.POST_DETAILS)
+        emit(position)
+    }
 
     init {
         loadPost(postId)
         loadComments(postId)
-        setUpScrollListener()
     }
 
     private fun loadPost(id: PostId) {
@@ -91,20 +92,22 @@ class PostDetailsViewModel @Inject constructor(
         }
     }
 
-    private fun setUpScrollListener() {
+    suspend fun onScrollStateUpdated(scrollPosition: ScrollPosition) {
+        scrollStateUpdates.emit(scrollPosition)
+    }
+
+    private val scrollStateUpdates: MutableSharedFlow<ScrollPosition> = MutableSharedFlow()
+
+    init {
         viewModelScope.launch {
-            scrollUpdates.collect {
+            scrollStateUpdates.asSharedFlow().debounce(128).collect {
                 tabSupervisor.updateScrollState(
                     parentId = ParentId(postId.value),
                     type = TabType.POST_DETAILS,
-                    scrollPosition = ScrollPosition(it)
+                    scrollPosition = it
                 )
             }
         }
-    }
-
-    fun onScrollStateUpdated(firstVisibleItemIndex: Int) {
-        viewModelScope.launch { _scrollUpdates.emit(firstVisibleItemIndex) }
     }
 }
 

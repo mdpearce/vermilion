@@ -7,7 +7,6 @@ import androidx.navigation.NavDestination
 import com.neaniesoft.vermilion.tabs.domain.TabSupervisor
 import com.neaniesoft.vermilion.tabs.domain.entities.ActiveTab
 import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
-import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
 import com.neaniesoft.vermilion.tabs.domain.entities.TabState
 import com.neaniesoft.vermilion.tabs.domain.entities.TabType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -61,7 +60,13 @@ class VermilionAppViewModel @Inject constructor(
                     }
                 }
                 route.startsWith(VermilionScreen.Home.name) -> {
-                    viewModelScope.launch { _activeTab.emit(ActiveTab.Home) }
+                    viewModelScope.launch(Dispatchers.IO) {
+                        tabSupervisor.addNewTabIfNotExists(
+                            ParentId(VermilionScreen.Home.name),
+                            TabType.HOME
+                        )
+                        _activeTab.emit(ActiveTab.Home)
+                    }
                 }
                 else -> {
                     viewModelScope.launch { _activeTab.emit(ActiveTab.None) }
@@ -71,15 +76,17 @@ class VermilionAppViewModel @Inject constructor(
     }
 
     fun onTabClicked(tab: TabState) {
-        emitRouteEvent(tab.type, tab.parentId, tab.scrollPosition)
+        emitRouteEvent(tab.type, tab.parentId)
     }
 
-    private fun emitRouteEvent(type: TabType, parentId: ParentId, scrollPosition: ScrollPosition) {
+    private fun emitRouteEvent(type: TabType, parentId: ParentId) {
         if (type == TabType.POST_DETAILS) {
-            val route = "${VermilionScreen.PostDetails}/${parentId.value}/${scrollPosition.value}"
+            val route =
+                "${VermilionScreen.PostDetails}/${parentId.value}"
             viewModelScope.launch { _routeEvents.emit(route) }
         } else if (type == TabType.POSTS) {
-            val route = "${VermilionScreen.Posts}/${parentId.value}/${scrollPosition.value}"
+            val route =
+                "${VermilionScreen.Posts}/${parentId.value}"
             viewModelScope.launch { _routeEvents.emit(route) }
         }
     }

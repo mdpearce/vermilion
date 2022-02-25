@@ -61,16 +61,24 @@ class RoomBackedTabRepository @Inject constructor(
         type: TabType,
         scrollPosition: ScrollPosition
     ) {
-        logger.debugIfEnabled { "Updating scroll state for parent: ${parentId.value} to: $scrollPosition" }
-        database.withTransaction {
-            tabStateDao.updateTabWithScrollState(
-                parentId.value,
-                type.name,
-                scrollPosition.index,
-                scrollPosition.offset
-            )
-            tabStateDao.findByParentAndType(parentId.value, TabType.POST_DETAILS.name)
+        if (scrollPosition.index != 0 && scrollPosition.offset != 0) {
+            // logger.debugIfEnabled { "Updating scroll state for parent: ${parentId.value}, type: $type to: $scrollPosition" }
+            database.withTransaction {
+                tabStateDao.updateTabWithScrollState(
+                    parentId.value,
+                    type.name,
+                    scrollPosition.index,
+                    scrollPosition.offset
+                )
+                tabStateDao.findByParentAndType(parentId.value, TabType.POST_DETAILS.name)
+            }
         }
+    }
+
+    override suspend fun findTab(parentId: ParentId, type: TabType): TabState? {
+        return database.withTransaction {
+            tabStateDao.findByParentAndType(parentId.value, type.name)
+        }?.toTabState().also { logger.debugIfEnabled { "Found tab: $it" } }
     }
 
     private suspend fun NewTabState.toNewTabStateRecord(): NewTabStateRecord {
@@ -97,6 +105,7 @@ class RoomBackedTabRepository @Inject constructor(
         return when (type) {
             TabType.POST_DETAILS -> displayNameForPostDetails(parentId)
             TabType.POSTS -> DisplayName(parentId.value)
+            TabType.HOME -> DisplayName("Home")
         }
     }
 

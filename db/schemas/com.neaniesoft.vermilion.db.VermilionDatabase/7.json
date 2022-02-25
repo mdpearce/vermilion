@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 7,
-    "identityHash": "ab1b3dd5d31a5004af40213a9547a789",
+    "identityHash": "2a2ed62b8f339662a8c3a36738fa7e97",
     "entities": [
       {
         "tableName": "user_accounts",
@@ -290,7 +290,7 @@
       },
       {
         "tableName": "tabs",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT NOT NULL, `parentId` TEXT NOT NULL, `displayName` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `tabSortOrder` INTEGER NOT NULL, `scrollPosition` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT NOT NULL, `parentId` TEXT NOT NULL, `displayName` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `tabSortOrder` INTEGER NOT NULL, `scrollPosition` INTEGER NOT NULL, `scrollOffset` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -333,6 +333,12 @@
             "columnName": "scrollPosition",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "scrollOffset",
+            "columnName": "scrollOffset",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -348,7 +354,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ab1b3dd5d31a5004af40213a9547a789')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2a2ed62b8f339662a8c3a36738fa7e97')"
     ]
   }
 }
