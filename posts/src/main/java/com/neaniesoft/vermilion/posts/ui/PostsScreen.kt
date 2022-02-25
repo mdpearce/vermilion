@@ -17,6 +17,8 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -57,26 +59,31 @@ fun PostsScreen(
         )
     )
 
-    if (!listState.isScrollInProgress) {
-        val scrollPosition =
+    val isScrolling = remember {
+        derivedStateOf { listState.isScrollInProgress }
+    }
+
+    val scrollPosition = remember {
+        derivedStateOf {
             ScrollPosition(listState.firstVisibleItemIndex, listState.firstVisibleItemScrollOffset)
+        }
+    }
+
+    if (!isScrolling.value) {
         LaunchedEffect(key1 = scrollPosition) {
-            viewModel.onScrollStateUpdated(
-                scrollPosition
-            )
+            viewModel.onScrollStateUpdated(scrollPosition.value)
         }
     }
 
     // Only launch this effect if we have items
     LaunchedEffect(key1 = pagingItems.itemCount > 0) {
-        if (listState.layoutInfo.totalItemsCount > 1) {
+        if (pagingItems.itemCount > 0) {
             listState.scrollToItem(
                 initialScrollPosition.value.index,
                 initialScrollPosition.value.offset
             )
         }
     }
-
 
     Box {
         PostsList(listState = listState, posts = pagingItems, onMediaClicked = {

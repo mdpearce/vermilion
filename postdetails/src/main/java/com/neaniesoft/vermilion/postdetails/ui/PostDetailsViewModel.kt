@@ -18,12 +18,9 @@ import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
 import com.neaniesoft.vermilion.tabs.domain.entities.TabType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import org.commonmark.parser.Parser
@@ -93,21 +90,11 @@ class PostDetailsViewModel @Inject constructor(
     }
 
     suspend fun onScrollStateUpdated(scrollPosition: ScrollPosition) {
-        scrollStateUpdates.emit(scrollPosition)
-    }
-
-    private val scrollStateUpdates: MutableSharedFlow<ScrollPosition> = MutableSharedFlow()
-
-    init {
-        viewModelScope.launch {
-            scrollStateUpdates.asSharedFlow().debounce(128).collect {
-                tabSupervisor.updateScrollState(
-                    parentId = ParentId(postId.value),
-                    type = TabType.POST_DETAILS,
-                    scrollPosition = it
-                )
-            }
-        }
+        tabSupervisor.updateScrollState(
+            ParentId(postId.value),
+            TabType.POST_DETAILS,
+            scrollPosition
+        )
     }
 }
 

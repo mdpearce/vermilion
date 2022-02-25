@@ -12,7 +12,9 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -37,17 +39,22 @@ fun PostDetailsScreen(
             0
         )
     )
-    // Send scroll state updated events to the view model to deal with - these get stored in tabs
-    if (!columnState.isScrollInProgress) {
-        val scrollPosition =
+    val isScrolling by remember {
+        derivedStateOf { columnState.isScrollInProgress }
+    }
+
+    val scrollPosition by remember {
+        derivedStateOf {
             ScrollPosition(
                 columnState.firstVisibleItemIndex,
                 columnState.firstVisibleItemScrollOffset
             )
+        }
+    }
+
+    if (!isScrolling) {
         LaunchedEffect(key1 = scrollPosition) {
-            viewModel.onScrollStateUpdated(
-                scrollPosition
-            )
+            viewModel.onScrollStateUpdated(scrollPosition)
         }
     }
 

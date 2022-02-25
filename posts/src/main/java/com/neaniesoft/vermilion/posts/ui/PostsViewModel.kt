@@ -24,12 +24,8 @@ import com.neaniesoft.vermilion.utils.logger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import org.commonmark.parser.Parser
 import java.time.Clock
 import javax.inject.Inject
@@ -88,20 +84,24 @@ class PostsViewModel @Inject constructor(
     }
 
     suspend fun onScrollStateUpdated(scrollPosition: ScrollPosition) {
-        scrollStateUpdates.emit(scrollPosition)
+        tabSupervisor.updateScrollState(
+            parentId = ParentId(communityName.value),
+            type = tabType,
+            scrollPosition = scrollPosition
+        )
     }
 
-    private val scrollStateUpdates: MutableSharedFlow<ScrollPosition> = MutableSharedFlow()
+    // private val scrollStateUpdates: MutableSharedFlow<ScrollPosition> = MutableSharedFlow()
 
-    init {
-        viewModelScope.launch {
-            scrollStateUpdates.asSharedFlow().debounce(128).collect {
-                tabSupervisor.updateScrollState(
-                    parentId = ParentId(communityName.value),
-                    type = tabType,
-                    scrollPosition = it
-                )
-            }
-        }
-    }
+    // init {
+    //     viewModelScope.launch {
+    //         scrollStateUpdates.asSharedFlow().debounce(128).collect {
+    //             tabSupervisor.updateScrollState(
+    //                 parentId = ParentId(communityName.value),
+    //                 type = tabType,
+    //                 scrollPosition = it
+    //             )
+    //         }
+    //     }
+    // }
 }
