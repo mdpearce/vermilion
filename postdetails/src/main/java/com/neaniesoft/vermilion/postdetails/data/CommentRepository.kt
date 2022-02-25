@@ -4,6 +4,7 @@ import androidx.core.net.toUri
 import androidx.room.withTransaction
 import com.neaniesoft.vermilion.api.entities.CommentData
 import com.neaniesoft.vermilion.api.entities.CommentThing
+import com.neaniesoft.vermilion.api.entities.Link
 import com.neaniesoft.vermilion.api.entities.MoreCommentsData
 import com.neaniesoft.vermilion.api.entities.MoreCommentsThing
 import com.neaniesoft.vermilion.api.entities.ThingData
@@ -23,7 +24,9 @@ import com.neaniesoft.vermilion.postdetails.domain.entities.ControversialIndex
 import com.neaniesoft.vermilion.postdetails.domain.entities.DurationString
 import com.neaniesoft.vermilion.postdetails.domain.entities.MoreCommentsCount
 import com.neaniesoft.vermilion.postdetails.domain.entities.UpVotesCount
+import com.neaniesoft.vermilion.posts.data.toPost
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
+import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.utils.logger
@@ -41,8 +44,13 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 interface CommentRepository {
-    suspend fun getFlattenedCommentTreeForPost(postId: PostId): Flow<List<CommentKind>>
+    suspend fun getFlattenedCommentTreeForPost(postId: PostId): Flow<CommentRepositoryResponse>
     suspend fun fetchAndInsertMoreCommentsFor(stub: CommentStub): List<CommentKind>
+}
+
+sealed class CommentRepositoryResponse {
+    data class ListOfComments(val comments: List<CommentKind>) : CommentRepositoryResponse()
+    data class UpdatedPost(val post: Post) : CommentRepositoryResponse()
 }
 
 @Singleton
@@ -59,7 +67,7 @@ class CommentRepositoryImpl @Inject constructor(
     }
 
     private val logger by logger()
-    override suspend fun getFlattenedCommentTreeForPost(postId: PostId): Flow<List<CommentKind>> =
+    override suspend fun getFlattenedCommentTreeForPost(postId: PostId): Flow<CommentRepositoryResponse> =
         flow {
             val lastInsertedAtTime = database.withTransaction {
                 dao.getLastInsertedAtForPost(postId.value)
@@ -68,18 +76,31 @@ class CommentRepositoryImpl @Inject constructor(
             if (lastInsertedAtTime != null && lastInsertedAtTime >= clock.millis() - CACHE_VALID_DURATION.toMillis()) {
                 // Cache is valid, let's just return the database records
                 emit(
-                    dao.getAllForPost(postId.value)
-                        .map { it.toCommentKind() }
+                    CommentRepositoryResponse.ListOfComments(
+                        dao.getAllForPost(postId.value)
+                            .map { it.toCommentKind() }
+                    )
                 )
             } else {
                 // Cache is invalid. First, let's return it so we have something to display
                 emit(
-                    dao.getAllForPost(postId.value)
-                        .map { it.toCommentKind() }
+                    CommentRepositoryResponse.ListOfComments(
+                        dao.getAllForPost(postId.value)
+                            .map { it.toCommentKind() }
+                    )
                 )
 
                 // Then, fetch new comments from the API
                 val apiResponse = apiService.commentsForArticle(postId.value)
+
+                // The response comes with an updated post, so we might as well return it so the caller can update the db if required
+                val post = (apiResponse[0].data.children.firstOrNull()?.data as? Link)?.toPost(
+                    markdownParser
+                )
+                if (post != null) {
+                    emit(CommentRepositoryResponse.UpdatedPost(post))
+                }
+
                 val newCommentRecords: List<CommentRecord> =
                     apiResponse[1].getCommentRecords(postId)
 
@@ -103,7 +124,7 @@ class CommentRepositoryImpl @Inject constructor(
                 }
 
                 // Now, emit the new comments
-                emit(newComments.map { it.toCommentKind() })
+                emit(CommentRepositoryResponse.ListOfComments(newComments.map { it.toCommentKind() }))
             }
         }
 
