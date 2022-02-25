@@ -57,18 +57,19 @@ class RoomBackedTabRepository @Inject constructor(
         }
     }
 
-    override suspend fun updateScrollStateForPostDetailsTab(
-        postId: PostId,
+    override suspend fun updateScrollStateForTab(
+        parentId: ParentId,
+        type: TabType,
         scrollPosition: ScrollPosition
     ) {
-        logger.debugIfEnabled { "Updating scroll state for post: ${postId.value} to: ${scrollPosition.value}" }
+        logger.debugIfEnabled { "Updating scroll state for post: ${parentId.value} to: ${scrollPosition.value}" }
         database.withTransaction {
             tabStateDao.updateTabWithScrollState(
-                postId.value,
-                TabType.POST_DETAILS.name,
+                parentId.value,
+                type.name,
                 scrollPosition.value
             )
-            tabStateDao.findByParentAndType(postId.value, TabType.POST_DETAILS.name)
+            tabStateDao.findByParentAndType(parentId.value, TabType.POST_DETAILS.name)
         }
     }
 

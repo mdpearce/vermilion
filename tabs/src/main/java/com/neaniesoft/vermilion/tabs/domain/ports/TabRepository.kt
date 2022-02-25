@@ -3,8 +3,10 @@ package com.neaniesoft.vermilion.tabs.domain.ports
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.tabs.domain.entities.DisplayName
 import com.neaniesoft.vermilion.tabs.domain.entities.NewTabState
+import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
 import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
 import com.neaniesoft.vermilion.tabs.domain.entities.TabState
+import com.neaniesoft.vermilion.tabs.domain.entities.TabType
 import kotlinx.coroutines.flow.Flow
 
 interface TabRepository {
@@ -18,5 +20,5 @@ interface TabRepository {
 
     suspend fun removeAll()
 
-    suspend fun updateScrollStateForPostDetailsTab(postId: PostId, scrollPosition: ScrollPosition)
+    suspend fun updateScrollStateForTab(parentId: ParentId, type: TabType, scrollPosition: ScrollPosition)
 }

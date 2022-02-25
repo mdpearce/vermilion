@@ -73,7 +73,21 @@ class TabSupervisor @Inject constructor(
     }
 
     suspend fun updateScrollStateForPostDetailsTab(postId: PostId, scrollPosition: ScrollPosition) {
-        repository.updateScrollStateForPostDetailsTab(postId, scrollPosition)
+        repository.updateScrollStateForTab(
+            ParentId(postId.value),
+            TabType.POST_DETAILS,
+            scrollPosition
+        )
+    }
 
+    suspend fun updateScrollStateForPostsTab(
+        communityName: CommunityName,
+        scrollPosition: ScrollPosition
+    ) {
+        repository.updateScrollStateForTab(
+            ParentId(communityName.value),
+            TabType.POST_DETAILS,
+            scrollPosition
+        )
     }
 }
