@@ -103,7 +103,7 @@ class PostDetailsViewModel @Inject constructor(
         }
     }
 
-    fun onScrollStateUpdated(firstVisibleItemIndex: Int, firstVisibleItemScrollOffset: Int) {
+    fun onScrollStateUpdated(firstVisibleItemIndex: Int) {
         viewModelScope.launch { _scrollUpdates.emit(firstVisibleItemIndex) }
     }
 }

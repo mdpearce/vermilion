@@ -28,6 +28,7 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
         startDestination = VermilionScreen.Home.name,
         modifier = modifier
     ) {
+        // Home screen - this is just an instance of PostsScreen hardcoded to the front page
         composable(VermilionScreen.Home.name) {
             PostsScreen(
                 community = FrontPage,
@@ -45,6 +46,7 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
             )
         }
 
+        // Individual subreddit listings
         composable(
             "${VermilionScreen.Posts}/{communityName}/{initialScrollIndex}",
             arguments = listOf(
@@ -71,6 +73,7 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
             )
         }
 
+        // Post with comments
         composable(
             "${VermilionScreen.PostDetails.name}/{id}/{initialScrollIndex}",
             arguments = listOf(
@@ -83,10 +86,12 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
             }
         }
 
+        // Account/Settings
         bottomSheet(VermilionScreen.MyAccount.name) {
             UserAccountScreen()
         }
 
+        // Custom tabs to open links
         customTab(
             "${VermilionScreen.CustomTab.name}/{uri}",
             arguments = listOf(navArgument("uri") { type = NavType.StringType })

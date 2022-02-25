@@ -31,9 +31,9 @@ fun PostDetailsScreen(
     val columnState = rememberLazyListState()
     val initialScrollPosition by viewModel.initialScrollPositionState.collectAsState()
 
+    // Send scroll state updated events to the view model to deal with - these get stored in tabs
     viewModel.onScrollStateUpdated(
-        columnState.firstVisibleItemIndex,
-        columnState.firstVisibleItemScrollOffset
+        columnState.firstVisibleItemIndex
     )
 
     Surface(
@@ -41,7 +41,6 @@ fun PostDetailsScreen(
         color = MaterialTheme.colors.surface,
         elevation = 0.dp
     ) {
-
         LazyColumn(state = columnState) {
             when (val currentPostDetailsState = postDetailsState) {
                 is PostDetails -> {
@@ -87,7 +86,8 @@ fun PostDetailsScreen(
                 }
             }
         }
-        // Only launch this effect if we have items
+
+        // Wait until we have more than 1 item, then initiate a scroll on launch
         LaunchedEffect(key1 = columnState.layoutInfo.totalItemsCount > 1) {
             if (columnState.layoutInfo.totalItemsCount > 1) {
                 Log.d("PostDetailsScreen", "Scrolling to: ${initialScrollPosition.value}")
