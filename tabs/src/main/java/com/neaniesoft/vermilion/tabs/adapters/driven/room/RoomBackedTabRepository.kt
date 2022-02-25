@@ -6,7 +6,6 @@ import com.neaniesoft.vermilion.dbentities.posts.PostDao
 import com.neaniesoft.vermilion.dbentities.tabs.NewTabStateRecord
 import com.neaniesoft.vermilion.dbentities.tabs.TabStateDao
 import com.neaniesoft.vermilion.dbentities.tabs.TabStateRecord
-import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.tabs.domain.entities.DisplayName
 import com.neaniesoft.vermilion.tabs.domain.entities.NewTabState
 import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
@@ -62,7 +61,7 @@ class RoomBackedTabRepository @Inject constructor(
         type: TabType,
         scrollPosition: ScrollPosition
     ) {
-        logger.debugIfEnabled { "Updating scroll state for post: ${parentId.value} to: ${scrollPosition.value}" }
+        logger.debugIfEnabled { "Updating scroll state for parent: ${parentId.value} to: ${scrollPosition.value}" }
         database.withTransaction {
             tabStateDao.updateTabWithScrollState(
                 parentId.value,
@@ -85,11 +84,18 @@ class RoomBackedTabRepository @Inject constructor(
         )
     }
 
-    override suspend fun displayNameForPostDetails(postId: PostId): DisplayName {
-        val post = postDao.postWithId(postId.value)
-            ?: throw IllegalStateException("Post ${postId.value} not found in db")
+    private suspend fun displayNameForPostDetails(parentId: ParentId): DisplayName {
+        val post = postDao.postWithId(parentId.value)
+            ?: throw IllegalStateException("Post ${parentId.value} not found in db")
 
         return DisplayName(post.title)
+    }
+
+    override suspend fun displayName(parentId: ParentId, type: TabType): DisplayName {
+        return when (type) {
+            TabType.POST_DETAILS -> displayNameForPostDetails(parentId)
+            TabType.POSTS -> DisplayName(parentId.value)
+        }
     }
 
     override suspend fun removeAll() {

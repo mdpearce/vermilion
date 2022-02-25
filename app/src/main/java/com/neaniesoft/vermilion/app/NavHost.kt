@@ -39,15 +39,18 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
                 },
                 onOpenCommunity = { community ->
                     if (community is NamedCommunity) {
-                        navController.navigate("${VermilionScreen.Posts}/${community.name.value}")
+                        navController.navigate("${VermilionScreen.Posts}/${community.name.value}/0")
                     }
                 }
             )
         }
 
         composable(
-            "${VermilionScreen.Posts}/{communityName}",
-            arguments = listOf(navArgument("communityName") { type = NavType.StringType })
+            "${VermilionScreen.Posts}/{communityName}/{initialScrollIndex}",
+            arguments = listOf(
+                navArgument("communityName") { type = NavType.StringType },
+                navArgument("initialScrollIndex") { type = NavType.IntType }
+            )
         ) {
             val name = it.arguments?.getString("communityName")
                 ?: throw IllegalStateException("Cannot navigate to posts without a community name")
@@ -62,7 +65,7 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
                 },
                 onOpenCommunity = { communityToOpen ->
                     if (communityToOpen is NamedCommunity) {
-                        navController.navigate("${VermilionScreen.Posts}/${communityToOpen.name.value}")
+                        navController.navigate("${VermilionScreen.Posts}/${communityToOpen.name.value}/0")
                     }
                 }
             )

@@ -13,7 +13,9 @@ import com.neaniesoft.vermilion.posts.data.toPost
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.tabs.domain.TabSupervisor
+import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
 import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
+import com.neaniesoft.vermilion.tabs.domain.entities.TabType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -92,8 +94,9 @@ class PostDetailsViewModel @Inject constructor(
     private fun setUpScrollListener() {
         viewModelScope.launch {
             scrollUpdates.collect {
-                tabSupervisor.updateScrollStateForPostDetailsTab(
-                    postId = postId,
+                tabSupervisor.updateScrollState(
+                    parentId = ParentId(postId.value),
+                    type = TabType.POST_DETAILS,
                     scrollPosition = ScrollPosition(it)
                 )
             }

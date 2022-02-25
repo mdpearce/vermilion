@@ -1,8 +1,5 @@
 package com.neaniesoft.vermilion.tabs.domain
 
-import com.neaniesoft.vermilion.posts.domain.entities.CommunityName
-import com.neaniesoft.vermilion.posts.domain.entities.PostId
-import com.neaniesoft.vermilion.tabs.domain.entities.DisplayName
 import com.neaniesoft.vermilion.tabs.domain.entities.NewTabState
 import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
 import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
@@ -41,13 +38,12 @@ class TabSupervisor @Inject constructor(
         }
     }
 
-    suspend fun addNewPostDetailsTabIfNotExists(parentId: ParentId): TabState {
-
-        val displayName = repository.displayNameForPostDetails(postId = PostId(parentId.value))
+    suspend fun addNewTabIfNotExists(parentId: ParentId, type: TabType): TabState {
+        val displayName = repository.displayName(parentId, type)
 
         val tab = NewTabState(
             parentId,
-            TabType.POST_DETAILS,
+            type,
             displayName,
             Instant.ofEpochMilli(clock.millis()),
             ScrollPosition(0)
@@ -59,34 +55,14 @@ class TabSupervisor @Inject constructor(
         repository.removeTab(tab)
     }
 
-    suspend fun addNewCommunityTabIfNotExists(communityName: CommunityName): TabState {
-        val displayName = DisplayName(communityName.value)
-
-        val tab = NewTabState(
-            ParentId(communityName.value),
-            TabType.POSTS,
-            displayName,
-            Instant.ofEpochMilli(clock.millis()),
-            ScrollPosition(0)
-        )
-        return repository.addNewTabIfNotExists(tab)
-    }
-
-    suspend fun updateScrollStateForPostDetailsTab(postId: PostId, scrollPosition: ScrollPosition) {
-        repository.updateScrollStateForTab(
-            ParentId(postId.value),
-            TabType.POST_DETAILS,
-            scrollPosition
-        )
-    }
-
-    suspend fun updateScrollStateForPostsTab(
-        communityName: CommunityName,
+    suspend fun updateScrollState(
+        parentId: ParentId,
+        type: TabType,
         scrollPosition: ScrollPosition
     ) {
         repository.updateScrollStateForTab(
-            ParentId(communityName.value),
-            TabType.POST_DETAILS,
+            parentId,
+            type,
             scrollPosition
         )
     }
