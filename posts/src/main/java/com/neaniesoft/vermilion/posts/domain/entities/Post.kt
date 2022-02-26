@@ -24,8 +24,13 @@ sealed class PostFlair {
     object NoFlair : PostFlair()
     data class TextFlair(
         val text: PostFlairText,
-        val backgroundColor: PostFlairBackgroundColor
+        val backgroundColor: PostFlairBackgroundColor,
+        val textColor: PostFlairTextColor
     ) : PostFlair()
+}
+
+enum class PostFlairTextColor {
+    DARK, LIGHT
 }
 
 @JvmInline

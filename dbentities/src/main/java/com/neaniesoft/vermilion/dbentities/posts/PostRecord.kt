@@ -26,7 +26,8 @@ data class PostRecord(
     val score: Int,
     val flags: String,
     val flairText: String?,
-    val flairBackgroundColor: Int
+    val flairBackgroundColor: Int,
+    val flairTextColor: String
 )
 
 enum class PostType {

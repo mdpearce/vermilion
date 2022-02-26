@@ -14,8 +14,10 @@ import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -165,6 +167,23 @@ fun PostContent(
                     ) { onMediaClicked(post) }
                 }
             }
+            if (post.flair is PostFlair.TextFlair) {
+                val flairBackgroundColor =
+                    if (post.flair.backgroundColor == PostFlairBackgroundColor(0)) {
+                        MaterialTheme.colors.surface
+                    } else {
+                        Color(post.flair.backgroundColor.value)
+                    }
+                Surface(
+                    color = flairBackgroundColor,
+                    contentColor = (flairBackgroundColor),
+                    shape = MaterialTheme.shapes.small,
+                    elevation = 2.dp,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                ) {
+                    Text(text = post.flair.text.value, modifier = Modifier.padding(8.dp), style = MaterialTheme.typography.caption)
+                }
+            }
             if (summary is TextPostSummary) {
                 TextSummary(content = summary.previewTextMarkdown, shouldTruncate) {
                     onSummaryClicked(post)
@@ -175,7 +194,9 @@ fun PostContent(
 
             PostDetails(
                 post = post,
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
                 onCommunityClicked = onCommunityClicked,
                 onUpVoteClicked = {},
                 onDownVoteClicked = {},

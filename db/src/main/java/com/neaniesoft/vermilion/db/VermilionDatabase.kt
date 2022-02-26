@@ -15,7 +15,7 @@ import com.neaniesoft.vermilion.dbentities.useraccount.UserAccountRecord
 
 @Database(
     entities = [UserAccountRecord::class, PostRecord::class, PostRemoteKey::class, CommentRecord::class, TabStateRecord::class],
-    version = 9
+    version = 10
 )
 abstract class VermilionDatabase : RoomDatabase() {
     abstract fun userAccountDao(): UserAccountDao

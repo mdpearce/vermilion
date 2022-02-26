@@ -24,6 +24,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.PostFlags
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlair
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlairBackgroundColor
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlairText
+import com.neaniesoft.vermilion.posts.domain.entities.PostFlairTextColor
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.PostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.PostTitle
@@ -70,7 +71,11 @@ internal fun Link.flair(): PostFlair {
         } else {
             0
         }
-        PostFlair.TextFlair(PostFlairText(flairText), PostFlairBackgroundColor(bg))
+        PostFlair.TextFlair(
+            PostFlairText(flairText),
+            PostFlairBackgroundColor(bg),
+            PostFlairTextColor.valueOf(linkFlairTextColor.uppercase())
+        )
     } else {
         PostFlair.NoFlair
     }
@@ -146,8 +151,8 @@ internal fun List<Awarding>.toAwardsMap(): Map<Award, AwardCount> =
     associateBy(keySelector = { awarding ->
         Award(AwardName(awarding.name), URL(awarding.iconUrl))
     }, valueTransform = { awarding ->
-            AwardCount(awarding.count)
-        })
+        AwardCount(awarding.count)
+    })
 
 internal fun Link.flags(): Set<PostFlags> {
     return mutableSetOf<PostFlags>().apply {

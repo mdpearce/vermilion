@@ -17,6 +17,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.PostFlags
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlair
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlairBackgroundColor
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlairText
+import com.neaniesoft.vermilion.posts.domain.entities.PostFlairTextColor
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.PostTitle
 import com.neaniesoft.vermilion.posts.domain.entities.PreviewText
@@ -97,7 +98,12 @@ fun PostRecord.toPost(markdownParser: Parser): Post {
             else -> {
                 PostFlair.TextFlair(
                     PostFlairText(text),
-                    PostFlairBackgroundColor(flairBackgroundColor)
+                    PostFlairBackgroundColor(flairBackgroundColor),
+                    when (flairTextColor) {
+                        PostFlairTextColor.DARK.name -> PostFlairTextColor.DARK
+                        PostFlairTextColor.LIGHT.name -> PostFlairTextColor.LIGHT
+                        else -> throw IllegalStateException("Unable to parse flair text color")
+                    }
                 )
             }
         }
@@ -157,5 +163,9 @@ fun Post.toPostRecord(query: String, clock: Clock): PostRecord = PostRecord(
     flairBackgroundColor = when (flair) {
         is PostFlair.NoFlair -> 0
         is PostFlair.TextFlair -> flair.backgroundColor.value
+    },
+    flairTextColor = when (flair) {
+        is PostFlair.NoFlair -> PostFlairTextColor.DARK.name
+        is PostFlair.TextFlair -> flair.textColor.name
     }
 )
