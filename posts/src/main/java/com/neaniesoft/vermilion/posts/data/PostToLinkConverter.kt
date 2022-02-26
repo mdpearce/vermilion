@@ -41,7 +41,7 @@ import java.time.Instant
 import java.util.Locale
 import kotlin.math.roundToLong
 
-internal fun Link.toPost(markdownParser: Parser): Post {
+fun Link.toPost(markdownParser: Parser): Post {
     return Post(
         PostId(id),
         PostTitle(StringEscapeUtils.unescapeHtml4(title)),

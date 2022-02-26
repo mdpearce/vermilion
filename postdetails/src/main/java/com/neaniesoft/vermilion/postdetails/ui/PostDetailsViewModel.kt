@@ -7,6 +7,7 @@ import androidx.room.withTransaction
 import com.neaniesoft.vermilion.db.VermilionDatabase
 import com.neaniesoft.vermilion.dbentities.posts.PostDao
 import com.neaniesoft.vermilion.postdetails.data.CommentRepository
+import com.neaniesoft.vermilion.postdetails.data.CommentRepositoryResponse
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentKind
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub
 import com.neaniesoft.vermilion.posts.data.toPost
@@ -54,11 +55,11 @@ class PostDetailsViewModel @Inject constructor(
     }
 
     init {
-        loadPost(postId)
+        loadPostFromDb(postId)
         loadComments(postId)
     }
 
-    private fun loadPost(id: PostId) {
+    private fun loadPostFromDb(id: PostId) {
         viewModelScope.launch {
             val post = database.withTransaction {
                 postDao.postWithId(id.value)
@@ -75,8 +76,11 @@ class PostDetailsViewModel @Inject constructor(
         viewModelScope.launch {
             val comments = commentRepository.getFlattenedCommentTreeForPost(id)
 
-            comments.collect {
-                _comments.emit(it)
+            comments.collect { response ->
+                when (response) {
+                    is CommentRepositoryResponse.UpdatedPost -> _post.emit(PostDetails(response.post))
+                    is CommentRepositoryResponse.ListOfComments -> _comments.emit(response.comments)
+                }
             }
         }
     }
