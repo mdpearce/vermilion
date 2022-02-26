@@ -72,5 +72,7 @@ data class MoreCommentsData(
 ) : ThingData()
 
 data class SubredditData(
-    @JsonProperty("id") val id: String
+    @JsonProperty("id") val id: String,
+    @JsonProperty("display_name") val displayName: String,
+    @JsonProperty("title") val title: String,
 ) : ThingData()
