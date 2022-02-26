@@ -14,7 +14,8 @@ data class Post(
     val commentCount: CommentCount,
     val score: Score,
     val flags: Set<PostFlags>,
-    val link: Uri
+    val link: Uri,
+    val flair: PostFlair
 )
 
 fun Post.isNsfw(): Boolean = flags.contains(PostFlags.NSFW)

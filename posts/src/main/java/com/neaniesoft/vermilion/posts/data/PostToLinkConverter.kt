@@ -1,5 +1,6 @@
 package com.neaniesoft.vermilion.posts.data
 
+import android.graphics.Color
 import android.net.Uri
 import androidx.core.net.toUri
 import com.neaniesoft.vermilion.api.entities.Awarding
@@ -20,6 +21,10 @@ import com.neaniesoft.vermilion.posts.domain.entities.NamedCommunity
 import com.neaniesoft.vermilion.posts.domain.entities.NsfwThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlags
+import com.neaniesoft.vermilion.posts.domain.entities.PostFlair
+import com.neaniesoft.vermilion.posts.domain.entities.PostFlairBackgroundColor
+import com.neaniesoft.vermilion.posts.domain.entities.PostFlairText
+import com.neaniesoft.vermilion.posts.domain.entities.PostFlairTextColor
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.PostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.PostTitle
@@ -53,8 +58,27 @@ fun Link.toPost(markdownParser: Parser): Post {
         CommentCount(numComments),
         Score(score),
         flags(),
-        url.toUri()
+        url.toUri(),
+        flair()
     )
+}
+
+internal fun Link.flair(): PostFlair {
+    val flairText = linkFlairText
+    return if (!flairText.isNullOrEmpty()) {
+        val bg = if (!linkFlairBackgroundColor.isNullOrEmpty()) {
+            Color.parseColor(linkFlairBackgroundColor)
+        } else {
+            0
+        }
+        PostFlair.TextFlair(
+            PostFlairText(flairText),
+            PostFlairBackgroundColor(bg),
+            PostFlairTextColor.valueOf(linkFlairTextColor.uppercase())
+        )
+    } else {
+        PostFlair.NoFlair
+    }
 }
 
 internal fun Link.postSummary(markdownParser: Parser): PostSummary {

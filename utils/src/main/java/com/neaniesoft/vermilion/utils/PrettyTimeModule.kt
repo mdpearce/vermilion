@@ -1,4 +1,4 @@
-package com.neaniesoft.vermilion.postdetails.data
+package com.neaniesoft.vermilion.utils
 
 import dagger.Module
 import dagger.Provides
