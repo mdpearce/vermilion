@@ -1,8 +1,5 @@
 package com.neaniesoft.vermilion.tabs.domain
 
-import com.neaniesoft.vermilion.posts.domain.entities.CommunityName
-import com.neaniesoft.vermilion.posts.domain.entities.PostId
-import com.neaniesoft.vermilion.tabs.domain.entities.DisplayName
 import com.neaniesoft.vermilion.tabs.domain.entities.NewTabState
 import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
 import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
@@ -10,6 +7,7 @@ import com.neaniesoft.vermilion.tabs.domain.entities.TabState
 import com.neaniesoft.vermilion.tabs.domain.entities.TabType
 import com.neaniesoft.vermilion.tabs.domain.ports.TabRepository
 import com.neaniesoft.vermilion.utils.CoroutinesModule
+import com.neaniesoft.vermilion.utils.logger
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,6 +28,7 @@ class TabSupervisor @Inject constructor(
 ) {
     private val _currentTabs: MutableStateFlow<List<TabState>> = MutableStateFlow(emptyList())
     val currentTabs: StateFlow<List<TabState>> = _currentTabs.asStateFlow()
+    private val logger by logger()
 
     private val scope = CoroutineScope(dispatcher)
 
@@ -41,16 +40,15 @@ class TabSupervisor @Inject constructor(
         }
     }
 
-    suspend fun addNewPostDetailsTabIfNotExists(parentId: ParentId): TabState {
-
-        val displayName = repository.displayNameForPostDetails(postId = PostId(parentId.value))
+    suspend fun addNewTabIfNotExists(parentId: ParentId, type: TabType): TabState {
+        val displayName = repository.displayName(parentId, type)
 
         val tab = NewTabState(
             parentId,
-            TabType.POST_DETAILS,
+            type,
             displayName,
             Instant.ofEpochMilli(clock.millis()),
-            ScrollPosition(0)
+            ScrollPosition(0, 0)
         )
         return repository.addNewTabIfNotExists(tab)
     }
@@ -59,16 +57,23 @@ class TabSupervisor @Inject constructor(
         repository.removeTab(tab)
     }
 
-    suspend fun addNewCommunityTabIfNotExists(communityName: CommunityName): TabState {
-        val displayName = DisplayName(communityName.value)
-
-        val tab = NewTabState(
-            ParentId(communityName.value),
-            TabType.POSTS,
-            displayName,
-            Instant.ofEpochMilli(clock.millis()),
-            ScrollPosition(0)
+    suspend fun updateScrollState(
+        parentId: ParentId,
+        type: TabType,
+        scrollPosition: ScrollPosition
+    ) {
+        logger.debugIfEnabled { "Persisting scroll state for $parentId to $scrollPosition" }
+        repository.updateScrollStateForTab(
+            parentId,
+            type,
+            scrollPosition
         )
-        return repository.addNewTabIfNotExists(tab)
+    }
+
+    suspend fun scrollPositionForTab(parentId: ParentId, tabType: TabType): ScrollPosition? {
+        return repository.findTab(
+            parentId,
+            tabType
+        )?.scrollPosition.also { logger.warnIfEnabled { "Tab not found, defaulting to null scroll position" } }
     }
 }

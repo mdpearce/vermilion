@@ -13,20 +13,28 @@ import com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub
 import com.neaniesoft.vermilion.posts.data.toPost
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
+import com.neaniesoft.vermilion.tabs.domain.TabSupervisor
+import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
+import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
+import com.neaniesoft.vermilion.tabs.domain.entities.TabType
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import org.commonmark.parser.Parser
 import javax.inject.Inject
 
+@FlowPreview
 @HiltViewModel
 class PostDetailsViewModel @Inject constructor(
     private val database: VermilionDatabase,
     private val postDao: PostDao,
     private val commentRepository: CommentRepository,
     private val markdownParser: Parser,
+    private val tabSupervisor: TabSupervisor,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val _post: MutableStateFlow<PostDetailsState> = MutableStateFlow(Empty)
@@ -39,6 +47,12 @@ class PostDetailsViewModel @Inject constructor(
         savedStateHandle.get<String>("id")
             ?: throw IllegalStateException("Could not obtain post ID from saved state")
     )
+
+    val restoredScrollPosition = flow {
+        val position =
+            tabSupervisor.scrollPositionForTab(ParentId(postId.value), TabType.POST_DETAILS)
+        emit(position)
+    }
 
     init {
         loadPostFromDb(postId)
@@ -77,6 +91,14 @@ class PostDetailsViewModel @Inject constructor(
 
             _comments.emit(comments)
         }
+    }
+
+    suspend fun onScrollStateUpdated(scrollPosition: ScrollPosition) {
+        tabSupervisor.updateScrollState(
+            ParentId(postId.value),
+            TabType.POST_DETAILS,
+            scrollPosition
+        )
     }
 }
 

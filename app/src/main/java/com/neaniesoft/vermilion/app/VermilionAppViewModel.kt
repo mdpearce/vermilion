@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavDestination
-import com.neaniesoft.vermilion.posts.domain.entities.CommunityName
 import com.neaniesoft.vermilion.tabs.domain.TabSupervisor
 import com.neaniesoft.vermilion.tabs.domain.entities.ActiveTab
 import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
@@ -43,7 +42,8 @@ class VermilionAppViewModel @Inject constructor(
                     val id =
                         requireNotNull(args?.getString("id")) { "Received a post details route with no id" }
                     viewModelScope.launch(Dispatchers.IO) {
-                        val tab = tabSupervisor.addNewPostDetailsTabIfNotExists(ParentId(id))
+                        val tab =
+                            tabSupervisor.addNewTabIfNotExists(ParentId(id), TabType.POST_DETAILS)
                         _activeTab.emit(ActiveTab.Tab(tab.id))
                     }
                 }
@@ -52,12 +52,21 @@ class VermilionAppViewModel @Inject constructor(
                         requireNotNull(args?.getString("communityName")) { "Received a posts route with no name " }
                     viewModelScope.launch(Dispatchers.IO) {
                         val tab =
-                            tabSupervisor.addNewCommunityTabIfNotExists(CommunityName(communityName))
+                            tabSupervisor.addNewTabIfNotExists(
+                                ParentId(communityName),
+                                TabType.POSTS
+                            )
                         _activeTab.emit(ActiveTab.Tab(tab.id))
                     }
                 }
                 route.startsWith(VermilionScreen.Home.name) -> {
-                    viewModelScope.launch { _activeTab.emit(ActiveTab.Home) }
+                    viewModelScope.launch(Dispatchers.IO) {
+                        tabSupervisor.addNewTabIfNotExists(
+                            ParentId(VermilionScreen.Home.name),
+                            TabType.HOME
+                        )
+                        _activeTab.emit(ActiveTab.Home)
+                    }
                 }
                 else -> {
                     viewModelScope.launch { _activeTab.emit(ActiveTab.None) }
@@ -72,10 +81,12 @@ class VermilionAppViewModel @Inject constructor(
 
     private fun emitRouteEvent(type: TabType, parentId: ParentId) {
         if (type == TabType.POST_DETAILS) {
-            val route = "${VermilionScreen.PostDetails}/${parentId.value}"
+            val route =
+                "${VermilionScreen.PostDetails}/${parentId.value}"
             viewModelScope.launch { _routeEvents.emit(route) }
         } else if (type == TabType.POSTS) {
-            val route = "${VermilionScreen.Posts}/${parentId.value}"
+            val route =
+                "${VermilionScreen.Posts}/${parentId.value}"
             viewModelScope.launch { _routeEvents.emit(route) }
         }
     }

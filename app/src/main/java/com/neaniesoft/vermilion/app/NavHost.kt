@@ -28,7 +28,10 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
         startDestination = VermilionScreen.Home.name,
         modifier = modifier
     ) {
-        composable(VermilionScreen.Home.name) {
+        // Home screen - this is just an instance of PostsScreen hardcoded to the front page
+        composable(
+            VermilionScreen.Home.name
+        ) {
             PostsScreen(
                 community = FrontPage,
                 onOpenPostDetails = { postId ->
@@ -45,9 +48,12 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
             )
         }
 
+        // Individual subreddit listings
         composable(
             "${VermilionScreen.Posts}/{communityName}",
-            arguments = listOf(navArgument("communityName") { type = NavType.StringType })
+            arguments = listOf(
+                navArgument("communityName") { type = NavType.StringType }
+            )
         ) {
             val name = it.arguments?.getString("communityName")
                 ?: throw IllegalStateException("Cannot navigate to posts without a community name")
@@ -68,19 +74,24 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
             )
         }
 
+        // Post with comments
         composable(
             "${VermilionScreen.PostDetails.name}/{id}",
-            arguments = listOf(navArgument("id") { type = NavType.StringType })
+            arguments = listOf(
+                navArgument("id") { type = NavType.StringType }
+            )
         ) {
             PostDetailsScreen {
                 navController.navigate(customTabRoute(it))
             }
         }
 
+        // Account/Settings
         bottomSheet(VermilionScreen.MyAccount.name) {
             UserAccountScreen()
         }
 
+        // Custom tabs to open links
         customTab(
             "${VermilionScreen.CustomTab.name}/{uri}",
             arguments = listOf(navArgument("uri") { type = NavType.StringType })

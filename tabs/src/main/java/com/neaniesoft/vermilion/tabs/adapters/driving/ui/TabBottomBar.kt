@@ -71,15 +71,17 @@ fun TabBottomBar(
             }
 
             items(tabs) { tab ->
-                val isActive = activeTab is ActiveTab.Tab && tab.id == activeTab.id
+                if (tab.type != TabType.HOME) {
+                    val isActive = activeTab is ActiveTab.Tab && tab.id == activeTab.id
 
-                Box(modifier = Modifier.height(IntrinsicSize.Min)) {
-                    TopLevelTab(
-                        isActive = isActive,
-                        tabState = tab,
-                        onTabClicked = onTabClicked,
-                        onCloseClicked = onTabCloseClicked
-                    )
+                    Box(modifier = Modifier.height(IntrinsicSize.Min)) {
+                        TopLevelTab(
+                            isActive = isActive,
+                            tabState = tab,
+                            onTabClicked = onTabClicked,
+                            onCloseClicked = onTabCloseClicked
+                        )
+                    }
                 }
             }
         }
@@ -228,7 +230,7 @@ private val DUMMY_TAB = TabState(
     DisplayName("AskScience"),
     createdAt = Instant.now(),
     TabSortOrderIndex(1),
-    ScrollPosition(0)
+    ScrollPosition(0, 0)
 )
 
 private val DUMMY_TAB_2 = DUMMY_TAB.copy(

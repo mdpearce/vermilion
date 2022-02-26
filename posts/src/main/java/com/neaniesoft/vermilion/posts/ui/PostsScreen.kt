@@ -1,6 +1,7 @@
 package com.neaniesoft.vermilion.posts.ui
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -8,11 +9,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -23,7 +30,6 @@ import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadState
-import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
@@ -31,9 +37,11 @@ import com.neaniesoft.vermilion.posts.R
 import com.neaniesoft.vermilion.posts.domain.entities.Community
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
+import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
 @ExperimentalPagingApi
 @Composable
 fun PostsScreen(
@@ -44,9 +52,41 @@ fun PostsScreen(
     onOpenCommunity: (community: Community) -> Unit
 ) {
     val pagingItems = viewModel.pagingData(community.routeName).collectAsLazyPagingItems()
+    val listState = rememberLazyListState()
+    val initialScrollPosition = viewModel.restoredScrollPosition.collectAsState(
+        initial = null
+    )
+
+    val isScrolling = remember {
+        derivedStateOf { listState.isScrollInProgress }
+    }
+
+    val scrollPosition = remember {
+        derivedStateOf {
+            ScrollPosition(listState.firstVisibleItemIndex, listState.firstVisibleItemScrollOffset)
+        }
+    }
+
+    if (!isScrolling.value) {
+        LaunchedEffect(key1 = scrollPosition) {
+            viewModel.onScrollStateUpdated(scrollPosition.value)
+        }
+    }
+
+    // Only launch this effect if we have items
+    LaunchedEffect(key1 = pagingItems.itemCount > 0) {
+        val scrollToPosition = initialScrollPosition.value
+        if (pagingItems.itemCount > 0 && scrollToPosition != null) {
+            Log.d("PostsScreen", "Scrolling to $scrollToPosition")
+            listState.scrollToItem(
+                scrollToPosition.index,
+                scrollToPosition.offset
+            )
+        }
+    }
 
     Box {
-        PostsList(posts = pagingItems, onMediaClicked = {
+        PostsList(listState = listState, posts = pagingItems, onMediaClicked = {
             onOpenUri(it.link.toString().toUri())
         }, onPostClicked = { post ->
                 onOpenPostDetails(post.id)
@@ -56,12 +96,13 @@ fun PostsScreen(
 
 @Composable
 fun PostsList(
+    listState: LazyListState,
     posts: LazyPagingItems<Post>,
     onPostClicked: (Post) -> Unit,
     onMediaClicked: (Post) -> Unit,
     onCommunityClicked: (Community) -> Unit
 ) {
-    LazyColumn(Modifier.padding(start = 8.dp, end = 8.dp)) {
+    LazyColumn(state = listState, modifier = Modifier.padding(start = 8.dp, end = 8.dp)) {
         items(posts) { post ->
             Box(modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)) {
                 if (post != null) {
@@ -170,39 +211,39 @@ fun LoadingScreenPreview() {
         LoadingScreen()
     }
 }
-
-@Preview(name = "Posts light theme")
-@Composable
-fun PostsScreenPreview() {
-    VermilionTheme {
-        PostsList(
-            flowOf(
-                PagingData.from(
-                    listOf(
-                        DUMMY_TEXT_POST,
-                        DUMMY_TEXT_POST
-                    )
-                )
-            ).collectAsLazyPagingItems(),
-            {}, {}
-        ) {}
-    }
-}
-
-@Preview(name = "Posts dark theme")
-@Composable
-fun PostsScreenPreviewDark() {
-    VermilionTheme(darkTheme = true) {
-        PostsList(
-            flowOf(
-                PagingData.from(
-                    listOf(
-                        DUMMY_TEXT_POST,
-                        DUMMY_TEXT_POST
-                    )
-                )
-            ).collectAsLazyPagingItems(),
-            {}, {}
-        ) {}
-    }
-}
+//
+// @Preview(name = "Posts light theme")
+// @Composable
+// fun PostsScreenPreview() {
+//     VermilionTheme {
+//         PostsList(
+//             flowOf(
+//                 PagingData.from(
+//                     listOf(
+//                         DUMMY_TEXT_POST,
+//                         DUMMY_TEXT_POST
+//                     )
+//                 )
+//             ).collectAsLazyPagingItems(),
+//             {}, {}
+//         ) {}
+//     }
+// }
+//
+// @Preview(name = "Posts dark theme")
+// @Composable
+// fun PostsScreenPreviewDark() {
+//     VermilionTheme(darkTheme = true) {
+//         PostsList(
+//             flowOf(
+//                 PagingData.from(
+//                     listOf(
+//                         DUMMY_TEXT_POST,
+//                         DUMMY_TEXT_POST
+//                     )
+//                 )
+//             ).collectAsLazyPagingItems(),
+//             {}, {}
+//         ) {}
+//     }
+// }

@@ -6,7 +6,6 @@ import com.neaniesoft.vermilion.dbentities.posts.PostDao
 import com.neaniesoft.vermilion.dbentities.tabs.NewTabStateRecord
 import com.neaniesoft.vermilion.dbentities.tabs.TabStateDao
 import com.neaniesoft.vermilion.dbentities.tabs.TabStateRecord
-import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.tabs.domain.entities.DisplayName
 import com.neaniesoft.vermilion.tabs.domain.entities.NewTabState
 import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
@@ -16,6 +15,7 @@ import com.neaniesoft.vermilion.tabs.domain.entities.TabSortOrderIndex
 import com.neaniesoft.vermilion.tabs.domain.entities.TabState
 import com.neaniesoft.vermilion.tabs.domain.entities.TabType
 import com.neaniesoft.vermilion.tabs.domain.ports.TabRepository
+import com.neaniesoft.vermilion.utils.logger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -30,6 +30,8 @@ class RoomBackedTabRepository @Inject constructor(
     private val postDao: PostDao
 ) : TabRepository {
 
+    private val logger by logger()
+
     override val currentTabs: Flow<List<TabState>> =
         tabStateDao.getAllCurrentTabs().distinctUntilChanged().map {
             it.map { record ->
@@ -40,18 +42,40 @@ class RoomBackedTabRepository @Inject constructor(
     override suspend fun addNewTabIfNotExists(tab: NewTabState): TabState {
         return database.withTransaction {
             val existingTab = tabStateDao.findByParentAndType(tab.parentId.value, tab.type.name)
-            if (existingTab.isEmpty()) {
+            if (existingTab == null) {
                 val newRecord = tab.toNewTabStateRecord()
                 if (newRecord.tabSortOrder == -1) {
                     tabStateDao.shiftAllTabsFrom(0)
                 }
                 tabStateDao.insertAll(newRecord)
-                tabStateDao.findByParentAndType(tab.parentId.value, tab.type.name).first()
-                    .toTabState()
+                tabStateDao.findByParentAndType(tab.parentId.value, tab.type.name)
+                    ?.toTabState() ?: throw IllegalStateException("Could not find saved tab record")
             } else {
-                existingTab.first().toTabState()
+                existingTab.toTabState()
             }
         }
+    }
+
+    override suspend fun updateScrollStateForTab(
+        parentId: ParentId,
+        type: TabType,
+        scrollPosition: ScrollPosition
+    ) {
+        database.withTransaction {
+            tabStateDao.updateTabWithScrollState(
+                parentId.value,
+                type.name,
+                scrollPosition.index,
+                scrollPosition.offset
+            )
+            tabStateDao.findByParentAndType(parentId.value, TabType.POST_DETAILS.name)
+        }
+    }
+
+    override suspend fun findTab(parentId: ParentId, type: TabType): TabState? {
+        return database.withTransaction {
+            tabStateDao.findByParentAndType(parentId.value, type.name)
+        }?.toTabState().also { logger.debugIfEnabled { "Found tab: $it" } }
     }
 
     private suspend fun NewTabState.toNewTabStateRecord(): NewTabStateRecord {
@@ -62,15 +86,24 @@ class RoomBackedTabRepository @Inject constructor(
             displayName.value,
             createdAt.toEpochMilli(),
             leftMostIndex - 1,
-            scrollPosition.value
+            scrollPosition.index,
+            scrollPosition.offset
         )
     }
 
-    override suspend fun displayNameForPostDetails(postId: PostId): DisplayName {
-        val post = postDao.postWithId(postId.value)
-            ?: throw IllegalStateException("Post ${postId.value} not found in db")
+    private suspend fun displayNameForPostDetails(parentId: ParentId): DisplayName {
+        val post = postDao.postWithId(parentId.value)
+            ?: throw IllegalStateException("Post ${parentId.value} not found in db")
 
         return DisplayName(post.title)
+    }
+
+    override suspend fun displayName(parentId: ParentId, type: TabType): DisplayName {
+        return when (type) {
+            TabType.POST_DETAILS -> displayNameForPostDetails(parentId)
+            TabType.POSTS -> DisplayName(parentId.value)
+            TabType.HOME -> DisplayName("Home")
+        }
     }
 
     override suspend fun removeAll() {
@@ -93,7 +126,7 @@ class RoomBackedTabRepository @Inject constructor(
             DisplayName(displayName),
             Instant.ofEpochMilli(createdAt),
             TabSortOrderIndex(tabSortOrder),
-            ScrollPosition(scrollPosition)
+            ScrollPosition(scrollPosition, scrollOffset)
         )
     }
 }

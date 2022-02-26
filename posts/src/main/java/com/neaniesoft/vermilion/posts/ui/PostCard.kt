@@ -1,6 +1,5 @@
 package com.neaniesoft.vermilion.posts.ui
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -87,6 +86,7 @@ fun PostContent(
     onSummaryClicked: (Post) -> Unit,
     onCommunityClicked: (Community) -> Unit
 ) {
+    // Log.d("PostContent", "Drawing content")
     Column(modifier = modifier.padding(0.dp)) {
         val summary = post.summary
         when (summary) {
@@ -205,12 +205,12 @@ fun PostContent(
 
 @Composable
 fun Thumbnail(thumbnail: Thumbnail, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    // Log.d("Thumbnail", "thumbnsil")
     val painter = when (thumbnail) {
         is SelfThumbnail, is DefaultThumbnail, is NoThumbnail, is NsfwThumbnail, is SpoilerThumbnail -> painterResource(
             id = R.drawable.ic_baseline_image_72
         )
         is UriThumbnail -> {
-            Log.d("Thumbnail", "loading thumbnail from uri: ${thumbnail.uri}")
             rememberImagePainter(thumbnail.uri)
         }
     }
