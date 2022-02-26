@@ -35,6 +35,9 @@ import com.neaniesoft.vermilion.posts.domain.entities.NamedCommunity
 import com.neaniesoft.vermilion.posts.domain.entities.NoThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.NsfwThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.Post
+import com.neaniesoft.vermilion.posts.domain.entities.PostFlair
+import com.neaniesoft.vermilion.posts.domain.entities.PostFlairBackgroundColor
+import com.neaniesoft.vermilion.posts.domain.entities.PostFlairText
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.PostTitle
 import com.neaniesoft.vermilion.posts.domain.entities.PreviewSummary
@@ -338,7 +341,8 @@ internal val DUMMY_TEXT_POST = Post(
     CommentCount(123),
     Score(1024),
     flags = emptySet(),
-    "http://reddit.com/".toUri()
+    "http://reddit.com/".toUri(),
+    PostFlair.TextFlair(PostFlairText("Some flair"), PostFlairBackgroundColor(0))
 )
 
 internal val DUMMY_LINK_POST = Post(
@@ -356,5 +360,6 @@ internal val DUMMY_LINK_POST = Post(
     CommentCount(123),
     Score(1024),
     flags = emptySet(),
-    "http://reddit.com/".toUri()
+    "http://reddit.com/".toUri(),
+    PostFlair.TextFlair(PostFlairText("Some flair"), PostFlairBackgroundColor(0))
 )

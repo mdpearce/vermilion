@@ -14,7 +14,22 @@ data class Post(
     val commentCount: CommentCount,
     val score: Score,
     val flags: Set<PostFlags>,
-    val link: Uri
+    val link: Uri,
+    val flair: PostFlair
 )
 
 fun Post.isNsfw(): Boolean = flags.contains(PostFlags.NSFW)
+
+sealed class PostFlair {
+    object NoFlair : PostFlair()
+    data class TextFlair(
+        val text: PostFlairText,
+        val backgroundColor: PostFlairBackgroundColor
+    ) : PostFlair()
+}
+
+@JvmInline
+value class PostFlairText(val value: String)
+
+@JvmInline
+value class PostFlairBackgroundColor(val value: Int)

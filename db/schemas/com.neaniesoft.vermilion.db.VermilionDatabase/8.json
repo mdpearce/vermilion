@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 8,
-    "identityHash": "2a2ed62b8f339662a8c3a36738fa7e97",
+    "identityHash": "a98ece82c1a04e600052067015487c41",
     "entities": [
       {
         "tableName": "user_accounts",
@@ -32,7 +32,7 @@
       },
       {
         "tableName": "posts",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `postId` TEXT NOT NULL, `query` TEXT NOT NULL, `insertedAt` INTEGER NOT NULL, `title` TEXT NOT NULL, `postType` TEXT NOT NULL, `linkHost` TEXT NOT NULL, `thumbnailUri` TEXT, `previewUri` TEXT, `previewWidth` INTEGER, `previewHeight` INTEGER, `linkUri` TEXT NOT NULL, `previewText` TEXT, `communityName` TEXT NOT NULL, `authorName` TEXT NOT NULL, `postedAt` INTEGER NOT NULL, `commentCount` INTEGER NOT NULL, `score` INTEGER NOT NULL, `flags` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `postId` TEXT NOT NULL, `query` TEXT NOT NULL, `insertedAt` INTEGER NOT NULL, `title` TEXT NOT NULL, `postType` TEXT NOT NULL, `linkHost` TEXT NOT NULL, `thumbnailUri` TEXT, `previewUri` TEXT, `previewWidth` INTEGER, `previewHeight` INTEGER, `linkUri` TEXT NOT NULL, `previewText` TEXT, `communityName` TEXT NOT NULL, `authorName` TEXT NOT NULL, `postedAt` INTEGER NOT NULL, `commentCount` INTEGER NOT NULL, `score` INTEGER NOT NULL, `flags` TEXT NOT NULL, `flairText` TEXT, `flairBackgroundColor` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -146,6 +146,18 @@
             "fieldPath": "flags",
             "columnName": "flags",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "flairText",
+            "columnName": "flairText",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "flairBackgroundColor",
+            "columnName": "flairBackgroundColor",
+            "affinity": "INTEGER",
             "notNull": true
           }
         ],
@@ -354,7 +366,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2a2ed62b8f339662a8c3a36738fa7e97')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a98ece82c1a04e600052067015487c41')"
     ]
   }
 }

@@ -24,7 +24,9 @@ data class PostRecord(
     // val awards TODO implement caching of awards
     val commentCount: Int,
     val score: Int,
-    val flags: String
+    val flags: String,
+    val flairText: String?,
+    val flairBackgroundColor: Int
 )
 
 enum class PostType {
