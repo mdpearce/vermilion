@@ -45,13 +45,12 @@ fun PostDetails(
 
     Row(
         modifier = modifier,
-        verticalAlignment = Alignment.Bottom,
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         val postedAtTime = remember {
             LocalPrettyTimeFormatter.format(post.postedAt)
         }
-        Column(horizontalAlignment = Alignment.Start, modifier = Modifier.padding(bottom = 16.dp)) {
-            // Subreddit
+        Column(horizontalAlignment = Alignment.Start) {
             val subredditName =
                 if (post.community is NamedCommunity) {
                     buildAnnotatedString {
@@ -65,7 +64,6 @@ fun PostDetails(
                 } else {
                     AnnotatedString("")
                 }
-            // Comments
             val commentString = buildAnnotatedString {
                 if (post.commentCount.value > 0) {
                     pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
@@ -85,6 +83,12 @@ fun PostDetails(
                 )
             }
             Text(
+                text = postedAtTime,
+                style = MaterialTheme.typography.caption,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            Text(
                 text = commentString,
                 style = MaterialTheme.typography.caption,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -100,17 +104,11 @@ fun PostDetails(
             }
         }
         Spacer(modifier = Modifier.weight(1.0f))
-        Column(horizontalAlignment = Alignment.End, modifier = Modifier.padding(bottom = 16.dp)) {
-            Text(
-                text = post.score.value.toString(),
-                style = MaterialTheme.typography.h5,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-            Text(
-                text = postedAtTime,
-                style = MaterialTheme.typography.caption
-            )
-        }
+        Text(
+            text = post.score.value.toString(),
+            style = MaterialTheme.typography.h5,
+            modifier = Modifier.padding(end = 16.dp)
+        )
         VoteSaveBlock(
             onUpVoteClicked = { onUpVoteClicked(post) },
             onDownVoteClicked = { onDownVoteClicked(post) },
@@ -126,6 +124,19 @@ fun VoteSaveBlock(
     onSaveClicked: () -> Unit
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
+        Surface(
+            elevation = 8.dp,
+            shape = CircleShape,
+            modifier = Modifier
+                .size(64.dp)
+        ) {
+            IconButton(onClick = onUpVoteClicked) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_baseline_arrow_upward_24),
+                    contentDescription = "Up vote", tint = MaterialTheme.colors.primary
+                )
+            }
+        }
         Column {
             IconButton(
                 onClick = onSaveClicked
@@ -142,19 +153,6 @@ fun VoteSaveBlock(
                     painter = painterResource(id = R.drawable.ic_baseline_arrow_downward_24),
                     contentDescription = "Down vote",
                     tint = MaterialTheme.colors.secondary
-                )
-            }
-        }
-        Surface(
-            elevation = 8.dp,
-            shape = CircleShape,
-            modifier = Modifier
-                .size(64.dp)
-        ) {
-            IconButton(onClick = onUpVoteClicked) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_baseline_arrow_upward_24),
-                    contentDescription = "Up vote", tint = MaterialTheme.colors.primary
                 )
             }
         }

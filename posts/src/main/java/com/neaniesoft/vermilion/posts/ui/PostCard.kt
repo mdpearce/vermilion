@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Card
+import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -170,9 +171,11 @@ fun PostContent(
                 }
             }
 
+            Divider(modifier = Modifier.padding(top = 8.dp, bottom = 8.dp))
+
             PostDetails(
                 post = post,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
                 onCommunityClicked = onCommunityClicked,
                 onUpVoteClicked = {},
                 onDownVoteClicked = {},
@@ -184,7 +187,6 @@ fun PostContent(
 
 @Composable
 fun Thumbnail(thumbnail: Thumbnail, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    // Log.d("Thumbnail", "thumbnsil")
     val painter = when (thumbnail) {
         is SelfThumbnail, is DefaultThumbnail, is NoThumbnail, is NsfwThumbnail, is SpoilerThumbnail -> painterResource(
             id = R.drawable.ic_baseline_image_72
