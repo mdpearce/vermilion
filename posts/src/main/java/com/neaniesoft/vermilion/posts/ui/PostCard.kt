@@ -184,6 +184,7 @@ fun PostContent(
 
 @Composable
 fun Thumbnail(thumbnail: Thumbnail, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    // Log.d("Thumbnail", "thumbnsil")
     val painter = when (thumbnail) {
         is SelfThumbnail, is DefaultThumbnail, is NoThumbnail, is NsfwThumbnail, is SpoilerThumbnail -> painterResource(
             id = R.drawable.ic_baseline_image_72
