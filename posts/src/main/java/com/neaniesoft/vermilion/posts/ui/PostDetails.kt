@@ -1,9 +1,9 @@
 package com.neaniesoft.vermilion.posts.ui
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -37,15 +37,20 @@ import java.time.Instant
 fun PostDetails(
     post: Post,
     modifier: Modifier = Modifier,
-    onCommunityClicked: (Community) -> Unit = {}
+    onCommunityClicked: (Community) -> Unit = {},
+    onUpVoteClicked: (Post) -> Unit = {},
+    onDownVoteClicked: (Post) -> Unit = {},
+    onSaveClicked: (Post) -> Unit = {}
 ) {
 
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.Bottom,
-        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Column() {
+        val postedAtTime = remember {
+            LocalPrettyTimeFormatter.format(post.postedAt)
+        }
+        Column(horizontalAlignment = Alignment.Start, modifier = Modifier.padding(bottom = 16.dp)) {
             // Subreddit
             val subredditName =
                 if (post.community is NamedCommunity) {
@@ -60,47 +65,42 @@ fun PostDetails(
                 } else {
                     AnnotatedString("")
                 }
-            if (subredditName.isNotEmpty()) {
-                Text(
-                    style = MaterialTheme.typography.body2,
-                    text = subredditName,
-                    modifier = Modifier
-                        .clickable { onCommunityClicked(post.community) }
-                        .padding(bottom = 8.dp)
-                )
-            }
-
             // Comments
             val commentString = buildAnnotatedString {
                 if (post.commentCount.value > 0) {
                     pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
                     append("${post.commentCount.value} ")
                     pop()
-                    append(
-                        stringResource(
-                            id = if (post.commentCount.value == 1) {
-                                R.string.post_details_comment
-                            } else {
-                                R.string.post_details_comments
-                            }
-                        )
-                    )
+                } else {
+                    append("No ")
                 }
+                append(
+                    stringResource(
+                        id = if (post.commentCount.value == 1) {
+                            R.string.post_details_comment
+                        } else {
+                            R.string.post_details_comments
+                        }
+                    )
+                )
             }
-            Text(text = commentString, style = MaterialTheme.typography.caption)
+            Text(
+                text = commentString,
+                style = MaterialTheme.typography.caption,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            if (subredditName.isNotEmpty()) {
+                Text(
+                    style = MaterialTheme.typography.body2,
+                    text = subredditName,
+                    modifier = Modifier
+                        .clickable { onCommunityClicked(post.community) }
+                )
+            }
         }
-
-        VoteSaveBlock(
-            onUpVoteClicked = { { /*TODO*/ } },
-            onDownVoteClicked = {},
-            onSaveClicked = {}
-        )
-
-        val postedAtTime = remember {
-            LocalPrettyTimeFormatter.format(post.postedAt)
-        }
-
-        Column(horizontalAlignment = Alignment.End) {
+        Spacer(modifier = Modifier.weight(1.0f))
+        Column(horizontalAlignment = Alignment.End, modifier = Modifier.padding(bottom = 16.dp)) {
             Text(
                 text = post.score.value.toString(),
                 style = MaterialTheme.typography.h5,
@@ -111,9 +111,11 @@ fun PostDetails(
                 style = MaterialTheme.typography.caption
             )
         }
-
-
-
+        VoteSaveBlock(
+            onUpVoteClicked = { onUpVoteClicked(post) },
+            onDownVoteClicked = { onDownVoteClicked(post) },
+            onSaveClicked = { onSaveClicked(post) }
+        )
     }
 }
 
@@ -125,28 +127,31 @@ fun VoteSaveBlock(
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Column {
-            IconButton(onClick = onDownVoteClicked) {
+            IconButton(
+                onClick = onSaveClicked
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_baseline_star_24),
+                    contentDescription = "Save"
+                )
+            }
+            IconButton(
+                onClick = onDownVoteClicked
+            ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_baseline_arrow_downward_24),
                     contentDescription = "Down vote",
                     tint = MaterialTheme.colors.secondary
                 )
             }
-            IconButton(onClick = onSaveClicked) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_baseline_star_24),
-                    contentDescription = "Save"
-                )
-            }
         }
-
         Surface(
             elevation = 8.dp,
             shape = CircleShape,
             modifier = Modifier
                 .size(64.dp)
         ) {
-            IconButton(onClick = { onUpVoteClicked() }) {
+            IconButton(onClick = onUpVoteClicked) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_baseline_arrow_upward_24),
                     contentDescription = "Up vote", tint = MaterialTheme.colors.primary
@@ -160,7 +165,7 @@ fun VoteSaveBlock(
 @Composable
 fun PostDetailsLightPreview() {
     VermilionTheme {
-        androidx.compose.material.Surface {
+        Surface {
             PostDetails(post = DUMMY_TEXT_POST, Modifier.fillMaxWidth())
         }
     }
@@ -170,7 +175,7 @@ fun PostDetailsLightPreview() {
 @Composable
 fun PostDetailsDarkPreview() {
     VermilionTheme(darkTheme = true) {
-        androidx.compose.material.Surface {
+        Surface {
             PostDetails(post = DUMMY_TEXT_POST, Modifier.fillMaxWidth())
         }
     }

@@ -17,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -134,7 +133,7 @@ fun PostContent(
                 // Do nothing, we draw the text post summary after the header
             }
         }
-        Column(Modifier.padding(16.dp)) {
+        Column(Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp)) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
@@ -170,45 +169,21 @@ fun PostContent(
                     onSummaryClicked(post)
                 }
             }
-            Row(
-                horizontalArrangement = Arrangement.End,
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                Text(
-                    text = if (post.community is NamedCommunity) {
-                        post.community.name.value
-                    } else {
-                        ""
-                    },
-                    style = MaterialTheme.typography.caption,
-                    modifier = Modifier.clickable { onCommunityClicked(post.community) }
-                )
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                val commentString = when (val count = post.commentCount.value) {
-                    0 -> stringResource(id = R.string.post_card_comment_count_0)
-                    1 -> stringResource(id = R.string.post_card_comment_count_1)
-                    else -> stringResource(id = R.string.post_card_comment_count_many, count)
-                }
-                Text(
-                    text = commentString,
-                    style = MaterialTheme.typography.caption
-                )
-                Text(text = post.score.value.toString(), style = MaterialTheme.typography.caption)
-            }
+
+            PostDetails(
+                post = post,
+                modifier = Modifier.fillMaxWidth(),
+                onCommunityClicked = onCommunityClicked,
+                onUpVoteClicked = {},
+                onDownVoteClicked = {},
+                onSaveClicked = {}
+            )
         }
     }
 }
 
 @Composable
 fun Thumbnail(thumbnail: Thumbnail, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    // Log.d("Thumbnail", "thumbnsil")
     val painter = when (thumbnail) {
         is SelfThumbnail, is DefaultThumbnail, is NoThumbnail, is NsfwThumbnail, is SpoilerThumbnail -> painterResource(
             id = R.drawable.ic_baseline_image_72
