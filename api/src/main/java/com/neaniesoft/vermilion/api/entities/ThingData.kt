@@ -27,7 +27,11 @@ data class Link(
     @JsonProperty("over_18") val over18: Boolean?,
     @JsonProperty("all_awardings") val allAwardings: List<Awarding>,
     @JsonProperty("post_hint") val postHint: String?,
-    @JsonProperty("preview") val preview: Preview?
+    @JsonProperty("preview") val preview: Preview?,
+    @JsonProperty("link_flair_text") val linkFlairText: String?,
+    @JsonProperty("link_flair_text_color") val linkFlairTextColor: String,
+    @JsonProperty("link_flair_background_color") val linkFlairBackgroundColor: String?,
+    @JsonProperty("link_flair_type") val linkFlairType: String,
 ) : ThingData()
 
 data class CommentData(

@@ -10,14 +10,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Card
+import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -35,6 +36,10 @@ import com.neaniesoft.vermilion.posts.domain.entities.NamedCommunity
 import com.neaniesoft.vermilion.posts.domain.entities.NoThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.NsfwThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.Post
+import com.neaniesoft.vermilion.posts.domain.entities.PostFlair
+import com.neaniesoft.vermilion.posts.domain.entities.PostFlairBackgroundColor
+import com.neaniesoft.vermilion.posts.domain.entities.PostFlairText
+import com.neaniesoft.vermilion.posts.domain.entities.PostFlairTextColor
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.PostTitle
 import com.neaniesoft.vermilion.posts.domain.entities.PreviewSummary
@@ -49,6 +54,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.UriImage
 import com.neaniesoft.vermilion.posts.domain.entities.UriThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.VideoPostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.isNsfw
+import com.neaniesoft.vermilion.ui.theme.AlmostBlack
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import org.commonmark.node.Document
 import org.commonmark.parser.Parser
@@ -131,7 +137,7 @@ fun PostContent(
                 // Do nothing, we draw the text post summary after the header
             }
         }
-        Column(Modifier.padding(16.dp)) {
+        Column(Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp)) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
@@ -162,50 +168,60 @@ fun PostContent(
                     ) { onMediaClicked(post) }
                 }
             }
+            if (post.flair is PostFlair.TextFlair) {
+                val flairBackgroundColor =
+                    if (post.flair.backgroundColor == PostFlairBackgroundColor(0)) {
+                        MaterialTheme.colors.surface
+                    } else {
+                        Color(post.flair.backgroundColor.value)
+                    }
+                val flairTextColor =
+                    if (post.flair.backgroundColor == PostFlairBackgroundColor(0)) {
+                        MaterialTheme.colors.onSurface
+                    } else {
+                        when (post.flair.textColor) {
+                            PostFlairTextColor.DARK -> AlmostBlack
+                            PostFlairTextColor.LIGHT -> Color.White
+                        }
+                    }
+                Surface(
+                    color = flairBackgroundColor,
+                    contentColor = flairTextColor,
+                    shape = MaterialTheme.shapes.small,
+                    elevation = 2.dp,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                ) {
+                    Text(
+                        text = post.flair.text.value,
+                        modifier = Modifier.padding(4.dp),
+                        style = MaterialTheme.typography.caption
+                    )
+                }
+            }
             if (summary is TextPostSummary) {
                 TextSummary(content = summary.previewTextMarkdown, shouldTruncate) {
                     onSummaryClicked(post)
                 }
             }
-            Row(
-                horizontalArrangement = Arrangement.End,
+
+            Divider(modifier = Modifier.padding(top = 8.dp, bottom = 8.dp))
+
+            PostDetails(
+                post = post,
                 modifier = Modifier
                     .fillMaxWidth()
-            ) {
-                Text(
-                    text = if (post.community is NamedCommunity) {
-                        post.community.name.value
-                    } else {
-                        ""
-                    },
-                    style = MaterialTheme.typography.caption,
-                    modifier = Modifier.clickable { onCommunityClicked(post.community) }
-                )
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                val commentString = when (val count = post.commentCount.value) {
-                    0 -> stringResource(id = R.string.post_card_comment_count_0)
-                    1 -> stringResource(id = R.string.post_card_comment_count_1)
-                    else -> stringResource(id = R.string.post_card_comment_count_many, count)
-                }
-                Text(
-                    text = commentString,
-                    style = MaterialTheme.typography.caption
-                )
-                Text(text = post.score.value.toString(), style = MaterialTheme.typography.caption)
-            }
+                    .padding(bottom = 8.dp),
+                onCommunityClicked = onCommunityClicked,
+                onUpVoteClicked = {},
+                onDownVoteClicked = {},
+                onSaveClicked = {}
+            )
         }
     }
 }
 
 @Composable
 fun Thumbnail(thumbnail: Thumbnail, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    // Log.d("Thumbnail", "thumbnsil")
     val painter = when (thumbnail) {
         is SelfThumbnail, is DefaultThumbnail, is NoThumbnail, is NsfwThumbnail, is SpoilerThumbnail -> painterResource(
             id = R.drawable.ic_baseline_image_72
@@ -338,7 +354,12 @@ internal val DUMMY_TEXT_POST = Post(
     CommentCount(123),
     Score(1024),
     flags = emptySet(),
-    "http://reddit.com/".toUri()
+    "http://reddit.com/".toUri(),
+    PostFlair.TextFlair(
+        PostFlairText("Some flair"),
+        PostFlairBackgroundColor(0),
+        PostFlairTextColor.DARK
+    )
 )
 
 internal val DUMMY_LINK_POST = Post(
@@ -356,5 +377,10 @@ internal val DUMMY_LINK_POST = Post(
     CommentCount(123),
     Score(1024),
     flags = emptySet(),
-    "http://reddit.com/".toUri()
+    "http://reddit.com/".toUri(),
+    PostFlair.TextFlair(
+        PostFlairText("Some flair"),
+        PostFlairBackgroundColor(0),
+        PostFlairTextColor.DARK
+    )
 )
