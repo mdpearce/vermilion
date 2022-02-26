@@ -1,15 +1,5 @@
 @file:Suppress("UnstableApiUsage")
 
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
-
-rootProject.name = "Vermilion"
-
 include(":app")
 include(":posts")
 include(":ui")
@@ -21,3 +11,14 @@ include(":postdetails")
 include(":db")
 include(":dbentities")
 include(":tabs")
+include(":communitylist")
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.name = "Vermilion"
