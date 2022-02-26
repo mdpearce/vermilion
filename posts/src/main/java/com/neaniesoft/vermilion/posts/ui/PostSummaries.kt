@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -49,10 +50,12 @@ fun ImageSummary(image: UriImage, shouldTruncate: Boolean, isNsfw: Boolean, onCl
     }
 
     BoxWithConstraints(Modifier.fillMaxWidth()) {
-        val ratio = if (shouldTruncate) {
-            kotlin.math.max((image.width.toFloat() / image.height.toFloat()), MIN_RATIO)
-        } else {
-            image.width.toFloat() / image.height.toFloat()
+        val ratio = remember {
+            if (shouldTruncate) {
+                kotlin.math.max((image.width.toFloat() / image.height.toFloat()), MIN_RATIO)
+            } else {
+                image.width.toFloat() / image.height.toFloat()
+            }
         }
         Image(
             modifier = Modifier
