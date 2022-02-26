@@ -34,10 +34,7 @@ fun PostDetailsScreen(
     val comments by viewModel.comments.collectAsState()
     val columnState = rememberLazyListState()
     val initialScrollPosition = viewModel.restoredScrollPosition.collectAsState(
-        initial = ScrollPosition(
-            0,
-            0
-        )
+        initial = null
     )
     val isScrolling by remember {
         derivedStateOf { columnState.isScrollInProgress }
@@ -60,10 +57,11 @@ fun PostDetailsScreen(
 
     // Only launch this effect if we have items
     LaunchedEffect(key1 = comments.count() > 0) {
-        if (columnState.layoutInfo.totalItemsCount > 1) {
+        val scrollToPosition = initialScrollPosition.value
+        if (comments.count() > 0 && scrollToPosition != null) {
             columnState.scrollToItem(
-                initialScrollPosition.value.index,
-                initialScrollPosition.value.offset
+                scrollToPosition.index,
+                scrollToPosition.offset
             )
         }
     }

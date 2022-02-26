@@ -70,10 +70,10 @@ class TabSupervisor @Inject constructor(
         )
     }
 
-    suspend fun scrollPositionForTab(parentId: ParentId, tabType: TabType): ScrollPosition {
-        return repository.findTab(parentId, tabType)?.scrollPosition ?: ScrollPosition(
-            0,
-            0
-        ).also { logger.warnIfEnabled { "Tab not found, defaulting to scroll position 0, 0" } }
+    suspend fun scrollPositionForTab(parentId: ParentId, tabType: TabType): ScrollPosition? {
+        return repository.findTab(
+            parentId,
+            tabType
+        )?.scrollPosition.also { logger.warnIfEnabled { "Tab not found, defaulting to null scroll position" } }
     }
 }

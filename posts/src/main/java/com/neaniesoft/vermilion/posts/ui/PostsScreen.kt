@@ -1,6 +1,7 @@
 package com.neaniesoft.vermilion.posts.ui
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -53,10 +54,7 @@ fun PostsScreen(
     val pagingItems = viewModel.pagingData(community.routeName).collectAsLazyPagingItems()
     val listState = rememberLazyListState()
     val initialScrollPosition = viewModel.restoredScrollPosition.collectAsState(
-        initial = ScrollPosition(
-            0,
-            0
-        )
+        initial = null
     )
 
     val isScrolling = remember {
@@ -77,10 +75,12 @@ fun PostsScreen(
 
     // Only launch this effect if we have items
     LaunchedEffect(key1 = pagingItems.itemCount > 0) {
-        if (pagingItems.itemCount > 0) {
+        val scrollToPosition = initialScrollPosition.value
+        if (pagingItems.itemCount > 0 && scrollToPosition != null) {
+            Log.d("PostsScreen", "Scrolling to $scrollToPosition")
             listState.scrollToItem(
-                initialScrollPosition.value.index,
-                initialScrollPosition.value.offset
+                scrollToPosition.index,
+                scrollToPosition.offset
             )
         }
     }

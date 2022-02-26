@@ -61,17 +61,14 @@ class RoomBackedTabRepository @Inject constructor(
         type: TabType,
         scrollPosition: ScrollPosition
     ) {
-        if (scrollPosition.index != 0 && scrollPosition.offset != 0) {
-            // logger.debugIfEnabled { "Updating scroll state for parent: ${parentId.value}, type: $type to: $scrollPosition" }
-            database.withTransaction {
-                tabStateDao.updateTabWithScrollState(
-                    parentId.value,
-                    type.name,
-                    scrollPosition.index,
-                    scrollPosition.offset
-                )
-                tabStateDao.findByParentAndType(parentId.value, TabType.POST_DETAILS.name)
-            }
+        database.withTransaction {
+            tabStateDao.updateTabWithScrollState(
+                parentId.value,
+                type.name,
+                scrollPosition.index,
+                scrollPosition.offset
+            )
+            tabStateDao.findByParentAndType(parentId.value, TabType.POST_DETAILS.name)
         }
     }
 
