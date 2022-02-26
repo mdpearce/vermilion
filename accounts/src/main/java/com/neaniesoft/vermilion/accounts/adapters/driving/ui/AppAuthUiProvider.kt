@@ -21,7 +21,7 @@ class AppAuthUiProvider @Inject constructor(
         private val REDIRECT_URL = "com.neaniesoft.vermilion://oauth2redirect".toUri()
         private const val RESPONSE_TYPE = "code"
         private const val DURATION = "permanent"
-        private const val SCOPE = "read identity"
+        private const val SCOPE = "read identity mysubreddits"
     }
 
     override fun getAuthIntent(): Intent {
