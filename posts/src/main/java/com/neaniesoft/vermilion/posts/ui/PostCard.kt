@@ -14,7 +14,6 @@ import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,6 +39,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlair
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlairBackgroundColor
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlairText
+import com.neaniesoft.vermilion.posts.domain.entities.PostFlairTextColor
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.PostTitle
 import com.neaniesoft.vermilion.posts.domain.entities.PreviewSummary
@@ -54,6 +54,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.UriImage
 import com.neaniesoft.vermilion.posts.domain.entities.UriThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.VideoPostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.isNsfw
+import com.neaniesoft.vermilion.ui.theme.AlmostBlack
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import org.commonmark.node.Document
 import org.commonmark.parser.Parser
@@ -174,14 +175,27 @@ fun PostContent(
                     } else {
                         Color(post.flair.backgroundColor.value)
                     }
+                val flairTextColor =
+                    if (post.flair.backgroundColor == PostFlairBackgroundColor(0)) {
+                        MaterialTheme.colors.onSurface
+                    } else {
+                        when (post.flair.textColor) {
+                            PostFlairTextColor.DARK -> AlmostBlack
+                            PostFlairTextColor.LIGHT -> Color.White
+                        }
+                    }
                 Surface(
                     color = flairBackgroundColor,
-                    contentColor = (flairBackgroundColor),
+                    contentColor = flairTextColor,
                     shape = MaterialTheme.shapes.small,
                     elevation = 2.dp,
                     modifier = Modifier.padding(bottom = 4.dp)
                 ) {
-                    Text(text = post.flair.text.value, modifier = Modifier.padding(8.dp), style = MaterialTheme.typography.caption)
+                    Text(
+                        text = post.flair.text.value,
+                        modifier = Modifier.padding(4.dp),
+                        style = MaterialTheme.typography.caption
+                    )
                 }
             }
             if (summary is TextPostSummary) {
@@ -341,7 +355,11 @@ internal val DUMMY_TEXT_POST = Post(
     Score(1024),
     flags = emptySet(),
     "http://reddit.com/".toUri(),
-    PostFlair.TextFlair(PostFlairText("Some flair"), PostFlairBackgroundColor(0))
+    PostFlair.TextFlair(
+        PostFlairText("Some flair"),
+        PostFlairBackgroundColor(0),
+        PostFlairTextColor.DARK
+    )
 )
 
 internal val DUMMY_LINK_POST = Post(
@@ -360,5 +378,9 @@ internal val DUMMY_LINK_POST = Post(
     Score(1024),
     flags = emptySet(),
     "http://reddit.com/".toUri(),
-    PostFlair.TextFlair(PostFlairText("Some flair"), PostFlairBackgroundColor(0))
+    PostFlair.TextFlair(
+        PostFlairText("Some flair"),
+        PostFlairBackgroundColor(0),
+        PostFlairTextColor.DARK
+    )
 )
