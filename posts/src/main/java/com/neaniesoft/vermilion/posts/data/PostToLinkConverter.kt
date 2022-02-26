@@ -6,18 +6,19 @@ import androidx.core.net.toUri
 import com.neaniesoft.vermilion.api.entities.Awarding
 import com.neaniesoft.vermilion.api.entities.Link
 import com.neaniesoft.vermilion.api.entities.Preview
+import com.neaniesoft.vermilion.coreentities.CommunityId
+import com.neaniesoft.vermilion.coreentities.CommunityName
+import com.neaniesoft.vermilion.coreentities.NamedCommunity
 import com.neaniesoft.vermilion.posts.domain.choosePreviewImage
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.Award
 import com.neaniesoft.vermilion.posts.domain.entities.AwardCount
 import com.neaniesoft.vermilion.posts.domain.entities.AwardName
 import com.neaniesoft.vermilion.posts.domain.entities.CommentCount
-import com.neaniesoft.vermilion.posts.domain.entities.CommunityName
 import com.neaniesoft.vermilion.posts.domain.entities.DefaultThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.ImagePostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.LinkHost
 import com.neaniesoft.vermilion.posts.domain.entities.LinkPostSummary
-import com.neaniesoft.vermilion.posts.domain.entities.NamedCommunity
 import com.neaniesoft.vermilion.posts.domain.entities.NsfwThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlags
@@ -51,7 +52,7 @@ fun Link.toPost(markdownParser: Parser): Post {
         PostId(id),
         PostTitle(StringEscapeUtils.unescapeHtml4(title)),
         postSummary(markdownParser),
-        NamedCommunity(CommunityName(subreddit)),
+        NamedCommunity(CommunityName(subreddit), CommunityId(subredditId)),
         AuthorName(author),
         Instant.ofEpochMilli((created * 1000.0).roundToLong()),
         allAwardings.toAwardsMap(),
@@ -151,8 +152,8 @@ internal fun List<Awarding>.toAwardsMap(): Map<Award, AwardCount> =
     associateBy(keySelector = { awarding ->
         Award(AwardName(awarding.name), URL(awarding.iconUrl))
     }, valueTransform = { awarding ->
-            AwardCount(awarding.count)
-        })
+        AwardCount(awarding.count)
+    })
 
 internal fun Link.flags(): Set<PostFlags> {
     return mutableSetOf<PostFlags>().apply {

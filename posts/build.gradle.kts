@@ -22,6 +22,7 @@ dependencies {
     implementation(project(":dbentities"))
     implementation(project(":db"))
     implementation(project(":tabs"))
+    implementation(project(":coreentities"))
     debugImplementation(Deps.COMPOSE_UI_TOOLING)
 
     implementation(Deps.ROOM_RUNTIME)

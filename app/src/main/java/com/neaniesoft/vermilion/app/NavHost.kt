@@ -13,10 +13,10 @@ import com.google.accompanist.navigation.material.bottomSheet
 import com.neaniesoft.vermilion.accounts.adapters.driving.ui.UserAccountScreen
 import com.neaniesoft.vermilion.app.customtabs.customTab
 import com.neaniesoft.vermilion.app.customtabs.customTabRoute
+import com.neaniesoft.vermilion.coreentities.CommunityId
+import com.neaniesoft.vermilion.coreentities.CommunityName
+import com.neaniesoft.vermilion.coreentities.NamedCommunity
 import com.neaniesoft.vermilion.postdetails.ui.PostDetailsScreen
-import com.neaniesoft.vermilion.posts.domain.entities.CommunityName
-import com.neaniesoft.vermilion.posts.domain.entities.FrontPage
-import com.neaniesoft.vermilion.posts.domain.entities.NamedCommunity
 import com.neaniesoft.vermilion.posts.ui.PostsScreen
 
 @ExperimentalMaterialNavigationApi
@@ -33,7 +33,7 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
             VermilionScreen.Home.name
         ) {
             PostsScreen(
-                community = FrontPage,
+                community = com.neaniesoft.vermilion.coreentities.FrontPage,
                 onOpenPostDetails = { postId ->
                     navController.navigate("${VermilionScreen.PostDetails}/${postId.value}")
                 },
@@ -57,7 +57,9 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
         ) {
             val name = it.arguments?.getString("communityName")
                 ?: throw IllegalStateException("Cannot navigate to posts without a community name")
-            val community = NamedCommunity(CommunityName(name))
+            val community = NamedCommunity(
+                CommunityName(name), CommunityId("")
+            )
             PostsScreen(
                 community = community,
                 onOpenPostDetails = { postId ->

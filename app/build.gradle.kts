@@ -150,6 +150,7 @@ dependencies {
     implementation(project(":utils"))
     implementation(project(":tabs"))
     implementation(project(":communitylist"))
+    implementation(project(":coreentities"))
     testImplementation(Deps.JUNIT)
     androidTestImplementation(Deps.ANDROIDX_TEST_EXT)
     androidTestImplementation(Deps.ANDROIDX_TEST_ESPRESSO)

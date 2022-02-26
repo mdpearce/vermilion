@@ -12,6 +12,7 @@ include(":db")
 include(":dbentities")
 include(":tabs")
 include(":communitylist")
+include(":coreentities")
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)

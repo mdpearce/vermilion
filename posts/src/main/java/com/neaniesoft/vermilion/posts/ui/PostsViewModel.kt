@@ -14,7 +14,7 @@ import com.neaniesoft.vermilion.dbentities.posts.PostDao
 import com.neaniesoft.vermilion.dbentities.posts.PostRemoteKeyDao
 import com.neaniesoft.vermilion.posts.data.PostRepository
 import com.neaniesoft.vermilion.posts.data.toPost
-import com.neaniesoft.vermilion.posts.domain.entities.CommunityName
+import com.neaniesoft.vermilion.coreentities.CommunityName
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.tabs.domain.TabSupervisor
 import com.neaniesoft.vermilion.tabs.domain.entities.ParentId

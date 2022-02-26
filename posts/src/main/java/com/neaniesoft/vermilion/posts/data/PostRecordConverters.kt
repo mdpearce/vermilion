@@ -1,17 +1,18 @@
 package com.neaniesoft.vermilion.posts.data
 
 import androidx.core.net.toUri
+import com.neaniesoft.vermilion.coreentities.CommunityId
+import com.neaniesoft.vermilion.coreentities.CommunityName
+import com.neaniesoft.vermilion.coreentities.FrontPage
+import com.neaniesoft.vermilion.coreentities.NamedCommunity
 import com.neaniesoft.vermilion.dbentities.posts.PostRecord
 import com.neaniesoft.vermilion.dbentities.posts.PostType
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.CommentCount
-import com.neaniesoft.vermilion.posts.domain.entities.CommunityName
 import com.neaniesoft.vermilion.posts.domain.entities.DefaultThumbnail
-import com.neaniesoft.vermilion.posts.domain.entities.FrontPage
 import com.neaniesoft.vermilion.posts.domain.entities.ImagePostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.LinkHost
 import com.neaniesoft.vermilion.posts.domain.entities.LinkPostSummary
-import com.neaniesoft.vermilion.posts.domain.entities.NamedCommunity
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlags
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlair
@@ -82,7 +83,7 @@ fun PostRecord.toPost(markdownParser: Parser): Post {
         community = if (communityName == FrontPage.routeName) {
             FrontPage
         } else {
-            NamedCommunity(CommunityName(communityName))
+            NamedCommunity(CommunityName(communityName), CommunityId(communityId))
         },
         authorName = AuthorName(authorName),
         postedAt = Instant.ofEpochMilli(postedAt),
@@ -151,6 +152,7 @@ fun Post.toPostRecord(query: String, clock: Clock): PostRecord = PostRecord(
         else -> null
     },
     communityName = community.routeName,
+    communityId = (community as? NamedCommunity)?.id?.value ?: "",
     authorName = authorName.value,
     postedAt = postedAt.toEpochMilli(),
     commentCount = commentCount.value,

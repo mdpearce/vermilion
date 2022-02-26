@@ -23,16 +23,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import coil.compose.rememberImagePainter
+import com.neaniesoft.vermilion.coreentities.Community
+import com.neaniesoft.vermilion.coreentities.CommunityId
+import com.neaniesoft.vermilion.coreentities.CommunityName
+import com.neaniesoft.vermilion.coreentities.NamedCommunity
 import com.neaniesoft.vermilion.posts.R
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.CommentCount
-import com.neaniesoft.vermilion.posts.domain.entities.Community
-import com.neaniesoft.vermilion.posts.domain.entities.CommunityName
 import com.neaniesoft.vermilion.posts.domain.entities.DefaultThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.ImagePostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.LinkHost
 import com.neaniesoft.vermilion.posts.domain.entities.LinkPostSummary
-import com.neaniesoft.vermilion.posts.domain.entities.NamedCommunity
 import com.neaniesoft.vermilion.posts.domain.entities.NoThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.NsfwThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.Post
@@ -347,7 +348,7 @@ internal val DUMMY_TEXT_POST = Post(
         PreviewText(DUMMY_CONTENT),
         Parser.builder().build().parse(MIXED_MD) as Document
     ),
-    NamedCommunity(CommunityName("Subreddit")),
+    NamedCommunity(CommunityName("Subreddit"), CommunityId("")),
     AuthorName("/u/SomeDude"),
     postedAt = Instant.now(),
     awardCounts = emptyMap(),
@@ -370,7 +371,7 @@ internal val DUMMY_LINK_POST = Post(
         DefaultThumbnail,
         LinkHost("somehost")
     ),
-    NamedCommunity(CommunityName("Subreddit")),
+    NamedCommunity(CommunityName("Subreddit"), CommunityId("")),
     AuthorName("/u/SomeDude"),
     postedAt = Instant.now(),
     awardCounts = emptyMap(),
