@@ -89,8 +89,8 @@ fun PostsScreen(
         PostsList(listState = listState, posts = pagingItems, onMediaClicked = {
             onOpenUri(it.link.toString().toUri())
         }, onPostClicked = { post ->
-            onOpenPostDetails(post.id)
-        }, onCommunityClicked = onOpenCommunity)
+                onOpenPostDetails(post.id)
+            }, onCommunityClicked = onOpenCommunity)
     }
 }
 
