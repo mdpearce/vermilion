@@ -2,6 +2,7 @@ package com.neaniesoft.vermilion.communities.ui
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -47,13 +48,15 @@ fun CommunityList(
         }
 
         items(communities) { community ->
-            Text(
-                text = (community as NamedCommunity).name.value,
-                modifier = Modifier
-                    .padding(16.dp)
+            Box(
+                Modifier
                     .clickable { onCommunityClicked(community) }
-                    .fillMaxWidth()
-            )
+                    .fillMaxWidth()) {
+                Text(
+                    modifier = Modifier.padding(16.dp),
+                    text = (community as NamedCommunity).name.value
+                )
+            }
         }
 
     }
