@@ -9,11 +9,17 @@ import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.create
 import retrofit2.http.GET
+import retrofit2.http.Query
 import javax.inject.Named
 
 interface CommunitiesApiService {
     @GET("subreddits/mine/subscriber")
-    fun subscribedCommunities(): ListingResponse
+    suspend fun subscribedCommunities(
+        @Query("limit") limit: Int,
+        @Query("before") before: String?,
+        @Query("after") after: String?,
+        @Query("count") count: Int?
+    ): ListingResponse
 }
 
 @Module
