@@ -1,6 +1,7 @@
 package com.neaniesoft.vermilion.app
 
 import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -24,11 +25,13 @@ import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import com.neaniesoft.vermilion.accounts.domain.UserAccountService
 import com.neaniesoft.vermilion.app.customtabs.CustomTabNavigator
+import com.neaniesoft.vermilion.communities.ui.CommunityList
 import com.neaniesoft.vermilion.tabs.adapters.driving.ui.TabBottomBar
 import com.neaniesoft.vermilion.tabs.domain.entities.ActiveTab
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import java.time.Clock
 
+@ExperimentalFoundationApi
 @ExperimentalPagingApi
 @ExperimentalMaterialNavigationApi
 @Composable
@@ -90,6 +93,9 @@ fun VermilionApp(
             }
         })
 
+        val subscribedCommunities by
+        viewModel.subscribedCommunities.collectAsState(initial = emptyList())
+
         Scaffold(
             scaffoldState = scaffoldState,
             snackbarHost = { scaffoldState.snackbarHostState },
@@ -115,6 +121,11 @@ fun VermilionApp(
                         viewModel.onTabCloseClicked(it)
                     }
                 )
+            },
+            drawerContent = {
+                CommunityList(
+                    communities = subscribedCommunities,
+                    onCommunityClicked = { viewModel.onCommunityClicked(it) })
             }
         ) { innerPadding ->
             ModalBottomSheetLayout(bottomSheetNavigator) {

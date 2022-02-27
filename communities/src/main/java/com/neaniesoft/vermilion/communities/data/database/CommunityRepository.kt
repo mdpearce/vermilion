@@ -16,7 +16,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 interface CommunityRepository {
-    suspend fun subscribedCommunities(): Flow<List<Community>>
+    fun subscribedCommunities(): Flow<List<Community>>
 }
 
 @Singleton
@@ -25,16 +25,12 @@ class CommunityRepositoryImpl @Inject constructor(
     private val dao: CommunityDao,
     private val api: CommunitiesApiService
 ) : CommunityRepository {
-    override suspend fun subscribedCommunities(): Flow<List<Community>> {
+    override fun subscribedCommunities(): Flow<List<Community>> {
         return dao.observeAllSubscribedCommunities()
             .map { it.map { record -> record.toCommunity() } }
-            .also {
-                // TODO check if these are stale before doing an update every time
-                updateRecordsFromApi()
-            }
     }
 
-    private suspend fun updateRecordsFromApi() {
+    suspend fun updateRecordsFromApi() {
         val communities =
             getSubscribedCommunitiesFromApi(
                 null,
