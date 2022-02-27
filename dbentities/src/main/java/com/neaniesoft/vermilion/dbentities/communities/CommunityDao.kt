@@ -15,4 +15,7 @@ interface CommunityDao {
 
     @Insert
     suspend fun insertAll(communities: List<CommunityRecord>)
+
+    @Query("SELECT insertedAt FROM communities WHERE isSubscribed == 1 ORDER BY insertedAt DESC LIMIT 1")
+    suspend fun getLastInsertedTime(): Long?
 }
