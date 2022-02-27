@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 data class CommunityRecord(
     @PrimaryKey(autoGenerate = true)
     val id: Int,
+    val insertedAt: Long,
     val communityId: String,
     val name: String,
     val isSubscribed: Boolean

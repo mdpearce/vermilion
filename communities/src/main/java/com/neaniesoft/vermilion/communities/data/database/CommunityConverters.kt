@@ -6,6 +6,7 @@ import com.neaniesoft.vermilion.coreentities.CommunityId
 import com.neaniesoft.vermilion.coreentities.CommunityName
 import com.neaniesoft.vermilion.coreentities.NamedCommunity
 import com.neaniesoft.vermilion.dbentities.communities.CommunityRecord
+import java.time.Clock
 
 fun CommunityRecord.toCommunity(): Community {
     return NamedCommunity(
@@ -21,10 +22,11 @@ fun SubredditData.toCommunity(): Community {
     )
 }
 
-fun Community.toCommunityRecord(): CommunityRecord {
+fun Community.toCommunityRecord(clock: Clock): CommunityRecord {
     if (this is NamedCommunity) {
         return CommunityRecord(
             id = 0,
+            insertedAt = clock.millis(),
             communityId = id.value,
             name = name.value,
             isSubscribed = isSubscribed

@@ -12,6 +12,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.time.Clock
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -24,7 +25,8 @@ interface CommunityRepository {
 class CommunityRepositoryImpl @Inject constructor(
     private val database: VermilionDatabase,
     private val dao: CommunityDao,
-    private val api: CommunitiesApiService
+    private val api: CommunitiesApiService,
+    private val clock: Clock
 ) : CommunityRepository {
     override fun subscribedCommunities(): Flow<List<Community>> {
         return dao.observeAllSubscribedCommunities()
@@ -40,7 +42,7 @@ class CommunityRepositoryImpl @Inject constructor(
 
         database.withTransaction {
             dao.removeAllCommunities()
-            dao.insertAll(communities.map { it.toCommunityRecord() })
+            dao.insertAll(communities.map { it.toCommunityRecord(clock) })
         }
     }
 
