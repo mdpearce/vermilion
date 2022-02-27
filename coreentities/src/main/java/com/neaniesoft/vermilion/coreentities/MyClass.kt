@@ -1,4 +1,3 @@
 package com.neaniesoft.vermilion.coreentities
 
-class MyClass {
-}
+class MyClass

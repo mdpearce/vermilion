@@ -86,4 +86,3 @@ abstract class CommunityRepositoryModule {
     @Binds
     abstract fun bindCommunityRepositoryImpl(impl: CommunityRepositoryImpl): CommunityRepository
 }
-

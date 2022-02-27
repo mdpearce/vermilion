@@ -93,7 +93,6 @@ fun VermilionApp(
             }
         })
 
-
         LaunchedEffect(key1 = currentUser) {
             viewModel.onUserChanged(currentUser)
         }
@@ -130,7 +129,8 @@ fun VermilionApp(
             drawerContent = {
                 CommunityList(
                     communities = subscribedCommunities,
-                    onCommunityClicked = { viewModel.onCommunityClicked(it) })
+                    onCommunityClicked = { viewModel.onCommunityClicked(it) }
+                )
             }
         ) { innerPadding ->
             ModalBottomSheetLayout(bottomSheetNavigator) {

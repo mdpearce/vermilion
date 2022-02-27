@@ -51,14 +51,14 @@ fun CommunityList(
             Box(
                 Modifier
                     .clickable { onCommunityClicked(community) }
-                    .fillMaxWidth()) {
+                    .fillMaxWidth()
+            ) {
                 Text(
                     modifier = Modifier.padding(16.dp),
                     text = (community as NamedCommunity).name.value
                 )
             }
         }
-
     }
 }
 
