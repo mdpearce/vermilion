@@ -1,5 +1,6 @@
 package com.neaniesoft.vermilion.communities.data.database
 
+import com.neaniesoft.vermilion.communities.data.http.CommunitiesApiService
 import com.neaniesoft.vermilion.dbentities.communities.CommunityDao
 import dagger.Binds
 import dagger.Module
@@ -13,7 +14,8 @@ interface CommunityRepository {
 
 @Singleton
 class CommunityRepositoryImpl @Inject constructor(
-    private val dao: CommunityDao
+    private val dao: CommunityDao,
+    private val api: CommunitiesApiService
 ) : CommunityRepository
 
 @Module
