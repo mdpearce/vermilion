@@ -17,6 +17,7 @@ import javax.inject.Singleton
 
 interface CommunityRepository {
     fun subscribedCommunities(): Flow<List<Community>>
+    suspend fun updateSubscribedCommunities()
 }
 
 @Singleton
@@ -30,7 +31,7 @@ class CommunityRepositoryImpl @Inject constructor(
             .map { it.map { record -> record.toCommunity() } }
     }
 
-    suspend fun updateRecordsFromApi() {
+    override suspend fun updateSubscribedCommunities() {
         val communities =
             getSubscribedCommunitiesFromApi(
                 null,
@@ -51,13 +52,16 @@ class CommunityRepositoryImpl @Inject constructor(
             before = null,
             after = afterKey,
             count = currentCount,
-            limit = 25
+            limit = 50
         ).data
         val nextAfterKey = result.after
         val communities =
             result.children.mapNotNull { (it as? SubredditThing)?.data?.toCommunity() }
         return if (!nextAfterKey.isNullOrEmpty()) {
-            communities + getSubscribedCommunitiesFromApi(nextAfterKey, communities.size)
+            communities + getSubscribedCommunitiesFromApi(
+                nextAfterKey,
+                currentCount + communities.size
+            )
         } else {
             communities
         }

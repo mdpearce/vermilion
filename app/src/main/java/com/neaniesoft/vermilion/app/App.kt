@@ -93,6 +93,11 @@ fun VermilionApp(
             }
         })
 
+
+        LaunchedEffect(key1 = currentUser) {
+            viewModel.onUserChanged(currentUser)
+        }
+
         val subscribedCommunities by
         viewModel.subscribedCommunities.collectAsState(initial = emptyList())
 

@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavDestination
+import com.neaniesoft.vermilion.accounts.domain.entities.UserAccount
 import com.neaniesoft.vermilion.communities.data.database.CommunityRepository
 import com.neaniesoft.vermilion.coreentities.Community
 import com.neaniesoft.vermilion.tabs.domain.TabSupervisor
@@ -115,4 +116,12 @@ class VermilionAppViewModel @Inject constructor(
     }
 
     val subscribedCommunities: Flow<List<Community>> = communityRepository.subscribedCommunities()
+
+    fun onUserChanged(userAccount: UserAccount?) {
+        if (userAccount != null) {
+            viewModelScope.launch(Dispatchers.IO) {
+                communityRepository.updateSubscribedCommunities()
+            }
+        }
+    }
 }

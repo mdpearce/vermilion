@@ -1,12 +1,12 @@
 package com.neaniesoft.vermilion.communities.ui
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Button
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -30,13 +30,15 @@ fun CommunityList(
     onCommunityClicked: (Community) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(modifier) {
+    LazyColumn(modifier.fillMaxWidth()) {
         stickyHeader {
             Surface(elevation = 8.dp) {
                 Column {
                     Text(
                         text = stringResource(id = R.string.community_list_title),
-                        Modifier.padding(16.dp),
+                        Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(),
                         style = MaterialTheme.typography.subtitle2
                     )
                     Divider()
@@ -45,12 +47,13 @@ fun CommunityList(
         }
 
         items(communities) { community ->
-            Button(onClick = { onCommunityClicked(community) }) {
-                Text(
-                    text = (community as NamedCommunity).name.value,
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
+            Text(
+                text = (community as NamedCommunity).name.value,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .clickable { onCommunityClicked(community) }
+                    .fillMaxWidth()
+            )
         }
 
     }
