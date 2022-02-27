@@ -11,7 +11,7 @@ include(":postdetails")
 include(":db")
 include(":dbentities")
 include(":tabs")
-include(":communitylist")
+include(":communities")
 include(":coreentities")
 
 dependencyResolutionManagement {
