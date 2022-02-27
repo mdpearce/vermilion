@@ -1,4 +1,4 @@
-package com.neaniesoft.vermilion.communitylist
+package com.neaniesoft.vermilion.communities
 
 import org.junit.Test
 
