@@ -17,11 +17,14 @@ import com.neaniesoft.vermilion.coreentities.FrontPage
 import com.neaniesoft.vermilion.coreentities.NamedCommunity
 import com.neaniesoft.vermilion.db.VermilionDatabase
 import com.neaniesoft.vermilion.dbentities.posts.PostDao
+import com.neaniesoft.vermilion.dbentities.posts.PostHistoryDao
 import com.neaniesoft.vermilion.dbentities.posts.PostRecord
 import com.neaniesoft.vermilion.dbentities.posts.PostRemoteKey
 import com.neaniesoft.vermilion.dbentities.posts.PostRemoteKeyDao
 import com.neaniesoft.vermilion.posts.data.PostRepository
 import com.neaniesoft.vermilion.posts.data.toPostRecord
+import com.neaniesoft.vermilion.posts.domain.entities.PostFlags
+import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.errors.PostsPersistenceError
 import com.neaniesoft.vermilion.utils.logger
 import java.net.URI
@@ -34,6 +37,7 @@ class PostsRemoteMediator(
     private val postDao: PostDao,
     private val postRemoteKeyDao: PostRemoteKeyDao,
     private val postRepository: PostRepository,
+    private val postHistoryDao: PostHistoryDao,
     private val database: VermilionDatabase,
     private val clock: Clock
 ) : RemoteMediator<Int, PostRecord>() {
@@ -98,10 +102,21 @@ class PostsRemoteMediator(
                                 )
                             )
 
+                            val history =
+                                postHistoryDao.getAllRecordsByDate().map { PostId(it.postId) }
+                                    .toSet()
+
                             // Insert new posts into db, which invalidates current PagingData
                             postDao.insertAll(
                                 response.results.map {
-                                    it.toPostRecord(
+                                    // TODO This feels a bit gross putting this logic here
+                                    val post = if (history.contains(it.id)) {
+                                        it.copy(flags = it.flags + PostFlags.VIEWED)
+                                    } else {
+                                        it
+                                    }
+
+                                    post.toPostRecord(
                                         query,
                                         clock
                                     )

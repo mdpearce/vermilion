@@ -12,6 +12,7 @@ import androidx.paging.map
 import com.neaniesoft.vermilion.coreentities.CommunityName
 import com.neaniesoft.vermilion.db.VermilionDatabase
 import com.neaniesoft.vermilion.dbentities.posts.PostDao
+import com.neaniesoft.vermilion.dbentities.posts.PostHistoryDao
 import com.neaniesoft.vermilion.dbentities.posts.PostRemoteKeyDao
 import com.neaniesoft.vermilion.posts.data.PostRepository
 import com.neaniesoft.vermilion.posts.data.toPost
@@ -36,6 +37,7 @@ class PostsViewModel @Inject constructor(
     private val postRepository: PostRepository,
     private val postDao: PostDao,
     private val postRemoteKeyDao: PostRemoteKeyDao,
+    private val postHistoryDao: PostHistoryDao,
     private val database: VermilionDatabase,
     private val clock: Clock,
     private val markdownParser: Parser,
@@ -70,6 +72,7 @@ class PostsViewModel @Inject constructor(
                     postDao,
                     postRemoteKeyDao,
                     postRepository,
+                    postHistoryDao,
                     database,
                     clock
                 )
@@ -90,18 +93,4 @@ class PostsViewModel @Inject constructor(
             scrollPosition = scrollPosition
         )
     }
-
-    // private val scrollStateUpdates: MutableSharedFlow<ScrollPosition> = MutableSharedFlow()
-
-    // init {
-    //     viewModelScope.launch {
-    //         scrollStateUpdates.asSharedFlow().debounce(128).collect {
-    //             tabSupervisor.updateScrollState(
-    //                 parentId = ParentId(communityName.value),
-    //                 type = tabType,
-    //                 scrollPosition = it
-    //             )
-    //         }
-    //     }
-    // }
 }
