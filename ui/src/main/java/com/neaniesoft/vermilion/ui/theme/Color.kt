@@ -23,3 +23,18 @@ val LightYellow = Color(0xFFFFCB6B)
 val LightBlue = Color(0xFF82AAFF)
 val LightRed = Color(0xFFF78C6C)
 val LightRedVariant = Color(0xFFFF5370)
+
+// Comment depth indicators
+val DepthRed = Color(0xffcb2e00)
+val DepthBlue = Color(0xff005dff)
+val DepthOrange = Color(0xffb04f00)
+val DepthGreen = Color(0xff008000)
+val DepthPurple = Color(0xffa026e5)
+
+val DepthsArray = arrayOf(
+    DepthRed, DepthBlue, DepthOrange, DepthGreen, DepthPurple
+)
+
+fun colorForDepth(depth: Int): Color {
+    return DepthsArray[depth % DepthsArray.size]
+}
