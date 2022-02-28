@@ -7,7 +7,6 @@ import com.neaniesoft.vermilion.dbentities.posts.PostHistoryRecord
 import com.neaniesoft.vermilion.posts.data.PostHistoryRepository
 import com.neaniesoft.vermilion.posts.data.entities.PostHistoryEntry
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
-import java.time.Clock
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -15,8 +14,7 @@ import javax.inject.Singleton
 @Singleton
 class PostHistoryRoomRepository @Inject constructor(
     private val db: VermilionDatabase,
-    private val dao: PostHistoryDao,
-    private val clock: Clock
+    private val dao: PostHistoryDao
 ) : PostHistoryRepository {
     override suspend fun addHistoryEntry(entry: PostHistoryEntry) {
         db.withTransaction {
@@ -37,7 +35,7 @@ class PostHistoryRoomRepository @Inject constructor(
     }
 
     private fun PostHistoryEntry.toRecord(): PostHistoryRecord {
-        return PostHistoryRecord(0, postId.value, clock.millis())
+        return PostHistoryRecord(0, postId.value, viewedAt.toEpochMilli())
     }
 }
 
