@@ -16,8 +16,8 @@ import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,6 +36,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.ui.markdown.MarkdownDocument
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
+import com.neaniesoft.vermilion.ui.theme.colorForDepth
 import org.commonmark.node.Document
 import java.time.Instant
 
@@ -49,15 +50,7 @@ fun CommentRow(comment: Comment, modifier: Modifier = Modifier) {
             modifier.height(intrinsicSize = IntrinsicSize.Min)
         ) {
 
-            repeat(comment.depth.value) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .width(16.dp)
-                        .padding(start = 7.dp, end = 7.dp)
-                        .background(Color.Gray)
-                )
-            }
+            DepthIndicators(depth = comment.depth.value)
 
             Column(Modifier.padding(8.dp)) {
                 Row(Modifier.fillMaxWidth()) {
@@ -93,6 +86,24 @@ fun CommentRow(comment: Comment, modifier: Modifier = Modifier) {
 }
 
 @Composable
+fun DepthIndicators(
+    depth: Int
+) {
+    Row {
+        repeat(depth) { count ->
+            Box(modifier = Modifier.width(16.dp), contentAlignment = Alignment.Center) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(2.dp)
+                        .background(colorForDepth(count))
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun MoreCommentsStubRow(
     stub: CommentStub,
     modifier: Modifier = Modifier,
@@ -103,15 +114,7 @@ fun MoreCommentsStubRow(
             .height(intrinsicSize = IntrinsicSize.Min)
             .clickable { onClick(stub) }
     ) {
-        repeat(stub.depth.value) {
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .width(16.dp)
-                    .padding(start = 7.dp, end = 7.dp)
-                    .background(MaterialTheme.colors.onBackground)
-            )
-        }
+        DepthIndicators(depth = stub.depth.value)
         Text(
             text = stringResource(id = R.string.more_comments, stub.count.value),
             style = MaterialTheme.typography.caption,
