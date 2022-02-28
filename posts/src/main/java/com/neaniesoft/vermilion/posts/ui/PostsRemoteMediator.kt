@@ -11,6 +11,10 @@ import com.github.michaelbull.result.andThen
 import com.github.michaelbull.result.map
 import com.github.michaelbull.result.mapError
 import com.github.michaelbull.result.runCatching
+import com.neaniesoft.vermilion.coreentities.CommunityId
+import com.neaniesoft.vermilion.coreentities.CommunityName
+import com.neaniesoft.vermilion.coreentities.FrontPage
+import com.neaniesoft.vermilion.coreentities.NamedCommunity
 import com.neaniesoft.vermilion.db.VermilionDatabase
 import com.neaniesoft.vermilion.dbentities.posts.PostDao
 import com.neaniesoft.vermilion.dbentities.posts.PostRecord
@@ -18,9 +22,6 @@ import com.neaniesoft.vermilion.dbentities.posts.PostRemoteKey
 import com.neaniesoft.vermilion.dbentities.posts.PostRemoteKeyDao
 import com.neaniesoft.vermilion.posts.data.PostRepository
 import com.neaniesoft.vermilion.posts.data.toPostRecord
-import com.neaniesoft.vermilion.posts.domain.entities.CommunityName
-import com.neaniesoft.vermilion.posts.domain.entities.FrontPage
-import com.neaniesoft.vermilion.posts.domain.entities.NamedCommunity
 import com.neaniesoft.vermilion.posts.domain.errors.PostsPersistenceError
 import com.neaniesoft.vermilion.utils.logger
 import java.net.URI
@@ -43,7 +44,7 @@ class PostsRemoteMediator(
         if (it == FrontPage::class.simpleName) {
             FrontPage
         } else {
-            NamedCommunity(CommunityName(it))
+            NamedCommunity(CommunityName(it), CommunityId(""))
         }
     }
 

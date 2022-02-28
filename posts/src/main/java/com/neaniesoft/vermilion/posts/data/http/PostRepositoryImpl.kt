@@ -5,13 +5,13 @@ import com.github.michaelbull.result.map
 import com.github.michaelbull.result.mapError
 import com.github.michaelbull.result.runCatching
 import com.neaniesoft.vermilion.api.entities.LinkThing
+import com.neaniesoft.vermilion.coreentities.Community
+import com.neaniesoft.vermilion.coreentities.FrontPage
+import com.neaniesoft.vermilion.coreentities.NamedCommunity
 import com.neaniesoft.vermilion.posts.data.PostRepository
 import com.neaniesoft.vermilion.posts.data.toPost
 import com.neaniesoft.vermilion.posts.domain.entities.AfterKey
 import com.neaniesoft.vermilion.posts.domain.entities.BeforeKey
-import com.neaniesoft.vermilion.posts.domain.entities.Community
-import com.neaniesoft.vermilion.posts.domain.entities.FrontPage
-import com.neaniesoft.vermilion.posts.domain.entities.NamedCommunity
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.ResultSet
 import com.neaniesoft.vermilion.posts.domain.errors.PostError

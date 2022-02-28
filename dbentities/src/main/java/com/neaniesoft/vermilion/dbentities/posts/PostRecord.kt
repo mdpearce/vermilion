@@ -19,6 +19,7 @@ data class PostRecord(
     val linkUri: String,
     val previewText: String?,
     val communityName: String,
+    val communityId: String,
     val authorName: String,
     val postedAt: Long,
     // val awards TODO implement caching of awards

@@ -25,9 +25,9 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.neaniesoft.vermilion.coreentities.Community
+import com.neaniesoft.vermilion.coreentities.NamedCommunity
 import com.neaniesoft.vermilion.posts.R
-import com.neaniesoft.vermilion.posts.domain.entities.Community
-import com.neaniesoft.vermilion.posts.domain.entities.NamedCommunity
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import org.ocpsoft.prettytime.PrettyTime

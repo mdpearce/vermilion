@@ -1,9 +1,11 @@
-package com.neaniesoft.vermilion.posts.domain.entities
+package com.neaniesoft.vermilion.coreentities
 
 sealed class Community(val routeName: String)
 
 data class NamedCommunity(
-    val name: CommunityName
+    val name: CommunityName,
+    val id: CommunityId,
+    val isSubscribed: Boolean = false
 ) : Community(name.value)
 
 object FrontPage : Community("FrontPage")

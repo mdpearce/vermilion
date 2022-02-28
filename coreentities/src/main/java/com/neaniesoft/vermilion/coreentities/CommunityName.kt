@@ -1,4 +1,4 @@
-package com.neaniesoft.vermilion.posts.domain.entities
+package com.neaniesoft.vermilion.coreentities
 
 @JvmInline
 value class CommunityName(val value: String)

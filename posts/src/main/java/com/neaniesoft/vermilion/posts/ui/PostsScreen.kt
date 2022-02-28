@@ -33,8 +33,8 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
+import com.neaniesoft.vermilion.coreentities.Community
 import com.neaniesoft.vermilion.posts.R
-import com.neaniesoft.vermilion.posts.domain.entities.Community
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition

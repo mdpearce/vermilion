@@ -4,6 +4,9 @@ import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavDestination
+import com.neaniesoft.vermilion.accounts.domain.entities.UserAccount
+import com.neaniesoft.vermilion.communities.data.database.CommunityRepository
+import com.neaniesoft.vermilion.coreentities.Community
 import com.neaniesoft.vermilion.tabs.domain.TabSupervisor
 import com.neaniesoft.vermilion.tabs.domain.entities.ActiveTab
 import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
@@ -11,6 +14,7 @@ import com.neaniesoft.vermilion.tabs.domain.entities.TabState
 import com.neaniesoft.vermilion.tabs.domain.entities.TabType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -21,7 +25,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class VermilionAppViewModel @Inject constructor(
-    private val tabSupervisor: TabSupervisor
+    private val tabSupervisor: TabSupervisor,
+    private val communityRepository: CommunityRepository
 ) : ViewModel() {
     val tabs = tabSupervisor.currentTabs
 
@@ -104,5 +109,19 @@ class VermilionAppViewModel @Inject constructor(
 
     fun onUserButtonClicked() {
         viewModelScope.launch { _routeEvents.emit(VermilionScreen.MyAccount.name) }
+    }
+
+    fun onCommunityClicked(community: Community) {
+        viewModelScope.launch { _routeEvents.emit("${VermilionScreen.Posts.name}/${community.routeName}") }
+    }
+
+    val subscribedCommunities: Flow<List<Community>> = communityRepository.subscribedCommunities()
+
+    fun onUserChanged(userAccount: UserAccount?) {
+        if (userAccount != null) {
+            viewModelScope.launch(Dispatchers.IO) {
+                communityRepository.updateSubscribedCommunities()
+            }
+        }
     }
 }

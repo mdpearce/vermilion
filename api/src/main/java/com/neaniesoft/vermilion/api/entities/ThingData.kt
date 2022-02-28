@@ -70,3 +70,10 @@ data class MoreCommentsData(
     @JsonProperty("depth") val depth: Int,
     @JsonProperty("children") val children: List<String>
 ) : ThingData()
+
+data class SubredditData(
+    @JsonProperty("id") val id: String,
+    @JsonProperty("display_name") val displayName: String,
+    @JsonProperty("title") val title: String,
+    @JsonProperty("user_is_subscriber") val userIsSubscriber: Boolean
+) : ThingData()

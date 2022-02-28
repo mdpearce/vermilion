@@ -3,6 +3,7 @@ package com.neaniesoft.vermilion.app
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.paging.ExperimentalPagingApi
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.neaniesoft.vermilion.accounts.domain.UserAccountService
@@ -10,6 +11,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import java.time.Clock
 import javax.inject.Inject
 
+@ExperimentalFoundationApi
 @ExperimentalPagingApi
 @ExperimentalMaterialNavigationApi
 @AndroidEntryPoint

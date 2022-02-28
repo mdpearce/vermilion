@@ -16,6 +16,11 @@ data class CommentThing(
     override val data: CommentData
 ) : Thing(data)
 
+@JsonTypeName("t5")
+data class SubredditThing(
+    override val data: SubredditData
+) : Thing(data)
+
 @JsonTypeName("more")
 data class MoreCommentsThing(
     override val data: MoreCommentsData
