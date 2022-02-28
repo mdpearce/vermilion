@@ -51,6 +51,7 @@ class CustomTabNavigator(
 
     companion object {
         const val KEY_URI = "uri"
+        private const val DEFAULT_PACKAGE = "com.android.chrome"
     }
 
     private var session: CustomTabsSession? = null
@@ -169,8 +170,9 @@ class CustomTabNavigator(
                 session = client.newSession(customTabsCallback)
             }
         }
-        // TODO See if we need to specify different packages when using a different browser that supports custom tabs
-        CustomTabsClient.bindCustomTabsService(context, "com.android.chrome", connection)
+
+        val packageName = CustomTabsClient.getPackageName(context, emptyList()) ?: DEFAULT_PACKAGE
+        CustomTabsClient.bindCustomTabsService(context, packageName, connection)
     }
 
     @NavDestination.ClassType(Activity::class)
