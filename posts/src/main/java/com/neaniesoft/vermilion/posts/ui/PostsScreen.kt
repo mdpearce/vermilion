@@ -33,6 +33,8 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.neaniesoft.vermilion.coreentities.Community
 import com.neaniesoft.vermilion.posts.R
 import com.neaniesoft.vermilion.posts.domain.entities.Post
@@ -109,45 +111,49 @@ fun PostsList(
     onMediaClicked: (Post) -> Unit,
     onCommunityClicked: (Community) -> Unit
 ) {
-    LazyColumn(state = listState, modifier = Modifier.padding(start = 8.dp, end = 8.dp)) {
-        items(posts) { post ->
-            Box(modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)) {
-                if (post != null) {
-                    PostCard(post = post, onPostClicked, onMediaClicked, onCommunityClicked)
-                } else {
-                    PostCardPlaceholder()
+    val isRefreshing = posts.loadState.refresh is LoadState.Loading
+    val refreshState = rememberSwipeRefreshState(isRefreshing = isRefreshing)
+    SwipeRefresh(state = refreshState, onRefresh = { posts.refresh() }) {
+        LazyColumn(state = listState, modifier = Modifier.padding(start = 8.dp, end = 8.dp)) {
+            items(posts) { post ->
+                Box(modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)) {
+                    if (post != null) {
+                        PostCard(post = post, onPostClicked, onMediaClicked, onCommunityClicked)
+                    } else {
+                        PostCardPlaceholder()
+                    }
                 }
             }
-        }
 
-        posts.apply {
-            val refresh = loadState.refresh
-            val append = loadState.append
-            when {
-                refresh is LoadState.Loading -> {
-                    item {
-                        LoadingScreen(Modifier.fillParentMaxSize())
-                    }
-                }
-                append is LoadState.Loading -> {
-                    item {
-                        LoadingItem()
-                    }
-                }
-                refresh is LoadState.Error -> {
-                    item {
-                        ErrorItem(
-                            modifier = Modifier.fillParentMaxSize(),
-                            message = stringResource(id = R.string.error_loading_posts_message)
-                        ) {
-                            retry()
+            posts.apply {
+                val refresh = loadState.refresh
+                val append = loadState.append
+                when {
+                    refresh is LoadState.Loading -> {
+                        item {
+                            LoadingScreen(Modifier.fillParentMaxSize())
                         }
                     }
-                }
-                append is LoadState.Error -> {
-                    item {
-                        ErrorItem(message = stringResource(id = R.string.error_loading_posts_message)) {
-                            retry()
+                    append is LoadState.Loading -> {
+                        item {
+                            LoadingItem()
+                        }
+                    }
+                    refresh is LoadState.Error -> {
+                        item {
+                            ErrorItem(
+                                modifier = Modifier.fillParentMaxSize(),
+                                message = stringResource(id = R.string.error_loading_posts_message)
+                            ) {
+                                retry()
+                            }
+                        }
+                    }
+                    append is LoadState.Error -> {
+                        item {
+                            ErrorItem(message = stringResource(id = R.string.error_loading_posts_message)) {
+                                retry()
+                            }
                         }
                     }
                 }
