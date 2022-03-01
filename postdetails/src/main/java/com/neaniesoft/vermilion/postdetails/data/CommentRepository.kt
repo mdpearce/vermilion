@@ -45,7 +45,8 @@ import javax.inject.Singleton
 
 interface CommentRepository {
     suspend fun getFlattenedCommentTreeForPost(
-        postId: PostId
+        postId: PostId,
+        forceRefresh: Boolean
     ): Flow<CommentRepositoryResponse>
 
     suspend fun fetchAndInsertMoreCommentsFor(stub: CommentStub): List<CommentKind>
@@ -73,7 +74,8 @@ class CommentRepositoryImpl @Inject constructor(
 
     private val logger by logger()
     override suspend fun getFlattenedCommentTreeForPost(
-        postId: PostId
+        postId: PostId,
+        forceRefresh: Boolean
     ): Flow<CommentRepositoryResponse> =
         flow {
             val lastInsertedAtTime = database.withTransaction {
@@ -83,7 +85,7 @@ class CommentRepositoryImpl @Inject constructor(
                 dao.commentCountForPost(postId.value)
             }
 
-            if (commentCount > 0 && (lastInsertedAtTime != null && lastInsertedAtTime >= clock.millis() - CACHE_VALID_DURATION.toMillis())) {
+            if (!forceRefresh && (commentCount > 0 && (lastInsertedAtTime != null && lastInsertedAtTime >= clock.millis() - CACHE_VALID_DURATION.toMillis()))) {
                 // Cache is valid, let's just return the database records
                 emit(
                     CommentRepositoryResponse.ListOfComments(
