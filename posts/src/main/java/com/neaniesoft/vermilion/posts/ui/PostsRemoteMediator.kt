@@ -100,10 +100,6 @@ class PostsRemoteMediator(
                                 )
                             )
 
-                            // val history =
-                            //     postHistoryDao.getAllRecordsByDate().map { PostId(it.postId) }
-                            //         .toSet()
-
                             // Insert new posts into db, which invalidates current PagingData
                             postDao.insertAll(
                                 response.results.map { post ->
@@ -131,16 +127,21 @@ class PostsRemoteMediator(
     }
 
     override suspend fun initialize(): InitializeAction {
-        val cacheTimeout = TimeUnit.MILLISECONDS.convert(5, TimeUnit.MINUTES)
-        logger.debugIfEnabled { "clock.millis(): ${clock.millis()}, cacheTimeout = $cacheTimeout" }
-        return if (clock.millis() - (postDao.lastUpdatedAt(query) ?: 0L) <= cacheTimeout) {
-            logger.debugIfEnabled { "Cache is up to date, skipping refresh" }
-            // Cache is up to date, skip refresh
-            InitializeAction.SKIP_INITIAL_REFRESH
+        if (postDao.postCount(query) > 0) {
+            logger.debugIfEnabled { "Switching to tab with existing data, skipping refresh" }
+            return InitializeAction.SKIP_INITIAL_REFRESH // We have an existing tab, lets not refresh and annoy the user
         } else {
-            logger.debugIfEnabled { "Cache is invalid, performing refresh" }
-            // Cache is invalid, perform a refresh
-            InitializeAction.LAUNCH_INITIAL_REFRESH
+            val cacheTimeout = TimeUnit.MILLISECONDS.convert(5, TimeUnit.MINUTES)
+            logger.debugIfEnabled { "clock.millis(): ${clock.millis()}, cacheTimeout = $cacheTimeout" }
+            return if (clock.millis() - (postDao.lastUpdatedAt(query) ?: 0L) <= cacheTimeout) {
+                logger.debugIfEnabled { "Cache is up to date, skipping refresh" }
+                // Cache is up to date, skip refresh
+                InitializeAction.SKIP_INITIAL_REFRESH
+            } else {
+                logger.debugIfEnabled { "Cache is invalid, performing refresh" }
+                // Cache is invalid, perform a refresh
+                InitializeAction.LAUNCH_INITIAL_REFRESH
+            }
         }
     }
 }

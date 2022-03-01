@@ -26,4 +26,7 @@ interface PostDao {
 
     @Query("DELETE FROM posts")
     suspend fun deleteAll()
+
+    @Query("SELECT count(id) FROM posts WHERE `query` == :query")
+    suspend fun postCount(query: String): Int
 }
