@@ -36,7 +36,8 @@ import java.util.UUID
 
 fun PostWithHistory.toPost(markdownParser: Parser): Post {
     return post.toPost(
-        markdownParser, additionalFlags = if (history.isNotEmpty()) {
+        markdownParser,
+        additionalFlags = if (history.isNotEmpty()) {
             setOf(PostFlags.VIEWED)
         } else {
             emptySet()

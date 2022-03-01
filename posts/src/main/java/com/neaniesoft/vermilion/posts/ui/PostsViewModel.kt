@@ -125,7 +125,7 @@ class PostsViewModel @Inject constructor(
                 val route = "Posts/${community.name.value}"
                 viewModelScope.launch { _routeEvents.emit(route) }
             }
-            else -> {// do nothing
+            else -> { // do nothing
             }
         }
     }
