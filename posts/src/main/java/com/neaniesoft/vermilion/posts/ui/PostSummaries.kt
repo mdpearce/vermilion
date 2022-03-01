@@ -25,10 +25,11 @@ import org.commonmark.node.Document
 fun TextSummary(
     content: Document,
     shouldTruncate: Boolean,
+    modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null
 ) {
 
-    Column((if (onClick != null) Modifier.clickable { onClick() } else Modifier)) {
+    Column((if (onClick != null) modifier.clickable { onClick() } else modifier)) {
         Divider(Modifier.padding(bottom = 8.dp, top = 8.dp))
         MarkdownDocument(
             document = content,
