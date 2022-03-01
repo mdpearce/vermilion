@@ -1,7 +1,9 @@
 package com.neaniesoft.vermilion.dbentities.posts
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.Relation
 
 @Entity(tableName = "posts")
 data class PostRecord(
@@ -37,3 +39,12 @@ enum class PostType {
     TEXT,
     VIDEO
 }
+
+data class PostWithHistory(
+    @Embedded val post: PostRecord,
+    @Relation(
+        parentColumn = "postId",
+        entityColumn = "postId"
+    )
+    val history: List<PostHistoryRecord>
+)

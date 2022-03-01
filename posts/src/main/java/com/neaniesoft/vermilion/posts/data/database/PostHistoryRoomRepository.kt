@@ -5,8 +5,12 @@ import com.neaniesoft.vermilion.db.VermilionDatabase
 import com.neaniesoft.vermilion.dbentities.posts.PostHistoryDao
 import com.neaniesoft.vermilion.dbentities.posts.PostHistoryRecord
 import com.neaniesoft.vermilion.posts.data.PostHistoryRepository
-import com.neaniesoft.vermilion.posts.data.entities.PostHistoryEntry
+import com.neaniesoft.vermilion.posts.domain.entities.PostHistoryEntry
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -39,4 +43,9 @@ class PostHistoryRoomRepository @Inject constructor(
     }
 }
 
-
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class PostHistoryRoomRepositoryModule {
+    @Binds
+    abstract fun providePostHistoryRepository(impl: PostHistoryRoomRepository): PostHistoryRepository
+}

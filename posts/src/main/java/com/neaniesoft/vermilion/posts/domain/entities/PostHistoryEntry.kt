@@ -1,4 +1,4 @@
-package com.neaniesoft.vermilion.posts.data.entities
+package com.neaniesoft.vermilion.posts.domain.entities
 
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import java.time.Instant

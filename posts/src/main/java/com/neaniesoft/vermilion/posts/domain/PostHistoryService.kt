@@ -1,7 +1,7 @@
 package com.neaniesoft.vermilion.posts.domain
 
 import com.neaniesoft.vermilion.posts.data.PostHistoryRepository
-import com.neaniesoft.vermilion.posts.data.entities.PostHistoryEntry
+import com.neaniesoft.vermilion.posts.domain.entities.PostHistoryEntry
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.utils.CoroutinesModule
 import kotlinx.coroutines.CoroutineDispatcher

@@ -21,12 +21,15 @@ import com.neaniesoft.vermilion.dbentities.posts.PostHistoryDao
 import com.neaniesoft.vermilion.dbentities.posts.PostRecord
 import com.neaniesoft.vermilion.dbentities.posts.PostRemoteKey
 import com.neaniesoft.vermilion.dbentities.posts.PostRemoteKeyDao
+import com.neaniesoft.vermilion.dbentities.posts.PostWithHistory
 import com.neaniesoft.vermilion.posts.data.PostRepository
 import com.neaniesoft.vermilion.posts.data.toPostRecord
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlags
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.errors.PostsPersistenceError
 import com.neaniesoft.vermilion.utils.logger
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.net.URI
 import java.time.Clock
 import java.util.concurrent.TimeUnit
@@ -37,10 +40,9 @@ class PostsRemoteMediator(
     private val postDao: PostDao,
     private val postRemoteKeyDao: PostRemoteKeyDao,
     private val postRepository: PostRepository,
-    private val postHistoryDao: PostHistoryDao,
     private val database: VermilionDatabase,
-    private val clock: Clock
-) : RemoteMediator<Int, PostRecord>() {
+    private val clock: Clock,
+) : RemoteMediator<Int, PostWithHistory>() {
 
     private val logger by logger()
 
@@ -54,7 +56,7 @@ class PostsRemoteMediator(
 
     override suspend fun load(
         loadType: LoadType,
-        state: PagingState<Int, PostRecord>
+        state: PagingState<Int, PostWithHistory>
     ): MediatorResult {
 
         val loadKey = when (loadType) {
@@ -79,7 +81,7 @@ class PostsRemoteMediator(
         }
         val previousCount = state.pages.fold(0) { acc, page -> acc + page.data.size }
 
-        val result =
+        val result = withContext(Dispatchers.IO) {
             postRepository.postsForCommunity(
                 community,
                 state.config.pageSize,
@@ -102,20 +104,13 @@ class PostsRemoteMediator(
                                 )
                             )
 
-                            val history =
-                                postHistoryDao.getAllRecordsByDate().map { PostId(it.postId) }
-                                    .toSet()
+                            // val history =
+                            //     postHistoryDao.getAllRecordsByDate().map { PostId(it.postId) }
+                            //         .toSet()
 
                             // Insert new posts into db, which invalidates current PagingData
                             postDao.insertAll(
-                                response.results.map {
-                                    // TODO This feels a bit gross putting this logic here
-                                    val post = if (history.contains(it.id)) {
-                                        it.copy(flags = it.flags + PostFlags.VIEWED)
-                                    } else {
-                                        it
-                                    }
-
+                                response.results.map { post ->
                                     post.toPostRecord(
                                         query,
                                         clock
@@ -130,6 +125,7 @@ class PostsRemoteMediator(
                 }.mapError {
                     MediatorResult.Error(it)
                 }
+        }
 
         return when (result) {
             is Ok<MediatorResult.Success> -> result.value

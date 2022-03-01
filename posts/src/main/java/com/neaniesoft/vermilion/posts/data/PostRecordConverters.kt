@@ -7,6 +7,7 @@ import com.neaniesoft.vermilion.coreentities.FrontPage
 import com.neaniesoft.vermilion.coreentities.NamedCommunity
 import com.neaniesoft.vermilion.dbentities.posts.PostRecord
 import com.neaniesoft.vermilion.dbentities.posts.PostType
+import com.neaniesoft.vermilion.dbentities.posts.PostWithHistory
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.CommentCount
 import com.neaniesoft.vermilion.posts.domain.entities.DefaultThumbnail
@@ -33,7 +34,17 @@ import java.time.Clock
 import java.time.Instant
 import java.util.UUID
 
-fun PostRecord.toPost(markdownParser: Parser): Post {
+fun PostWithHistory.toPost(markdownParser: Parser): Post {
+    return post.toPost(
+        markdownParser, additionalFlags = if (history.isNotEmpty()) {
+            setOf(PostFlags.VIEWED)
+        } else {
+            emptySet()
+        }
+    )
+}
+
+fun PostRecord.toPost(markdownParser: Parser, additionalFlags: Set<PostFlags> = emptySet()): Post {
     return Post(
         id = PostId(postId),
         title = PostTitle(title),
@@ -90,7 +101,8 @@ fun PostRecord.toPost(markdownParser: Parser): Post {
         awardCounts = emptyMap(), // TODO implement caching of awards
         commentCount = CommentCount(commentCount),
         score = Score(score),
-        flags = flags.split(",").filter { it.isNotEmpty() }.map { PostFlags.valueOf(it) }.toSet(),
+        flags = flags.split(",").filter { it.isNotEmpty() }.map { PostFlags.valueOf(it) }.toSet()
+            .plus(additionalFlags),
         link = linkUri.toUri(),
         flair = when (val text = flairText) {
             null -> {

@@ -4,14 +4,16 @@ import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Transaction
 
 @Dao
 interface PostDao {
     @Insert
     suspend fun insertAll(posts: List<PostRecord>)
 
+    @Transaction
     @Query("SELECT * FROM posts WHERE `query` == :query")
-    fun pagingSource(query: String): PagingSource<Int, PostRecord>
+    fun pagingSource(query: String): PagingSource<Int, PostWithHistory>
 
     @Query("DELETE FROM posts WHERE `query` == :query")
     suspend fun deleteByQuery(query: String)
