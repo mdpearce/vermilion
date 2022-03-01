@@ -50,6 +50,7 @@ interface CommentRepository {
 
     suspend fun fetchAndInsertMoreCommentsFor(stub: CommentStub): List<CommentKind>
     suspend fun cachedCommentsForPost(postId: PostId): Int
+    suspend fun deleteByPost(postId: PostId)
 }
 
 sealed class CommentRepositoryResponse {
@@ -185,6 +186,12 @@ class CommentRepositoryImpl @Inject constructor(
     override suspend fun cachedCommentsForPost(postId: PostId): Int {
         return database.withTransaction {
             dao.commentCountForPost(postId.value)
+        }
+    }
+
+    override suspend fun deleteByPost(postId: PostId) {
+        database.withTransaction {
+            dao.deleteAllForPost(postId.value)
         }
     }
 
