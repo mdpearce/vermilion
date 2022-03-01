@@ -112,8 +112,9 @@ class PostsViewModel @Inject constructor(
         }
     }
 
-    fun onOpenUri(uri: Uri) {
+    fun onOpenUri(post: Post, uri: Uri) {
         viewModelScope.launch {
+            postHistoryService.markPostAsRead(post.id)
             _routeEvents.emit(customTabRoute(uri))
         }
     }

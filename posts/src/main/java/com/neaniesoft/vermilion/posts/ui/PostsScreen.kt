@@ -91,7 +91,7 @@ fun PostsScreen(
             listState = listState,
             posts = pagingItems,
             onMediaClicked = { post ->
-                viewModel.onOpenUri(post.link.toString().toUri())
+                viewModel.onOpenUri(post, post.link.toString().toUri())
             },
             onPostClicked = { post ->
                 viewModel.onOpenPostDetails(post.id)
