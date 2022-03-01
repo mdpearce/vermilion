@@ -7,6 +7,9 @@ import androidx.navigation.NavDestination
 import com.neaniesoft.vermilion.accounts.domain.entities.UserAccount
 import com.neaniesoft.vermilion.communities.data.database.CommunityRepository
 import com.neaniesoft.vermilion.coreentities.Community
+import com.neaniesoft.vermilion.dbentities.posts.PostDao
+import com.neaniesoft.vermilion.postdetails.data.CommentRepository
+import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.tabs.domain.TabSupervisor
 import com.neaniesoft.vermilion.tabs.domain.entities.ActiveTab
 import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
@@ -26,7 +29,9 @@ import javax.inject.Inject
 @HiltViewModel
 class VermilionAppViewModel @Inject constructor(
     private val tabSupervisor: TabSupervisor,
-    private val communityRepository: CommunityRepository
+    private val communityRepository: CommunityRepository,
+    private val postDao: PostDao,
+    private val commentRepository: CommentRepository
 ) : ViewModel() {
     val tabs = tabSupervisor.currentTabs
 
@@ -97,8 +102,14 @@ class VermilionAppViewModel @Inject constructor(
     }
 
     fun onTabCloseClicked(tab: TabState) {
+        // TODO This should be encapsulated somewhere else. Probably the tab supervisor itself.
         viewModelScope.launch {
             tabSupervisor.removeTab(tab)
+            when (tab.type) {
+                TabType.POSTS -> postDao.deleteByQuery(tab.parentId.value)
+                TabType.POST_DETAILS -> commentRepository.deleteByPost(PostId(tab.parentId.value))
+                else -> {} // Not implemented
+            }
             _clearTabFromBackstackEvents.emit(tab)
         }
     }

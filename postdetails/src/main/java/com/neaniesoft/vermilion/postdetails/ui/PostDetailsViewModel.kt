@@ -43,6 +43,9 @@ class PostDetailsViewModel @Inject constructor(
     private val _comments: MutableStateFlow<List<CommentKind>> = MutableStateFlow(emptyList())
     val comments: StateFlow<List<CommentKind>> = _comments.asStateFlow()
 
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing = _isRefreshing.asStateFlow()
+
     private val postId = PostId(
         savedStateHandle.get<String>("id")
             ?: throw IllegalStateException("Could not obtain post ID from saved state")
@@ -56,7 +59,7 @@ class PostDetailsViewModel @Inject constructor(
 
     init {
         loadPostFromDb(postId)
-        loadComments(postId)
+        loadComments(false)
     }
 
     private fun loadPostFromDb(id: PostId) {
@@ -72,9 +75,10 @@ class PostDetailsViewModel @Inject constructor(
         }
     }
 
-    private fun loadComments(id: PostId) {
+    private fun loadComments(forceRefresh: Boolean) {
         viewModelScope.launch {
-            val comments = commentRepository.getFlattenedCommentTreeForPost(id)
+            _isRefreshing.emit(true)
+            val comments = commentRepository.getFlattenedCommentTreeForPost(postId, forceRefresh)
 
             comments.collect { response ->
                 when (response) {
@@ -82,6 +86,7 @@ class PostDetailsViewModel @Inject constructor(
                     is CommentRepositoryResponse.ListOfComments -> _comments.emit(response.comments)
                 }
             }
+            _isRefreshing.emit(false)
         }
     }
 
@@ -99,6 +104,10 @@ class PostDetailsViewModel @Inject constructor(
             TabType.POST_DETAILS,
             scrollPosition
         )
+    }
+
+    fun refresh() {
+        loadComments(true)
     }
 }
 

@@ -19,6 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentKind
 import com.neaniesoft.vermilion.posts.ui.PostContent
 import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
@@ -36,6 +38,8 @@ fun PostDetailsScreen(
     val initialScrollPosition = viewModel.restoredScrollPosition.collectAsState(
         initial = null
     )
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
+    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isRefreshing)
     val isScrolling by remember {
         derivedStateOf { columnState.isScrollInProgress }
     }
@@ -71,48 +75,50 @@ fun PostDetailsScreen(
         color = MaterialTheme.colors.surface,
         elevation = 0.dp
     ) {
-        LazyColumn(state = columnState) {
-            when (val currentPostDetailsState = postDetailsState) {
-                is PostDetails -> {
-                    item {
-                        Surface(modifier = Modifier.fillMaxWidth(), elevation = 4.dp) {
-                            PostContent(
-                                post = currentPostDetailsState.post,
-                                shouldTruncate = false,
-                                shouldHideNsfw = false,
-                                onMediaClicked = { onOpenUri(it.link.toString().toUri()) },
-                                onSummaryClicked = {},
-                                onCommunityClicked = {}
-                            )
+        SwipeRefresh(state = swipeRefreshState, onRefresh = { viewModel.refresh() }) {
+            LazyColumn(state = columnState) {
+                when (val currentPostDetailsState = postDetailsState) {
+                    is PostDetails -> {
+                        item {
+                            Surface(modifier = Modifier.fillMaxWidth(), elevation = 4.dp) {
+                                PostContent(
+                                    post = currentPostDetailsState.post,
+                                    shouldTruncate = false,
+                                    shouldHideNsfw = false,
+                                    onMediaClicked = { onOpenUri(it.link.toString().toUri()) },
+                                    onSummaryClicked = {},
+                                    onCommunityClicked = {}
+                                )
+                            }
                         }
                     }
+                    Empty -> item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                        )
+                    }
+                    Error -> item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                        )
+                    }
                 }
-                Empty -> item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
-                    )
-                }
-                Error -> item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
-                    )
-                }
-            }
 
-            items(comments) { item ->
-                when (item) {
-                    is CommentKind.Full -> CommentRow(
-                        comment = item.comment,
-                        Modifier.fillMaxWidth()
-                    )
-                    is CommentKind.Stub -> MoreCommentsStubRow(
-                        stub = item.stub,
-                        Modifier.fillMaxWidth()
-                    ) { viewModel.onMoreCommentsClicked(it) }
+                items(comments) { item ->
+                    when (item) {
+                        is CommentKind.Full -> CommentRow(
+                            comment = item.comment,
+                            Modifier.fillMaxWidth()
+                        )
+                        is CommentKind.Stub -> MoreCommentsStubRow(
+                            stub = item.stub,
+                            Modifier.fillMaxWidth()
+                        ) { viewModel.onMoreCommentsClicked(it) }
+                    }
                 }
             }
         }

@@ -15,6 +15,7 @@ dependencies {
     implementation(Deps.COMMONS_TEXT)
     implementation(Deps.PAGING_RUNTIME)
     implementation(Deps.PAGING_COMPOSE)
+    implementation(Deps.ACCOMPANIST_SWIPE_REFRESH)
     implementation(project(":ui"))
     implementation(project(":api"))
     implementation(project(":utils"))

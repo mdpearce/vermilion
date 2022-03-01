@@ -39,4 +39,7 @@ interface CommentDao {
 
     @Query("SELECT id FROM comments WHERE commentId == :commentId LIMIT 1")
     suspend fun getIdForComment(commentId: String): Int?
+
+    @Query("SELECT count(id) FROM comments WHERE postId == :postId")
+    suspend fun commentCountForPost(postId: String): Int
 }

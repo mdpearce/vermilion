@@ -18,6 +18,7 @@ dependencies {
     implementation(Deps.PAGING_COMPOSE)
     implementation(Deps.PRETTY_TIME)
     implementation(Deps.COMMONMARK)
+    implementation(Deps.ACCOMPANIST_SWIPE_REFRESH)
     implementation(project(":ui"))
     implementation(project(":api"))
     implementation(project(":utils"))

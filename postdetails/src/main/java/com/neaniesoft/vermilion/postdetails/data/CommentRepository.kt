@@ -44,8 +44,14 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 interface CommentRepository {
-    suspend fun getFlattenedCommentTreeForPost(postId: PostId): Flow<CommentRepositoryResponse>
+    suspend fun getFlattenedCommentTreeForPost(
+        postId: PostId,
+        forceRefresh: Boolean
+    ): Flow<CommentRepositoryResponse>
+
     suspend fun fetchAndInsertMoreCommentsFor(stub: CommentStub): List<CommentKind>
+    suspend fun cachedCommentsForPost(postId: PostId): Int
+    suspend fun deleteByPost(postId: PostId)
 }
 
 sealed class CommentRepositoryResponse {
@@ -63,17 +69,23 @@ class CommentRepositoryImpl @Inject constructor(
     private val markdownParser: Parser // TODO replace with a wrapper interface
 ) : CommentRepository {
     companion object {
-        private val CACHE_VALID_DURATION = Duration.ofMinutes(1)
+        private val CACHE_VALID_DURATION = Duration.ofMinutes(60)
     }
 
     private val logger by logger()
-    override suspend fun getFlattenedCommentTreeForPost(postId: PostId): Flow<CommentRepositoryResponse> =
+    override suspend fun getFlattenedCommentTreeForPost(
+        postId: PostId,
+        forceRefresh: Boolean
+    ): Flow<CommentRepositoryResponse> =
         flow {
             val lastInsertedAtTime = database.withTransaction {
                 dao.getLastInsertedAtForPost(postId.value)
             }
+            val commentCount = database.withTransaction {
+                dao.commentCountForPost(postId.value)
+            }
 
-            if (lastInsertedAtTime != null && lastInsertedAtTime >= clock.millis() - CACHE_VALID_DURATION.toMillis()) {
+            if (!forceRefresh && (commentCount > 0 && (lastInsertedAtTime != null && lastInsertedAtTime >= clock.millis() - CACHE_VALID_DURATION.toMillis()))) {
                 // Cache is valid, let's just return the database records
                 emit(
                     CommentRepositoryResponse.ListOfComments(
@@ -172,6 +184,18 @@ class CommentRepositoryImpl @Inject constructor(
                 dao.getAllForPost(stub.postId.value)
             }.map { it.toCommentKind() }
         }
+
+    override suspend fun cachedCommentsForPost(postId: PostId): Int {
+        return database.withTransaction {
+            dao.commentCountForPost(postId.value)
+        }
+    }
+
+    override suspend fun deleteByPost(postId: PostId) {
+        database.withTransaction {
+            dao.deleteAllForPost(postId.value)
+        }
+    }
 
     private fun CommentRecord.toCommentKind(): CommentKind {
         return if (flags == CommentFlags.MORE_COMMENTS_STUB.name) {
