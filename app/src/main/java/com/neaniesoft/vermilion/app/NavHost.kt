@@ -18,7 +18,9 @@ import com.neaniesoft.vermilion.coreentities.CommunityName
 import com.neaniesoft.vermilion.coreentities.NamedCommunity
 import com.neaniesoft.vermilion.postdetails.ui.PostDetailsScreen
 import com.neaniesoft.vermilion.posts.ui.PostsScreen
+import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
 @ExperimentalMaterialNavigationApi
 @ExperimentalPagingApi
 @Composable
@@ -34,15 +36,9 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
         ) {
             PostsScreen(
                 community = com.neaniesoft.vermilion.coreentities.FrontPage,
-                onOpenPostDetails = { postId ->
-                    navController.navigate("${VermilionScreen.PostDetails}/${postId.value}")
-                },
-                onOpenUri = { uri ->
-                    navController.navigate(customTabRoute(uri))
-                },
-                onOpenCommunity = { community ->
-                    if (community is NamedCommunity) {
-                        navController.navigate("${VermilionScreen.Posts}/${community.name.value}")
+                onRoute = { route ->
+                    if (route.isNotEmpty()) {
+                        navController.navigate(route)
                     }
                 }
             )
@@ -62,15 +58,9 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
             )
             PostsScreen(
                 community = community,
-                onOpenPostDetails = { postId ->
-                    navController.navigate("${VermilionScreen.PostDetails}/${postId.value}")
-                },
-                onOpenUri = { uri ->
-                    navController.navigate(customTabRoute(uri))
-                },
-                onOpenCommunity = { communityToOpen ->
-                    if (communityToOpen is NamedCommunity) {
-                        navController.navigate("${VermilionScreen.Posts}/${communityToOpen.name.value}")
+                onRoute = { route ->
+                    if (route.isNotEmpty()) {
+                        navController.navigate(route)
                     }
                 }
             )

@@ -15,7 +15,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -37,6 +39,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.LinkPostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.NoThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.NsfwThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.Post
+import com.neaniesoft.vermilion.posts.domain.entities.PostFlags
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlair
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlairBackgroundColor
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlairText
@@ -138,6 +141,15 @@ fun PostContent(
                 // Do nothing, we draw the text post summary after the header
             }
         }
+
+        val contentAlpha = remember {
+            if (post.flags.contains(PostFlags.VIEWED)) {
+                0.5f
+            } else {
+                1.0f
+            }
+        }
+
         Column(Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp)) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -151,6 +163,7 @@ fun PostContent(
                     modifier = Modifier
                         .padding(bottom = 8.dp, end = 8.dp)
                         .weight(0.1f)
+                        .alpha(contentAlpha)
                 )
                 val hasPreview = when (post.summary) {
                     is PreviewSummary -> post.summary.preview != null
@@ -200,7 +213,11 @@ fun PostContent(
                 }
             }
             if (summary is TextPostSummary) {
-                TextSummary(content = summary.previewTextMarkdown, shouldTruncate) {
+                TextSummary(
+                    content = summary.previewTextMarkdown,
+                    shouldTruncate,
+                    modifier = Modifier.alpha(contentAlpha)
+                ) {
                     onSummaryClicked(post)
                 }
             }

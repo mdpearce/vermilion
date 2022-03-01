@@ -1,6 +1,5 @@
 package com.neaniesoft.vermilion.posts.ui
 
-import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,7 +36,6 @@ import androidx.paging.compose.items
 import com.neaniesoft.vermilion.coreentities.Community
 import com.neaniesoft.vermilion.posts.R
 import com.neaniesoft.vermilion.posts.domain.entities.Post
-import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import kotlinx.coroutines.FlowPreview
@@ -46,16 +45,18 @@ import kotlinx.coroutines.FlowPreview
 @Composable
 fun PostsScreen(
     community: Community,
-    viewModel: PostsViewModel = hiltViewModel(),
-    onOpenPostDetails: (postId: PostId) -> Unit,
-    onOpenUri: (uri: Uri) -> Unit,
-    onOpenCommunity: (community: Community) -> Unit
+    onRoute: (String) -> Unit,
+    viewModel: PostsViewModel = hiltViewModel()
 ) {
     val pagingItems = viewModel.pagingData(community.routeName).collectAsLazyPagingItems()
     val listState = rememberLazyListState()
     val initialScrollPosition = viewModel.restoredScrollPosition.collectAsState(
         initial = null
     )
+    val routeEvent by viewModel.routeEvents.collectAsState(initial = "")
+    LaunchedEffect(key1 = routeEvent) {
+        onRoute(routeEvent)
+    }
 
     val isScrolling = remember {
         derivedStateOf { listState.isScrollInProgress }
@@ -86,11 +87,17 @@ fun PostsScreen(
     }
 
     Box {
-        PostsList(listState = listState, posts = pagingItems, onMediaClicked = {
-            onOpenUri(it.link.toString().toUri())
-        }, onPostClicked = { post ->
-                onOpenPostDetails(post.id)
-            }, onCommunityClicked = onOpenCommunity)
+        PostsList(
+            listState = listState,
+            posts = pagingItems,
+            onMediaClicked = { post ->
+                viewModel.onOpenUri(post, post.link.toString().toUri())
+            },
+            onPostClicked = { post ->
+                viewModel.onOpenPostDetails(post.id)
+            },
+            onCommunityClicked = { community -> viewModel.onOpenCommunity(community) }
+        )
     }
 }
 
