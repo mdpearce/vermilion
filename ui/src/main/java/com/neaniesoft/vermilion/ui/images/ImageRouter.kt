@@ -11,14 +11,14 @@ import javax.inject.Singleton
 
 @Singleton
 class ImageRouter @Inject constructor(private val matchers: Set<ImageHostMatcher>) {
-    fun routeForImage(uri: Uri): String {
+    fun directImageUriOrNull(uri: Uri): Uri? {
         matchers.forEach { matcher ->
             val result = matcher.match(uri)
             if (result is ImageHostMatchResult.DirectImageUri) {
-                return result.uri.toString()
+                return result.uri
             }
         }
-        return uri.toString()
+        return null
     }
 }
 
