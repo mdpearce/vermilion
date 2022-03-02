@@ -1,11 +1,15 @@
 package com.neaniesoft.vermilion.app
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.window.DialogProperties
+import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.dialog
 import androidx.navigation.navArgument
 import androidx.paging.ExperimentalPagingApi
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
@@ -18,8 +22,10 @@ import com.neaniesoft.vermilion.coreentities.CommunityName
 import com.neaniesoft.vermilion.coreentities.NamedCommunity
 import com.neaniesoft.vermilion.postdetails.ui.PostDetailsScreen
 import com.neaniesoft.vermilion.posts.ui.PostsScreen
+import com.neaniesoft.vermilion.ui.images.ImageDialog
 import kotlinx.coroutines.FlowPreview
 
+@ExperimentalComposeUiApi
 @FlowPreview
 @ExperimentalMaterialNavigationApi
 @ExperimentalPagingApi
@@ -88,5 +94,16 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
             "${VermilionScreen.CustomTab.name}/{uri}",
             arguments = listOf(navArgument("uri") { type = NavType.StringType })
         )
+
+        // Fullscreen image viewer
+        dialog(
+            "${VermilionScreen.Image}/{uri}",
+            arguments = listOf(navArgument("uri") { type = NavType.StringType }),
+            dialogProperties = DialogProperties(usePlatformDefaultWidth = false)
+        ) { backStackEntry ->
+            ImageDialog(
+                imageUri = backStackEntry.arguments?.getString("uri")?.toUri() ?: "".toUri()
+            )
+        }
     }
 }
