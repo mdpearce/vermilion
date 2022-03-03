@@ -24,6 +24,7 @@ import com.neaniesoft.vermilion.postdetails.ui.PostDetailsScreen
 import com.neaniesoft.vermilion.posts.ui.PostsScreen
 import com.neaniesoft.vermilion.ui.images.ImageDialog
 import kotlinx.coroutines.FlowPreview
+import java.net.URLDecoder
 
 @ExperimentalComposeUiApi
 @FlowPreview
@@ -101,8 +102,12 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
             arguments = listOf(navArgument("uri") { type = NavType.StringType }),
             dialogProperties = DialogProperties(usePlatformDefaultWidth = false)
         ) { backStackEntry ->
+            val decodedUri = URLDecoder.decode(
+                requireNotNull(backStackEntry.arguments?.getString(("uri"))),
+                "utf-8"
+            )
             ImageDialog(
-                imageUri = backStackEntry.arguments?.getString("uri")?.toUri() ?: "".toUri()
+                imageUri = decodedUri.toUri()
             )
         }
     }

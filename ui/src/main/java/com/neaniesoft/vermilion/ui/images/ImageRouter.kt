@@ -1,6 +1,7 @@
 package com.neaniesoft.vermilion.ui.images
 
 import android.net.Uri
+import com.neaniesoft.vermilion.utils.logger
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -10,11 +11,14 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ImageRouter @Inject constructor(private val matchers: Set<ImageHostMatcher>) {
+class ImageRouter @Inject constructor(private val matchers: Set<@JvmSuppressWildcards ImageHostMatcher>) {
+    private val logger by logger()
+
     fun directImageUriOrNull(uri: Uri): Uri? {
         matchers.forEach { matcher ->
             val result = matcher.match(uri)
             if (result is ImageHostMatchResult.DirectImageUri) {
+                logger.debugIfEnabled { "Matched a direct image URI: ${result.uri}" }
                 return result.uri
             }
         }
@@ -48,5 +52,5 @@ abstract class ImageHostMatcherModule {
 
     @Binds
     @IntoSet
-    abstract fun bindRedditImageHostMatcher(redditImageHostMatcher: RedditImageHostMatcher): ImageHostMatcher
+    abstract fun provideImageHostMatchers(redditImageHostMatcher: RedditImageHostMatcher): ImageHostMatcher
 }

@@ -118,8 +118,6 @@ class PostsViewModel @Inject constructor(
     fun onOpenUri(post: Post, uri: Uri) {
         viewModelScope.launch {
             postHistoryService.markPostAsRead(post.id)
-            // _routeEvents.emit(customTabRoute(uri))
-
             val route = when (post.summary) {
                 is ImagePostSummary -> {
                     val directUri = imageRouter.directImageUriOrNull(post.link)
