@@ -53,5 +53,5 @@ object Deps {
     const val FIREBASE_CRASHLYTICS = "com.google.firebase:firebase-crashlytics-ktx"
     const val FIREBASE_ANALYTICS = "com.google.firebase:firebase-analytics-ktx"
     const val FIREBASE_CRASHLYTICS_GRADLE_PLUGIN = "com.google.firebase:firebase-crashlytics-gradle:2.8.1"
-    const val ACCOMPANIST_SWIPE_REFRESH = "com.google.accompanist:accompanist-swiperefresh:0.20.1"
+    const val ACCOMPANIST_SWIPE_REFRESH = "com.google.accompanist:accompanist-swiperefresh:0.23.1"
 }
