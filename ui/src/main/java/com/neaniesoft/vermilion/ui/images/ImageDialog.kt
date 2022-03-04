@@ -3,67 +3,65 @@ package com.neaniesoft.vermilion.ui.images
 import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FractionalThreshold
 import androidx.compose.material.Surface
+import androidx.compose.material.rememberSwipeableState
+import androidx.compose.material.swipeable
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import coil.compose.ImagePainter
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
+import kotlin.math.roundToInt
 
+@ExperimentalMaterialApi
 @Composable
 fun ImageDialog(imageUri: Uri) {
     Log.d("ImageDialog", "Loading image uri: $imageUri")
     Surface(Modifier.fillMaxSize()) {
         val painter = rememberImagePainter(imageUri)
 
-        ZoomableImage(painter = painter)
-    }
-}
+        val zoomableState = rememberZoomableState(maxScale = 6f)
 
-private const val DEFAULT_MAX_ZOOM_LEVEL = 6f
+        val swipeableState = rememberSwipeableState(initialValue = 0)
+        val sizePx = with(LocalDensity.current) {
+            LocalConfiguration.current.screenHeightDp.dp.toPx()
+        }
+        val anchors = mapOf(0f to 0, sizePx to 1, 0 - sizePx to 2)
+        Log.d("ImageDialog", "swipeableState: ${swipeableState.progress}")
 
-@Composable
-fun ZoomableImage(painter: ImagePainter, maxZoomLevel: Float = DEFAULT_MAX_ZOOM_LEVEL) {
-    var scale by remember {
-        mutableStateOf(1f)
-    }
-
-    var translation by remember {
-        mutableStateOf(Offset(0f, 0f))
-    }
-
-    Image(
-        painter = painter,
-        contentDescription = "Full screen image",
-        contentScale = ContentScale.FillWidth,
-        modifier = Modifier
-            .fillMaxSize()
-            .graphicsLayer(
-                scaleX = scale,
-                scaleY = scale,
-                translationX = translation.x,
-                translationY = translation.y
+        Box(
+            Modifier
+                .fillMaxSize()
+                .swipeable(state = swipeableState,
+                    anchors = anchors,
+                    orientation = Orientation.Vertical,
+                    thresholds = { _, _ -> FractionalThreshold(0.3f) })
+        ) {
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .offset { IntOffset(0, swipeableState.offset.value.roundToInt()) },
+                contentAlignment = Alignment.Center
             )
-            .pointerInput(Unit) {
-                detectTransformGestures { _, pan, zoom, _ ->
-                    scale = when {
-                        // TODO: Fix the jitter at max and min zoom level
-                        scale < 1f -> 1f
-                        scale > maxZoomLevel -> maxZoomLevel
-                        else -> scale * zoom
-                    }
-                    // TODO: Clamp this to the edges of the screen so we can't pan about arbitrarily
-                    translation += pan * scale
+            {
+                Zoomable(state = zoomableState) {
+                    Image(
+                        painter = painter,
+                        contentDescription = "Full size image",
+                        contentScale = ContentScale.FillWidth,
+                    )
                 }
             }
-    )
+        }
+    }
 }
