@@ -14,8 +14,11 @@ import androidx.compose.material.rememberSwipeableState
 import androidx.compose.material.swipeable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
@@ -35,10 +38,19 @@ fun ImageDialog(imageUri: Uri, onDismiss: () -> Unit) {
 
         val swipeableState = rememberSwipeableState(initialValue = 0)
         val sizePx = with(LocalDensity.current) {
-            LocalConfiguration.current.screenHeightDp.dp.toPx()
+            LocalConfiguration.current.screenHeightDp.dp.toPx() / 2f
         }
         val anchors = mapOf(0f to 0, sizePx to 1, 0 - sizePx to 2)
-        Log.d("ImageDialog", "swipeableState: ${swipeableState.progress}")
+
+        val alpha = remember {
+            derivedStateOf {
+                if (swipeableState.progress.from == 0 && swipeableState.progress.to == 0) {
+                    1f
+                } else {
+                    1f - swipeableState.progress.fraction
+                }
+            }
+        }
 
         LaunchedEffect(key1 = swipeableState.currentValue) {
             if (swipeableState.currentValue != 0) {
@@ -58,12 +70,14 @@ fun ImageDialog(imageUri: Uri, onDismiss: () -> Unit) {
             Box(
                 Modifier
                     .fillMaxSize()
-                    .offset { IntOffset(0, swipeableState.offset.value.roundToInt()) },
+                    .offset { IntOffset(0, swipeableState.offset.value.roundToInt()) }
+                    .alpha(alpha.value),
                 contentAlignment = Alignment.Center
             )
             {
                 Zoomable(state = zoomableState) {
                     Image(
+                        modifier = Modifier.fillMaxSize(),
                         painter = painter,
                         contentDescription = "Full size image",
                         contentScale = ContentScale.FillWidth,
