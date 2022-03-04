@@ -1,5 +1,6 @@
 package com.neaniesoft.vermilion.app
 
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -26,6 +27,7 @@ import com.neaniesoft.vermilion.ui.images.ImageDialog
 import kotlinx.coroutines.FlowPreview
 import java.net.URLDecoder
 
+@ExperimentalMaterialApi
 @ExperimentalComposeUiApi
 @FlowPreview
 @ExperimentalMaterialNavigationApi
@@ -107,7 +109,10 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
                 "utf-8"
             )
             ImageDialog(
-                imageUri = decodedUri.toUri()
+                imageUri = decodedUri.toUri(),
+                onDismiss = {
+                    navController.popBackStack(backStackEntry.destination.id, true)
+                }
             )
         }
     }

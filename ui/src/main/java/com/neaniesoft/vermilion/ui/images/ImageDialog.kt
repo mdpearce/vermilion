@@ -13,6 +13,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.rememberSwipeableState
 import androidx.compose.material.swipeable
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -25,7 +26,7 @@ import kotlin.math.roundToInt
 
 @ExperimentalMaterialApi
 @Composable
-fun ImageDialog(imageUri: Uri) {
+fun ImageDialog(imageUri: Uri, onDismiss: () -> Unit) {
     Log.d("ImageDialog", "Loading image uri: $imageUri")
     Surface(Modifier.fillMaxSize()) {
         val painter = rememberImagePainter(imageUri)
@@ -38,6 +39,13 @@ fun ImageDialog(imageUri: Uri) {
         }
         val anchors = mapOf(0f to 0, sizePx to 1, 0 - sizePx to 2)
         Log.d("ImageDialog", "swipeableState: ${swipeableState.progress}")
+
+        LaunchedEffect(key1 = swipeableState.currentValue) {
+            if (swipeableState.currentValue != 0) {
+                Log.d("ImageDialog", "Dismissing")
+                onDismiss()
+            }
+        }
 
         Box(
             Modifier
