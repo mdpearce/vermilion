@@ -62,10 +62,12 @@ fun ImageDialog(imageUri: Uri, onDismiss: () -> Unit) {
         Box(
             Modifier
                 .fillMaxSize()
-                .swipeable(state = swipeableState,
+                .swipeable(
+                    state = swipeableState,
                     anchors = anchors,
                     orientation = Orientation.Vertical,
-                    thresholds = { _, _ -> FractionalThreshold(0.3f) })
+                    thresholds = { _, _ -> FractionalThreshold(0.3f) }
+                )
         ) {
             Box(
                 Modifier
@@ -73,8 +75,7 @@ fun ImageDialog(imageUri: Uri, onDismiss: () -> Unit) {
                     .offset { IntOffset(0, swipeableState.offset.value.roundToInt()) }
                     .alpha(alpha.value),
                 contentAlignment = Alignment.Center
-            )
-            {
+            ) {
                 Zoomable(state = zoomableState) {
                     Image(
                         modifier = Modifier.fillMaxSize(),

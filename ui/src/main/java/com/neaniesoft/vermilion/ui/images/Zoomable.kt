@@ -141,7 +141,6 @@ fun Zoomable(
     }
 }
 
-
 private suspend fun PointerInputScope.detectDrag(
     onDragStart: (Offset) -> Unit = { },
     onDragEnd: () -> Unit = { },
