@@ -43,6 +43,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.ui.markdown.MarkdownDocument
 import com.neaniesoft.vermilion.ui.theme.Green400
+import com.neaniesoft.vermilion.ui.theme.LightRedVariant
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import com.neaniesoft.vermilion.ui.theme.colorForDepth
 import org.commonmark.node.Document
@@ -113,6 +114,13 @@ fun CommentFlagIcons(flags: Set<CommentFlags>) {
                         drawable = R.drawable.ic_baseline_local_police_24,
                         contentDescription = "Moderator",
                         tint = Green400
+                    )
+                }
+                CommentFlags.IS_ADMIN -> {
+                    FlagIcon(
+                        drawable = R.drawable.ic_baseline_verified_user_24,
+                        contentDescription = "Admin",
+                        tint = LightRedVariant
                     )
                 }
                 else -> {
@@ -217,6 +225,17 @@ fun StickiedModCommentRowPreview() {
     }
 }
 
+@Preview
+@Composable
+fun AdminCommentRowPreview() {
+    VermilionTheme(darkTheme = true) {
+        androidx.compose.material.Surface {
+            CommentRow(ADMIN_DUMMY_COMMENT)
+
+        }
+    }
+}
+
 private val DUMMY_COMMENT = Comment(
     CommentId("id"),
     CommentContent("This is a pretty long comment that might split over several lines. It's got several sentences and goes on for some time. Still going here."),
@@ -240,3 +259,4 @@ private val DEEP_DUMMY_COMMENT = DUMMY_COMMENT.copy(depth = CommentDepth(6))
 private val STICKIED_DUMMY_COMMENT = DUMMY_COMMENT.copy(flags = setOf(CommentFlags.STICKIED))
 private val STICKED_MOD_DUMMY_COMMENT =
     DUMMY_COMMENT.copy(flags = setOf(CommentFlags.STICKIED, CommentFlags.IS_MOD))
+private val ADMIN_DUMMY_COMMENT = DUMMY_COMMENT.copy(flags = setOf(CommentFlags.IS_ADMIN))
