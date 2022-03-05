@@ -26,6 +26,7 @@ fun TextSummary(
     content: Document,
     shouldTruncate: Boolean,
     modifier: Modifier = Modifier,
+    onUriClicked: (String) -> Unit = {},
     onClick: (() -> Unit)? = null
 ) {
 
@@ -34,6 +35,7 @@ fun TextSummary(
         MarkdownDocument(
             document = content,
             if (shouldTruncate) 3 else Int.MAX_VALUE,
+            onUriClicked,
             onClick
         )
     }

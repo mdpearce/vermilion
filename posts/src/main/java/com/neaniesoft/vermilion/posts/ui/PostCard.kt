@@ -1,5 +1,6 @@
 package com.neaniesoft.vermilion.posts.ui
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -71,7 +72,8 @@ fun PostCard(
     onClick: (Post) -> Unit,
     onMediaClicked: (Post) -> Unit,
     onCommunityClicked: (Community) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onUriClicked: (Uri) -> Unit = {}
 ) {
     Card(elevation = 2.dp, modifier = modifier.clickable { onClick(post) }) {
         PostContent(
@@ -81,7 +83,8 @@ fun PostCard(
             shouldHideNsfw = true,
             onMediaClicked,
             onSummaryClicked = onClick,
-            onCommunityClicked = onCommunityClicked
+            onCommunityClicked = onCommunityClicked,
+            onUriClicked = onUriClicked
         )
     }
 }
@@ -94,7 +97,8 @@ fun PostContent(
     shouldHideNsfw: Boolean,
     onMediaClicked: (Post) -> Unit,
     onSummaryClicked: (Post) -> Unit,
-    onCommunityClicked: (Community) -> Unit
+    onCommunityClicked: (Community) -> Unit,
+    onUriClicked: (Uri) -> Unit
 ) {
     // Log.d("PostContent", "Drawing content")
     Column(modifier = modifier.padding(0.dp)) {
@@ -216,7 +220,8 @@ fun PostContent(
                 TextSummary(
                     content = summary.previewTextMarkdown,
                     shouldTruncate,
-                    modifier = Modifier.alpha(contentAlpha)
+                    modifier = Modifier.alpha(contentAlpha),
+                    onUriClicked = { onUriClicked(it.toUri()) }
                 ) {
                     onSummaryClicked(post)
                 }

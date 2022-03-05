@@ -87,7 +87,8 @@ fun PostDetailsScreen(
                                     shouldHideNsfw = false,
                                     onMediaClicked = { onOpenUri(it.link.toString().toUri()) },
                                     onSummaryClicked = {},
-                                    onCommunityClicked = {}
+                                    onCommunityClicked = {},
+                                    onUriClicked = onOpenUri
                                 )
                             }
                         }
@@ -112,7 +113,8 @@ fun PostDetailsScreen(
                     when (item) {
                         is CommentKind.Full -> CommentRow(
                             comment = item.comment,
-                            Modifier.fillMaxWidth()
+                            Modifier.fillMaxWidth(),
+                            onUriClicked = { onOpenUri(it.toUri()) }
                         )
                         is CommentKind.Stub -> MoreCommentsStubRow(
                             stub = item.stub,
