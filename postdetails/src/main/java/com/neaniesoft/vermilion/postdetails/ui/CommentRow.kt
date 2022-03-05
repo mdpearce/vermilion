@@ -11,14 +11,18 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -36,6 +40,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.ui.markdown.MarkdownDocument
+import com.neaniesoft.vermilion.ui.theme.Green400
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import com.neaniesoft.vermilion.ui.theme.colorForDepth
 import org.commonmark.node.Document
@@ -55,32 +60,54 @@ fun CommentRow(comment: Comment, modifier: Modifier = Modifier) {
             DepthIndicators(depth = comment.depth.value)
 
             Column(Modifier.padding(8.dp)) {
-                Row(Modifier.fillMaxWidth()) {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = comment.authorName.value,
                         style = MaterialTheme.typography.caption,
                         color = MaterialTheme.colors.primary,
-                        modifier = Modifier.alignByBaseline()
+                        // modifier = Modifier.alignByBaseline()
                     )
                     Text(
                         text = comment.score.value.toString(),
-                        style = MaterialTheme.typography.body1,
-                        color = MaterialTheme.colors.secondary,
+                        style = MaterialTheme.typography.caption,
+                        fontWeight = FontWeight.Bold,
+                        // color = MaterialTheme.colors.secondary,
                         modifier = Modifier
-                            .alignByBaseline()
-                            .padding(start = 8.dp)
+                            // .alignByBaseline()
+                            .padding(start = 8.dp, end = 8.dp)
                     )
+                    CommentFlagIcons(flags = comment.flags)
                     Spacer(modifier = Modifier.weight(1.0f))
                     Text(
                         text = comment.createdAtDurationString.value,
                         style = MaterialTheme.typography.caption,
                         color = MaterialTheme.colors.onBackground,
-                        modifier = Modifier.alignByBaseline()
+                        // modifier = Modifier.alignByBaseline()
                     )
                 }
 
                 Box(Modifier.padding(top = 8.dp)) {
                     MarkdownDocument(document = comment.contentMarkdown as Document)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CommentFlagIcons(flags: Set<CommentFlags>) {
+    Row {
+        flags.forEach { flag ->
+            when (flag) {
+                CommentFlags.STICKIED -> {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_baseline_push_pin_24),
+                        contentDescription = "Sticky",
+                        tint = Green400,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+                else -> {
                 }
             }
         }
