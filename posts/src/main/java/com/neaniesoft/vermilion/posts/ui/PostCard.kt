@@ -111,15 +111,13 @@ fun PostContent(
                         post.isNsfw()
                     } else {
                         false
-                    },
-                    shouldTruncate = shouldTruncate
+                    }
                 ) { onMediaClicked(post) }
             }
             is LinkPostSummary -> {
                 if (summary.preview != null) {
                     ImageSummary(
                         image = summary.preview,
-                        shouldTruncate = shouldTruncate,
                         isNsfw = if (shouldHideNsfw) {
                             post.isNsfw()
                         } else {
@@ -137,8 +135,7 @@ fun PostContent(
                         post.isNsfw()
                     } else {
                         false
-                    },
-                    shouldTruncate = shouldTruncate
+                    }
                 ) { onMediaClicked(post) }
             }
             is TextPostSummary -> {

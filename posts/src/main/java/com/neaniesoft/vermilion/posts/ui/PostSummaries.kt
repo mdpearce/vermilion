@@ -41,24 +41,19 @@ fun TextSummary(
     }
 }
 
-private const val MIN_RATIO = 1.0f
-
 @Composable
-fun ImageSummary(image: UriImage, shouldTruncate: Boolean, isNsfw: Boolean, onClick: () -> Unit) {
+fun ImageSummary(image: UriImage, isNsfw: Boolean, onClick: () -> Unit) {
     val painter = rememberImagePainter(data = image.uri.toString()) {
         placeholder(R.drawable.image_placeholder)
         if (isNsfw) {
             transformations(BlurTransformation(LocalContext.current, 25f, 8f))
         }
+        crossfade(200)
     }
 
     BoxWithConstraints(Modifier.fillMaxWidth()) {
         val ratio = remember {
-            if (shouldTruncate) {
-                kotlin.math.max((image.width.toFloat() / image.height.toFloat()), MIN_RATIO)
-            } else {
-                image.width.toFloat() / image.height.toFloat()
-            }
+            image.width.toFloat() / image.height.toFloat()
         }
         Image(
             modifier = Modifier
@@ -72,6 +67,6 @@ fun ImageSummary(image: UriImage, shouldTruncate: Boolean, isNsfw: Boolean, onCl
 }
 
 @Composable
-fun VideoSummary(image: UriImage, shouldTruncate: Boolean, isNsfw: Boolean, onClick: () -> Unit) {
-    ImageSummary(image = image, shouldTruncate, isNsfw, onClick)
+fun VideoSummary(image: UriImage, isNsfw: Boolean, onClick: () -> Unit) {
+    ImageSummary(image = image, isNsfw, onClick)
 }
