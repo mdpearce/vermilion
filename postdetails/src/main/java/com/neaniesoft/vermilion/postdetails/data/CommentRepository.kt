@@ -406,7 +406,11 @@ class CommentRepositoryImpl @Inject constructor(
 
     private fun CommentData.flairBackgroundColor(): Int {
         return if (!authorFlairBackgroundColor.isNullOrEmpty()) {
-            Color.parseColor(authorFlairBackgroundColor)
+            if (authorFlairBackgroundColor == "transparent") {
+                0
+            } else {
+                Color.parseColor(authorFlairBackgroundColor)
+            }
         } else {
             0
         }
