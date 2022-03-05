@@ -19,6 +19,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -48,6 +49,7 @@ import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import com.neaniesoft.vermilion.ui.theme.colorForDepth
 import org.commonmark.node.Document
 import org.commonmark.parser.Parser
+import java.text.NumberFormat
 import java.time.Instant
 
 @Composable
@@ -70,8 +72,13 @@ fun CommentRow(comment: Comment, modifier: Modifier = Modifier) {
                         color = MaterialTheme.colors.primary,
                         // modifier = Modifier.alignByBaseline()
                     )
+
+                    val score = remember {
+                        NumberFormat.getIntegerInstance().format(comment.score.value)
+                    }
+
                     Text(
-                        text = comment.score.value.toString(),
+                        text = score,
                         style = MaterialTheme.typography.caption,
                         fontWeight = FontWeight.Bold,
                         // color = MaterialTheme.colors.secondary,
@@ -245,7 +252,7 @@ private val DUMMY_COMMENT = Comment(
     AuthorName("Some user"),
     Instant.now(),
     DurationString("1h ago"),
-    Score(100),
+    Score(1024),
     "".toUri(),
     PostId("post_id"),
     ControversialIndex(0),
