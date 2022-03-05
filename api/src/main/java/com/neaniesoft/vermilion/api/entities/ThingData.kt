@@ -60,7 +60,7 @@ data class CommentData(
     @JsonProperty("depth") val depth: Int,
     @JsonProperty("ups") val ups: Int,
     @JsonProperty("collapsed") val collapsed: Boolean,
-    @JsonProperty("can_mod_post") val canModPost: Boolean
+    @JsonProperty("distinguished") val distinguished: String?
 ) : ThingData()
 
 data class MoreCommentsData(

@@ -5,6 +5,7 @@ enum class CommentFlags {
     EDITED,
     IS_OP,
     IS_MOD,
+    IS_ADMIN,
     STICKIED,
     SCORE_HIDDEN,
     LOCKED,
