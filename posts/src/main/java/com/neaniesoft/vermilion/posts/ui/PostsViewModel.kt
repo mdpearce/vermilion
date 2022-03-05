@@ -19,12 +19,14 @@ import com.neaniesoft.vermilion.dbentities.posts.PostRemoteKeyDao
 import com.neaniesoft.vermilion.posts.data.PostRepository
 import com.neaniesoft.vermilion.posts.data.toPost
 import com.neaniesoft.vermilion.posts.domain.PostHistoryService
+import com.neaniesoft.vermilion.posts.domain.entities.ImagePostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.tabs.domain.TabSupervisor
 import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
 import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
 import com.neaniesoft.vermilion.tabs.domain.entities.TabType
+import com.neaniesoft.vermilion.ui.images.ImageRouter
 import com.neaniesoft.vermilion.utils.logger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
@@ -50,6 +52,7 @@ class PostsViewModel @Inject constructor(
     private val clock: Clock,
     private val markdownParser: Parser,
     private val tabSupervisor: TabSupervisor,
+    private val imageRouter: ImageRouter,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val pagingDataMap: MutableMap<String, Flow<PagingData<Post>>> = mutableMapOf()
@@ -115,8 +118,24 @@ class PostsViewModel @Inject constructor(
     fun onOpenUri(post: Post, uri: Uri) {
         viewModelScope.launch {
             postHistoryService.markPostAsRead(post.id)
-            _routeEvents.emit(customTabRoute(uri))
+            val route = when (post.summary) {
+                is ImagePostSummary -> {
+                    val directUri = imageRouter.directImageUriOrNull(post.link)
+                    if (directUri != null) {
+                        buildImageRoute(directUri)
+                    } else {
+                        customTabRoute(uri)
+                    }
+                }
+                else -> customTabRoute(uri)
+            }
+
+            _routeEvents.emit(route)
         }
+    }
+
+    private fun buildImageRoute(uri: Uri): String {
+        return "Image/" + URLEncoder.encode(uri.toString(), "utf-8")
     }
 
     fun onOpenCommunity(community: Community) {

@@ -3,6 +3,7 @@ package com.neaniesoft.vermilion.app
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
@@ -12,6 +13,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -29,8 +31,12 @@ import com.neaniesoft.vermilion.communities.ui.CommunityList
 import com.neaniesoft.vermilion.tabs.adapters.driving.ui.TabBottomBar
 import com.neaniesoft.vermilion.tabs.domain.entities.ActiveTab
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
+import kotlinx.coroutines.FlowPreview
 import java.time.Clock
 
+@FlowPreview
+@ExperimentalMaterialApi
+@ExperimentalComposeUiApi
 @ExperimentalFoundationApi
 @ExperimentalPagingApi
 @ExperimentalMaterialNavigationApi
