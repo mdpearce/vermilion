@@ -20,5 +20,8 @@ data class CommentRecord(
     val link: String,
     val controversialIndex: Int,
     val depth: Int,
-    val upVotes: Int
+    val upVotes: Int,
+    val flairText: String?,
+    val flairBackgroundColor: Int,
+    val flairTextColor: String
 )

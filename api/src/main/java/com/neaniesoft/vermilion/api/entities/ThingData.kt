@@ -60,7 +60,11 @@ data class CommentData(
     @JsonProperty("depth") val depth: Int,
     @JsonProperty("ups") val ups: Int,
     @JsonProperty("collapsed") val collapsed: Boolean,
-    @JsonProperty("distinguished") val distinguished: String?
+    @JsonProperty("distinguished") val distinguished: String?,
+    @JsonProperty("author_flair_text") val authorFlairText: String?,
+    @JsonProperty("author_flair_text_color") val authorFlairTextColor: String?,
+    @JsonProperty("author_flair_background_color") val authorFlairBackgroundColor: String?,
+    @JsonProperty("author_flair_type") val authorFlairType: String?,
 ) : ThingData()
 
 data class MoreCommentsData(

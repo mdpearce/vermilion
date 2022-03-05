@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -34,6 +35,10 @@ import com.neaniesoft.vermilion.postdetails.domain.entities.Comment
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentContent
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentDepth
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentFlags
+import com.neaniesoft.vermilion.postdetails.domain.entities.CommentFlair
+import com.neaniesoft.vermilion.postdetails.domain.entities.CommentFlairBackgroundColor
+import com.neaniesoft.vermilion.postdetails.domain.entities.CommentFlairText
+import com.neaniesoft.vermilion.postdetails.domain.entities.CommentFlairTextColor
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentId
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub
 import com.neaniesoft.vermilion.postdetails.domain.entities.ControversialIndex
@@ -43,6 +48,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.ui.markdown.MarkdownDocument
+import com.neaniesoft.vermilion.ui.theme.AlmostBlack
 import com.neaniesoft.vermilion.ui.theme.Green400
 import com.neaniesoft.vermilion.ui.theme.LightRedVariant
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
@@ -53,7 +59,11 @@ import java.text.NumberFormat
 import java.time.Instant
 
 @Composable
-fun CommentRow(comment: Comment, modifier: Modifier = Modifier, onUriClicked: (String) -> Unit = {}) {
+fun CommentRow(
+    comment: Comment,
+    modifier: Modifier = Modifier,
+    onUriClicked: (String) -> Unit = {}
+) {
     Column {
         if (comment.depth == CommentDepth(0)) {
             Divider()
@@ -72,15 +82,19 @@ fun CommentRow(comment: Comment, modifier: Modifier = Modifier, onUriClicked: (S
                             text = comment.authorName.value,
                             style = MaterialTheme.typography.caption,
                             color = MaterialTheme.colors.primary,
-                            fontWeight = FontWeight.SemiBold
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.padding(end = 8.dp)
                         )
                     } else {
                         Text(
                             text = comment.authorName.value,
                             style = MaterialTheme.typography.caption,
-                            color = MaterialTheme.colors.secondary
+                            color = MaterialTheme.colors.secondary,
+                            modifier = Modifier.padding(end = 8.dp)
                         )
                     }
+
+                    CommentFlair(flair = comment.commentFlair, Modifier.padding(end = 8.dp))
 
                     val score = remember {
                         NumberFormat.getIntegerInstance().format(comment.score.value)
@@ -91,7 +105,7 @@ fun CommentRow(comment: Comment, modifier: Modifier = Modifier, onUriClicked: (S
                         style = MaterialTheme.typography.caption,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier
-                            .padding(start = 8.dp, end = 8.dp)
+                            .padding(end = 8.dp)
                     )
                     CommentFlagIcons(flags = comment.flags)
                     Spacer(modifier = Modifier.weight(1.0f))
@@ -202,6 +216,40 @@ fun MoreCommentsStubRow(
     }
 }
 
+@Composable
+fun CommentFlair(flair: CommentFlair, modifier: Modifier = Modifier) {
+    if (flair is CommentFlair.TextFlair) {
+        val flairBackgroundColor =
+            if (flair.backgroundColor == CommentFlairBackgroundColor(0)) {
+                MaterialTheme.colors.surface
+            } else {
+                Color(flair.backgroundColor.value)
+            }
+        val flairTextColor =
+            if (flair.backgroundColor == CommentFlairBackgroundColor(0)) {
+                MaterialTheme.colors.onSurface
+            } else {
+                when (flair.textColor) {
+                    CommentFlairTextColor.DARK -> AlmostBlack
+                    CommentFlairTextColor.LIGHT -> Color.White
+                }
+            }
+        Surface(
+            color = flairBackgroundColor,
+            contentColor = flairTextColor,
+            shape = MaterialTheme.shapes.small,
+            elevation = 2.dp,
+            modifier = modifier
+        ) {
+            Text(
+                text = flair.text.value,
+                modifier = Modifier.padding(4.dp),
+                style = MaterialTheme.typography.caption
+            )
+        }
+    }
+}
+
 @Preview
 @Composable
 fun CommentRowPreview() {
@@ -222,7 +270,7 @@ fun DeepCommentRowPreview() {
 @Composable
 fun StickiedCommentRowPreview() {
     VermilionTheme(darkTheme = true) {
-        androidx.compose.material.Surface {
+        Surface {
             CommentRow(STICKIED_DUMMY_COMMENT)
         }
     }
@@ -232,7 +280,7 @@ fun StickiedCommentRowPreview() {
 @Composable
 fun StickiedModCommentRowPreview() {
     VermilionTheme(darkTheme = true) {
-        androidx.compose.material.Surface {
+        Surface {
             CommentRow(STICKED_MOD_DUMMY_COMMENT)
         }
     }
@@ -242,7 +290,7 @@ fun StickiedModCommentRowPreview() {
 @Composable
 fun AdminCommentRowPreview() {
     VermilionTheme(darkTheme = true) {
-        androidx.compose.material.Surface {
+        Surface {
             CommentRow(ADMIN_DUMMY_COMMENT)
         }
     }
@@ -252,7 +300,7 @@ fun AdminCommentRowPreview() {
 @Composable
 fun OpCommentRowPreview() {
     VermilionTheme(darkTheme = true) {
-        androidx.compose.material.Surface {
+        Surface {
             CommentRow(OP_DUMMY_CONTENT)
         }
     }
@@ -273,7 +321,12 @@ private val DUMMY_COMMENT = Comment(
     ControversialIndex(0),
     CommentDepth(0),
     UpVotesCount(88),
-    null
+    null,
+    CommentFlair.TextFlair(
+        CommentFlairText("Some flair"),
+        CommentFlairBackgroundColor(0),
+        CommentFlairTextColor.DARK
+    )
 )
 
 private val DEEP_DUMMY_COMMENT = DUMMY_COMMENT.copy(depth = CommentDepth(6))
