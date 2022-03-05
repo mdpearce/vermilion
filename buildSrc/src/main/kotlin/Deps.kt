@@ -47,6 +47,7 @@ object Deps {
     const val ANDROIDX_BROWSER = "androidx.browser:browser:1.4.0"
     const val PRETTY_TIME = "org.ocpsoft.prettytime:prettytime:5.0.2.Final"
     const val COMMONMARK = "org.commonmark:commonmark:0.18.2"
+    const val COMMONMARK_EXT_AUTOLINK = "org.commonmark:commonmark-ext-autolink:0.18.2"
     const val SEMVER = "net.thauvin.erik.gradle:semver:1.0.4"
     const val GOOGLE_SERVICES_PLUGIN = "com.google.gms:google-services:4.3.10"
     const val FIREBASE_BOM = "com.google.firebase:firebase-bom:29.1.0"
