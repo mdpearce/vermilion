@@ -34,6 +34,7 @@ import com.neaniesoft.vermilion.postdetails.domain.entities.Comment
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentContent
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentDepth
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentFlags
+import com.neaniesoft.vermilion.postdetails.domain.entities.CommentFlair
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentId
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub
 import com.neaniesoft.vermilion.postdetails.domain.entities.ControversialIndex
@@ -273,7 +274,8 @@ private val DUMMY_COMMENT = Comment(
     ControversialIndex(0),
     CommentDepth(0),
     UpVotesCount(88),
-    null
+    null,
+    CommentFlair.NoFlair
 )
 
 private val DEEP_DUMMY_COMMENT = DUMMY_COMMENT.copy(depth = CommentDepth(6))

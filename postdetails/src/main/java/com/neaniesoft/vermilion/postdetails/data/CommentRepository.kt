@@ -1,5 +1,6 @@
 package com.neaniesoft.vermilion.postdetails.data
 
+import android.graphics.Color
 import androidx.core.net.toUri
 import androidx.room.withTransaction
 import com.neaniesoft.vermilion.api.entities.CommentData
@@ -17,6 +18,10 @@ import com.neaniesoft.vermilion.postdetails.domain.entities.Comment
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentContent
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentDepth
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentFlags
+import com.neaniesoft.vermilion.postdetails.domain.entities.CommentFlair
+import com.neaniesoft.vermilion.postdetails.domain.entities.CommentFlairBackgroundColor
+import com.neaniesoft.vermilion.postdetails.domain.entities.CommentFlairText
+import com.neaniesoft.vermilion.postdetails.domain.entities.CommentFlairTextColor
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentId
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentKind
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub
@@ -231,8 +236,22 @@ class CommentRepositoryImpl @Inject constructor(
             controversialIndex = ControversialIndex(controversialIndex),
             depth = CommentDepth(depth),
             upVotes = UpVotesCount(upVotes),
-            parentId = parentId?.let { CommentId(it) }
+            parentId = parentId?.let { CommentId(it) },
+            commentFlair = flair()
         )
+    }
+
+    private fun CommentRecord.flair(): CommentFlair {
+        val text = flairText
+        return if (text.isNullOrEmpty()) {
+            CommentFlair.NoFlair
+        } else {
+            CommentFlair.TextFlair(
+                CommentFlairText(text),
+                CommentFlairBackgroundColor(flairBackgroundColor),
+                CommentFlairTextColor.valueOf(flairTextColor.uppercase())
+            )
+        }
     }
 
     private fun Long.formatDuration(): DurationString {
@@ -317,7 +336,10 @@ class CommentRepositoryImpl @Inject constructor(
             link = "",
             controversialIndex = 0,
             depth = depth,
-            upVotes = 0
+            upVotes = 0,
+            flairText = null,
+            flairBackgroundColor = 0,
+            flairTextColor = CommentFlairTextColor.DARK.name
         )
     }
 
@@ -375,7 +397,22 @@ class CommentRepositoryImpl @Inject constructor(
             link = permalink,
             controversialIndex = controversiality,
             depth = depth,
-            upVotes = ups
+            upVotes = ups,
+            flairText = authorFlairText,
+            flairBackgroundColor = flairBackgroundColor(),
+            flairTextColor = flairTextColor()
         )
+    }
+
+    private fun CommentData.flairBackgroundColor(): Int {
+        return if (!authorFlairBackgroundColor.isNullOrEmpty()) {
+            Color.parseColor(authorFlairBackgroundColor)
+        } else {
+            0
+        }
+    }
+
+    private fun CommentData.flairTextColor(): String {
+        return authorFlairTextColor?.uppercase() ?: CommentFlairTextColor.DARK.name
     }
 }
