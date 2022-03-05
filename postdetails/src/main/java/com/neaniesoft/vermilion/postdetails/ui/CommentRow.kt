@@ -44,7 +44,10 @@ import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.ui.markdown.MarkdownDocument
 import com.neaniesoft.vermilion.ui.theme.Green400
+import com.neaniesoft.vermilion.ui.theme.LightBlue
 import com.neaniesoft.vermilion.ui.theme.LightRedVariant
+import com.neaniesoft.vermilion.ui.theme.Secondary
+import com.neaniesoft.vermilion.ui.theme.SecondaryDark
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import com.neaniesoft.vermilion.ui.theme.colorForDepth
 import org.commonmark.node.Document
@@ -66,10 +69,19 @@ fun CommentRow(comment: Comment, modifier: Modifier = Modifier) {
 
             Column(Modifier.padding(8.dp)) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = comment.authorName.value,
-                        style = MaterialTheme.typography.caption,
-                    )
+                    if (comment.flags.contains(CommentFlags.IS_OP)) {
+                        Text(
+                            text = comment.authorName.value,
+                            style = MaterialTheme.typography.caption,
+                            color = Secondary,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    } else {
+                        Text(
+                            text = comment.authorName.value,
+                            style = MaterialTheme.typography.caption,
+                        )
+                    }
 
                     val score = remember {
                         NumberFormat.getIntegerInstance().format(comment.score.value)
@@ -237,6 +249,17 @@ fun AdminCommentRowPreview() {
     }
 }
 
+@Preview
+@Composable
+fun OpCommentRowPreview() {
+    VermilionTheme(darkTheme = true) {
+        androidx.compose.material.Surface {
+            CommentRow(OP_DUMMY_CONTENT)
+
+        }
+    }
+}
+
 private val DUMMY_COMMENT = Comment(
     CommentId("id"),
     CommentContent("This is a pretty long comment that might split over several lines. It's got several sentences and goes on for some time. Still going here."),
@@ -261,3 +284,4 @@ private val STICKIED_DUMMY_COMMENT = DUMMY_COMMENT.copy(flags = setOf(CommentFla
 private val STICKED_MOD_DUMMY_COMMENT =
     DUMMY_COMMENT.copy(flags = setOf(CommentFlags.STICKIED, CommentFlags.IS_MOD))
 private val ADMIN_DUMMY_COMMENT = DUMMY_COMMENT.copy(flags = setOf(CommentFlags.IS_ADMIN))
+private val OP_DUMMY_CONTENT = DUMMY_COMMENT.copy(flags = setOf(CommentFlags.IS_OP))
