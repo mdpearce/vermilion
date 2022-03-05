@@ -69,7 +69,7 @@ fun CommentRow(comment: Comment, modifier: Modifier = Modifier) {
                     Text(
                         text = comment.authorName.value,
                         style = MaterialTheme.typography.caption,
-                        color = MaterialTheme.colors.primary,
+                        // color = MaterialTheme.colors.primary,
                         // modifier = Modifier.alignByBaseline()
                     )
 
