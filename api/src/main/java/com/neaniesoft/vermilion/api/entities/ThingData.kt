@@ -64,7 +64,7 @@ data class CommentData(
     @JsonProperty("author_flair_text") val authorFlairText: String?,
     @JsonProperty("author_flair_text_color") val authorFlairTextColor: String?,
     @JsonProperty("author_flair_background_color") val authorFlairBackgroundColor: String?,
-    @JsonProperty("author_flair_type") val authorFlairType: String,
+    @JsonProperty("author_flair_type") val authorFlairType: String?,
 ) : ThingData()
 
 data class MoreCommentsData(
