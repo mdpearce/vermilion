@@ -48,6 +48,7 @@ fun ImageSummary(image: UriImage, isNsfw: Boolean, onClick: () -> Unit) {
         if (isNsfw) {
             transformations(BlurTransformation(LocalContext.current, 25f, 8f))
         }
+        crossfade(200)
     }
 
     BoxWithConstraints(Modifier.fillMaxWidth()) {
