@@ -26,6 +26,7 @@ import com.neaniesoft.vermilion.postdetails.R
 import com.neaniesoft.vermilion.postdetails.domain.entities.Comment
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentContent
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentDepth
+import com.neaniesoft.vermilion.postdetails.domain.entities.CommentFlags
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentId
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub
 import com.neaniesoft.vermilion.postdetails.domain.entities.ControversialIndex
@@ -38,6 +39,7 @@ import com.neaniesoft.vermilion.ui.markdown.MarkdownDocument
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import com.neaniesoft.vermilion.ui.theme.colorForDepth
 import org.commonmark.node.Document
+import org.commonmark.parser.Parser
 import java.time.Instant
 
 @Composable
@@ -142,10 +144,22 @@ fun DeepCommentRowPreview() {
     }
 }
 
+@Preview
+@Composable
+fun StickiedCommentRowPreview() {
+    VermilionTheme(darkTheme = true) {
+        androidx.compose.material.Surface {
+            CommentRow(STICKIED_DUMMY_COMMENT)
+
+        }
+    }
+}
+
 private val DUMMY_COMMENT = Comment(
     CommentId("id"),
     CommentContent("This is a pretty long comment that might split over several lines. It's got several sentences and goes on for some time. Still going here."),
-    Document(),
+    Parser.builder().build()
+        .parse("This is a pretty long comment that might split over several lines. It's got several sentences and goes on for some time. Still going here."),
     emptySet(),
     AuthorName("Some user"),
     Instant.now(),
@@ -160,3 +174,5 @@ private val DUMMY_COMMENT = Comment(
 )
 
 private val DEEP_DUMMY_COMMENT = DUMMY_COMMENT.copy(depth = CommentDepth(6))
+
+private val STICKIED_DUMMY_COMMENT = DUMMY_COMMENT.copy(flags = setOf(CommentFlags.STICKIED))
