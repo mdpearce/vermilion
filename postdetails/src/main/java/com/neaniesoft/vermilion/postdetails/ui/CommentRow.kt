@@ -45,7 +45,6 @@ import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.ui.markdown.MarkdownDocument
 import com.neaniesoft.vermilion.ui.theme.Green400
 import com.neaniesoft.vermilion.ui.theme.LightRedVariant
-import com.neaniesoft.vermilion.ui.theme.Secondary
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import com.neaniesoft.vermilion.ui.theme.colorForDepth
 import org.commonmark.node.Document
@@ -72,13 +71,14 @@ fun CommentRow(comment: Comment, modifier: Modifier = Modifier) {
                         Text(
                             text = comment.authorName.value,
                             style = MaterialTheme.typography.caption,
-                            color = Secondary,
+                            color = MaterialTheme.colors.primary,
                             fontWeight = FontWeight.SemiBold
                         )
                     } else {
                         Text(
                             text = comment.authorName.value,
                             style = MaterialTheme.typography.caption,
+                            color = MaterialTheme.colors.secondary
                         )
                     }
 
