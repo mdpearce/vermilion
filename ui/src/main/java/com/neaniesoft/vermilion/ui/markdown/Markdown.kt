@@ -4,20 +4,21 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
@@ -31,8 +32,10 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
+import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import org.commonmark.node.BlockQuote
 import org.commonmark.node.BulletList
 import org.commonmark.node.Code
@@ -51,6 +54,7 @@ import org.commonmark.node.Paragraph
 import org.commonmark.node.StrongEmphasis
 import org.commonmark.node.Text
 import org.commonmark.node.ThematicBreak
+import org.commonmark.parser.Parser
 
 // Very heavily inspired/taken from https://www.hellsoft.se/rendering-markdown-with-jetpack-compose/
 @Composable
@@ -92,28 +96,21 @@ fun MarkdownBlockChildren(
 
 @Composable
 fun MarkdownBlockQuote(blockQuote: BlockQuote, modifier: Modifier = Modifier) {
-    val color = MaterialTheme.colors.onBackground
-    Box(
-        modifier = Modifier
-            .drawBehind {
-                drawLine(
-                    color = color,
-                    strokeWidth = 2f,
-                    start = Offset(12.dp.value, 0f),
-                    end = Offset(12.dp.value, size.height)
-                )
+    Box(Modifier.padding(bottom = 8.dp)) {
+        Surface(
+            elevation = 2.dp,
+            shape = MaterialTheme.shapes.medium,
+        ) {
+            Box(
+                modifier = Modifier
+                    .padding(8.dp)
+            ) {
+                val text = buildAnnotatedString {
+                    appendMarkdownChildren(blockQuote, MaterialTheme.colors)
+                }
+                Text(text, modifier.alpha(0.8f))
             }
-            .padding(start = 16.dp, top = 4.dp, bottom = 8.dp)
-    ) {
-        val text = buildAnnotatedString {
-            pushStyle(
-                MaterialTheme.typography.body1.toSpanStyle()
-                    .plus(SpanStyle(fontStyle = FontStyle.Italic))
-            )
-            appendMarkdownChildren(blockQuote, MaterialTheme.colors)
-            pop()
         }
-        Text(text, modifier)
     }
 }
 
@@ -367,3 +364,25 @@ fun MarkdownOrderedList(
 
 private const val TAG_URL = "url"
 private const val TAG_IMAGE_URL = "imageUrl"
+
+@Preview
+@Composable
+fun BlockQuotePreview() {
+    VermilionTheme(darkTheme = true) {
+        Surface(Modifier.fillMaxSize()) {
+            Box(modifier = Modifier.padding(8.dp)) {
+                MarkdownDocument(document = DUMMY_BLOCK_QUOTE)
+            }
+        }
+    }
+}
+
+private val parser = Parser.builder().build()
+
+private val DUMMY_BLOCK_QUOTE = parser.parse(
+    """
+    > This is some text in a block quote. It is reasonably long so it will look like a paragraph when displayed
+    
+    I disagree wholeheartedly!
+    """.trimIndent()
+) as Document

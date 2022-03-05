@@ -338,6 +338,11 @@ class CommentRepositoryImpl @Inject constructor(
             } else {
                 null
             },
+            when (distinguished) {
+                "moderator" -> CommentFlags.IS_MOD
+                "admin" -> CommentFlags.IS_ADMIN
+                else -> null
+            },
             if (sticked) {
                 CommentFlags.STICKIED
             } else {
