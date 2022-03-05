@@ -69,8 +69,6 @@ fun CommentRow(comment: Comment, modifier: Modifier = Modifier) {
                     Text(
                         text = comment.authorName.value,
                         style = MaterialTheme.typography.caption,
-                        // color = MaterialTheme.colors.primary,
-                        // modifier = Modifier.alignByBaseline()
                     )
 
                     val score = remember {
@@ -81,9 +79,7 @@ fun CommentRow(comment: Comment, modifier: Modifier = Modifier) {
                         text = score,
                         style = MaterialTheme.typography.caption,
                         fontWeight = FontWeight.Bold,
-                        // color = MaterialTheme.colors.secondary,
                         modifier = Modifier
-                            // .alignByBaseline()
                             .padding(start = 8.dp, end = 8.dp)
                     )
                     CommentFlagIcons(flags = comment.flags)
@@ -91,8 +87,6 @@ fun CommentRow(comment: Comment, modifier: Modifier = Modifier) {
                     Text(
                         text = comment.createdAtDurationString.value,
                         style = MaterialTheme.typography.caption,
-                        color = MaterialTheme.colors.onBackground,
-                        // modifier = Modifier.alignByBaseline()
                     )
                 }
 
