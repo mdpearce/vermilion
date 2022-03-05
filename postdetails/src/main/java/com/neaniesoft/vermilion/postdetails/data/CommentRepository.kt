@@ -338,6 +338,11 @@ class CommentRepositoryImpl @Inject constructor(
             } else {
                 null
             },
+            if (canModPost) {
+                CommentFlags.IS_MOD
+            } else {
+                null
+            },
             if (sticked) {
                 CommentFlags.STICKIED
             } else {

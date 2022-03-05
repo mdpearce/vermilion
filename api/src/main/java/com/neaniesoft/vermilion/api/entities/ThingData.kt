@@ -59,7 +59,8 @@ data class CommentData(
     @JsonProperty("controversiality") val controversiality: Int,
     @JsonProperty("depth") val depth: Int,
     @JsonProperty("ups") val ups: Int,
-    @JsonProperty("collapsed") val collapsed: Boolean
+    @JsonProperty("collapsed") val collapsed: Boolean,
+    @JsonProperty("can_mod_post") val canModPost: Boolean
 ) : ThingData()
 
 data class MoreCommentsData(
