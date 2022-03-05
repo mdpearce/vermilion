@@ -1,6 +1,5 @@
 package com.neaniesoft.vermilion.postdetails.domain.entities
 
-
 sealed class CommentFlair {
     object NoFlair : CommentFlair()
     data class TextFlair(
