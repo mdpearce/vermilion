@@ -44,10 +44,8 @@ import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.ui.markdown.MarkdownDocument
 import com.neaniesoft.vermilion.ui.theme.Green400
-import com.neaniesoft.vermilion.ui.theme.LightBlue
 import com.neaniesoft.vermilion.ui.theme.LightRedVariant
 import com.neaniesoft.vermilion.ui.theme.Secondary
-import com.neaniesoft.vermilion.ui.theme.SecondaryDark
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import com.neaniesoft.vermilion.ui.theme.colorForDepth
 import org.commonmark.node.Document
@@ -67,6 +65,7 @@ fun CommentRow(comment: Comment, modifier: Modifier = Modifier) {
 
             DepthIndicators(depth = comment.depth.value)
 
+            // TODO extract a lot of this out to functions, this is getting unwieldy
             Column(Modifier.padding(8.dp)) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     if (comment.flags.contains(CommentFlags.IS_OP)) {
