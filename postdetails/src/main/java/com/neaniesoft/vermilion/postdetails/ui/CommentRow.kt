@@ -270,7 +270,7 @@ fun DeepCommentRowPreview() {
 @Composable
 fun StickiedCommentRowPreview() {
     VermilionTheme(darkTheme = true) {
-        androidx.compose.material.Surface {
+        Surface {
             CommentRow(STICKIED_DUMMY_COMMENT)
         }
     }
@@ -280,7 +280,7 @@ fun StickiedCommentRowPreview() {
 @Composable
 fun StickiedModCommentRowPreview() {
     VermilionTheme(darkTheme = true) {
-        androidx.compose.material.Surface {
+        Surface {
             CommentRow(STICKED_MOD_DUMMY_COMMENT)
         }
     }
@@ -290,7 +290,7 @@ fun StickiedModCommentRowPreview() {
 @Composable
 fun AdminCommentRowPreview() {
     VermilionTheme(darkTheme = true) {
-        androidx.compose.material.Surface {
+        Surface {
             CommentRow(ADMIN_DUMMY_COMMENT)
         }
     }
@@ -300,7 +300,7 @@ fun AdminCommentRowPreview() {
 @Composable
 fun OpCommentRowPreview() {
     VermilionTheme(darkTheme = true) {
-        androidx.compose.material.Surface {
+        Surface {
             CommentRow(OP_DUMMY_CONTENT)
         }
     }
