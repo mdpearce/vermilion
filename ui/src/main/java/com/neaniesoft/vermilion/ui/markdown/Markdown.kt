@@ -20,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
@@ -61,10 +60,11 @@ import org.commonmark.parser.Parser
 fun MarkdownDocument(
     document: Document,
     truncateToBlocks: Int = Int.MAX_VALUE,
+    onUriClicked: (String) -> Unit = {},
     onTextClick: (() -> Unit)? = null
 ) {
     Column {
-        MarkdownBlockChildren(parent = document, truncateToBlocks, onTextClick)
+        MarkdownBlockChildren(parent = document, truncateToBlocks, onUriClicked, onTextClick)
     }
 }
 
@@ -72,6 +72,7 @@ fun MarkdownDocument(
 fun MarkdownBlockChildren(
     parent: Node,
     truncateToBlocks: Int = Int.MAX_VALUE,
+    onUriClicked: (String) -> Unit = {},
     onTextClick: (() -> Unit)? = null
 ) {
     var child = parent.firstChild
@@ -81,13 +82,17 @@ fun MarkdownBlockChildren(
         when (child) {
             is BlockQuote -> MarkdownBlockQuote(blockQuote = child)
             is ThematicBreak -> MarkdownThematicBreak(thematicBreak = child)
-            is Heading -> MarkdownHeading(heading = child, onTextClick = onTextClick)
-            is Paragraph -> MarkdownParagraph(paragraph = child, onClick = onTextClick)
+            is Heading -> MarkdownHeading(
+                heading = child,
+                onUriClicked = onUriClicked,
+                onTextClick = onTextClick
+            )
+            is Paragraph -> MarkdownParagraph(paragraph = child, onClick = onTextClick, onUriClicked = onUriClicked)
             is FencedCodeBlock -> MarkdownFencedCodeBlock(fencedCodeBlock = child)
             is IndentedCodeBlock -> MarkdownIndentedCodeBlock(indentedCodeBlock = child)
             is Image -> MarkdownImage(image = child)
-            is BulletList -> MarkdownBulletList(bulletList = child)
-            is OrderedList -> MarkdownOrderedList(orderedList = child)
+            is BulletList -> MarkdownBulletList(bulletList = child, onUriClicked = onUriClicked)
+            is OrderedList -> MarkdownOrderedList(orderedList = child, onUriClicked = onUriClicked)
         }
         count++
         child = child.next
@@ -123,6 +128,7 @@ fun MarkdownThematicBreak(thematicBreak: ThematicBreak) {
 fun MarkdownHeading(
     heading: Heading,
     modifier: Modifier = Modifier,
+    onUriClicked: (String) -> Unit = {},
     onTextClick: (() -> Unit)? = null
 ) {
     val style = when (heading.level) {
@@ -144,7 +150,7 @@ fun MarkdownHeading(
         val text = buildAnnotatedString {
             appendMarkdownChildren(heading, MaterialTheme.colors)
         }
-        MarkdownText(text, style, onClick = onTextClick)
+        MarkdownText(text, style, onUriClicked = onUriClicked, onClick = onTextClick)
     }
 }
 
@@ -153,9 +159,9 @@ fun MarkdownText(
     text: AnnotatedString,
     style: TextStyle,
     modifier: Modifier = Modifier,
+    onUriClicked: (String) -> Unit = {},
     onClick: (() -> Unit)? = null
 ) {
-    val uriHandler = LocalUriHandler.current
     val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
 
     Text(
@@ -168,7 +174,7 @@ fun MarkdownText(
                         .firstOrNull()
                     if (annotation != null) {
                         if (annotation.tag == TAG_URL) {
-                            uriHandler.openUri(annotation.item)
+                            onUriClicked(annotation.item)
                         }
                     } else {
                         if (onClick != null) {
@@ -234,6 +240,7 @@ private fun AnnotatedString.Builder.appendMarkdownChildren(parent: Node, colors:
 fun MarkdownParagraph(
     paragraph: Paragraph,
     modifier: Modifier = Modifier,
+    onUriClicked: (String) -> Unit = {},
     onClick: (() -> Unit)? = null
 ) {
     if (paragraph.firstChild is Image && paragraph.firstChild == paragraph.lastChild) {
@@ -254,6 +261,7 @@ fun MarkdownParagraph(
             MarkdownText(
                 text = styledText,
                 style = MaterialTheme.typography.body1,
+                onUriClicked = onUriClicked,
                 onClick = onClick
             )
         }
@@ -304,23 +312,31 @@ fun MarkdownImage(image: Image, modifier: Modifier = Modifier) {
 fun MarkdownBulletList(
     bulletList: BulletList,
     modifier: Modifier = Modifier,
+    onUriClicked: (String) -> Unit = {},
     onTextClick: (() -> Unit)? = null
 ) {
     val marker = bulletList.bulletMarker
-    MarkdownListItems(listBlock = bulletList, modifier) {
+    MarkdownListItems(listBlock = bulletList, onUriClicked = onUriClicked, modifier) {
         val text = buildAnnotatedString {
             pushStyle(MaterialTheme.typography.body1.toSpanStyle())
             append("$marker ")
             appendMarkdownChildren(it, MaterialTheme.colors)
             pop()
         }
-        MarkdownText(text = text, style = MaterialTheme.typography.body1, modifier, onTextClick)
+        MarkdownText(
+            text = text,
+            style = MaterialTheme.typography.body1,
+            modifier,
+            onUriClicked,
+            onTextClick
+        )
     }
 }
 
 @Composable
 fun MarkdownListItems(
     listBlock: ListBlock,
+    onUriClicked: (String) -> Unit = {},
     modifier: Modifier = Modifier,
     item: @Composable (node: Node) -> Unit
 ) {
@@ -332,8 +348,16 @@ fun MarkdownListItems(
             var child = listItem.firstChild
             while (child != null) {
                 when (child) {
-                    is BulletList -> MarkdownBulletList(child, modifier)
-                    is OrderedList -> MarkdownOrderedList(child, modifier)
+                    is BulletList -> MarkdownBulletList(
+                        child,
+                        modifier,
+                        onUriClicked = onUriClicked
+                    )
+                    is OrderedList -> MarkdownOrderedList(
+                        child,
+                        modifier,
+                        onUriClicked = onUriClicked
+                    )
                     else -> item(child)
                 }
                 child = child.next
@@ -347,18 +371,19 @@ fun MarkdownListItems(
 fun MarkdownOrderedList(
     orderedList: OrderedList,
     modifier: Modifier = Modifier,
+    onUriClicked: (String) -> Unit = {},
     onTextClick: (() -> Unit)? = null
 ) {
     var number = orderedList.startNumber
     val delimiter = orderedList.delimiter
-    MarkdownListItems(orderedList, modifier) {
+    MarkdownListItems(orderedList, onUriClicked = onUriClicked, modifier) {
         val text = buildAnnotatedString {
             pushStyle(MaterialTheme.typography.body1.toSpanStyle())
             append("${number++}$delimiter ")
             appendMarkdownChildren(it, MaterialTheme.colors)
             pop()
         }
-        MarkdownText(text, MaterialTheme.typography.body1, modifier, onTextClick)
+        MarkdownText(text, MaterialTheme.typography.body1, modifier, onUriClicked, onTextClick)
     }
 }
 

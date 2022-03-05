@@ -53,7 +53,7 @@ import java.text.NumberFormat
 import java.time.Instant
 
 @Composable
-fun CommentRow(comment: Comment, modifier: Modifier = Modifier) {
+fun CommentRow(comment: Comment, modifier: Modifier = Modifier, onUriClicked: (String) -> Unit = {}) {
     Column {
         if (comment.depth == CommentDepth(0)) {
             Divider()
@@ -102,7 +102,10 @@ fun CommentRow(comment: Comment, modifier: Modifier = Modifier) {
                 }
 
                 Box(Modifier.padding(top = 8.dp)) {
-                    MarkdownDocument(document = comment.contentMarkdown as Document)
+                    MarkdownDocument(
+                        document = comment.contentMarkdown as Document,
+                        onUriClicked = onUriClicked
+                    )
                 }
             }
         }

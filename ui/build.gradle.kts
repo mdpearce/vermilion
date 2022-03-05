@@ -10,6 +10,7 @@ dependencies {
     implementation(Deps.LIFECYCLE_RUNTIME)
     implementation(project(":utils"))
     api(Deps.COMMONMARK)
+    implementation(Deps.COMMONMARK_EXT_AUTOLINK)
     implementation(Deps.COIL_COMPOSE)
     debugImplementation(Deps.COMPOSE_UI_TOOLING)
 }
