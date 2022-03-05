@@ -18,8 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
@@ -97,28 +96,21 @@ fun MarkdownBlockChildren(
 
 @Composable
 fun MarkdownBlockQuote(blockQuote: BlockQuote, modifier: Modifier = Modifier) {
-    val color = MaterialTheme.colors.onBackground
-    Box(
-        modifier = Modifier
-            .drawBehind {
-                drawLine(
-                    color = color,
-                    strokeWidth = 2f,
-                    start = Offset(12.dp.value, 0f),
-                    end = Offset(12.dp.value, size.height)
-                )
+    Box(Modifier.padding(bottom = 8.dp)) {
+        Surface(
+            elevation = 2.dp,
+            shape = MaterialTheme.shapes.medium,
+        ) {
+            Box(
+                modifier = Modifier
+                    .padding(8.dp)
+            ) {
+                val text = buildAnnotatedString {
+                    appendMarkdownChildren(blockQuote, MaterialTheme.colors)
+                }
+                Text(text, modifier.alpha(0.8f))
             }
-            .padding(start = 16.dp, top = 4.dp, bottom = 8.dp)
-    ) {
-        val text = buildAnnotatedString {
-            pushStyle(
-                MaterialTheme.typography.body1.toSpanStyle()
-                    .plus(SpanStyle(fontStyle = FontStyle.Italic))
-            )
-            appendMarkdownChildren(blockQuote, MaterialTheme.colors)
-            pop()
         }
-        Text(text, modifier)
     }
 }
 
