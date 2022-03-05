@@ -384,5 +384,5 @@ private val DUMMY_BLOCK_QUOTE = parser.parse(
     > This is some text in a block quote. It is reasonably long so it will look like a paragraph when displayed
     
     I disagree wholeheartedly!
-""".trimIndent()
+    """.trimIndent()
 ) as Document
