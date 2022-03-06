@@ -7,11 +7,13 @@ plugins {
     id("kotlin-android")
     id("kotlin-kapt")
     id("dagger.hilt.android.plugin")
+    id("kotlin-parcelize")
 }
 
 apply(plugin = "net.thauvin.erik.gradle.semver")
 apply(plugin = "com.google.gms.google-services")
 apply(plugin = "com.google.firebase.crashlytics")
+apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
 
 // TODO This is pretty gross
 fun versionNameFromSemVer(): String {
@@ -157,4 +159,5 @@ dependencies {
     androidTestImplementation(Deps.ANDROIDX_TEST_ESPRESSO)
     androidTestImplementation(Deps.COMPOSE_UI_TEST_JUNIT4)
     debugImplementation(Deps.COMPOSE_UI_TOOLING_PREVIEW)
+    implementation(Deps.KOTLINX_SERIALIZATION_JSON)
 }

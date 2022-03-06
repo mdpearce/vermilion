@@ -14,4 +14,5 @@ dependencies {
     implementation(Deps.COMMONMARK_EXT_AUTOLINK)
     implementation(Deps.COIL_COMPOSE)
     debugImplementation(Deps.COMPOSE_UI_TOOLING)
+    implementation(Deps.KOTLINX_SERIALIZATION_JSON)
 }

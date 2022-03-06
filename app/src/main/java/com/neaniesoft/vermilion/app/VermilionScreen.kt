@@ -6,7 +6,8 @@ enum class VermilionScreen {
     PostDetails,
     MyAccount,
     CustomTab,
-    Image;
+    Image,
+    Video;
 
     companion object {
         fun fromRoute(route: String?): VermilionScreen = when (route?.substringBefore("/")) {
@@ -16,6 +17,7 @@ enum class VermilionScreen {
             MyAccount.name -> MyAccount
             CustomTab.name -> CustomTab
             Image.name -> Image
+            Video.name -> Video
             null -> Home
             else -> throw IllegalArgumentException("Unrecognized route: $route")
         }

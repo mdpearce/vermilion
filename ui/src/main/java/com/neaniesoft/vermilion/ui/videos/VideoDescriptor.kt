@@ -1,11 +1,36 @@
 package com.neaniesoft.vermilion.ui.videos
 
 import android.net.Uri
+import android.os.Parcelable
+import androidx.core.net.toUri
+import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 
+@Parcelize
+@Serializable
 data class VideoDescriptor(
     val width: VideoWidth,
     val height: VideoHeight,
-    val dash: Uri,
-    val hls: Uri,
-    val fallback: Uri
-)
+    @Serializable(with = UriAsStringSerializer::class) val dash: Uri,
+    @Serializable(with = UriAsStringSerializer::class) val hls: Uri,
+    @Serializable(with = UriAsStringSerializer::class) val fallback: Uri
+) : Parcelable
+
+object UriAsStringSerializer : KSerializer<Uri> {
+    override fun deserialize(decoder: Decoder): Uri {
+        return decoder.decodeString().toUri()
+    }
+
+    override val descriptor: SerialDescriptor =
+        PrimitiveSerialDescriptor("Uri", PrimitiveKind.STRING)
+
+    override fun serialize(encoder: Encoder, value: Uri) {
+        encoder.encodeString(value.toString())
+    }
+}

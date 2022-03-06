@@ -1,5 +1,6 @@
 package com.neaniesoft.vermilion.app
 
+import android.os.Bundle
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -24,7 +25,11 @@ import com.neaniesoft.vermilion.coreentities.NamedCommunity
 import com.neaniesoft.vermilion.postdetails.ui.PostDetailsScreen
 import com.neaniesoft.vermilion.posts.ui.PostsScreen
 import com.neaniesoft.vermilion.ui.images.ImageDialog
+import com.neaniesoft.vermilion.ui.videos.VideoDescriptor
+import com.neaniesoft.vermilion.ui.videos.VideoDialog
 import kotlinx.coroutines.FlowPreview
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import java.net.URLDecoder
 
 @ExperimentalMaterialApi
@@ -115,5 +120,35 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
                 }
             )
         }
+
+        // Fullscreen video viewer
+        dialog(
+            route = "${VermilionScreen.Video}/{videoDescriptor}",
+            arguments = listOf(
+                navArgument("videoDescriptor") { type = VideoDescriptorParamType() }
+            ),
+            dialogProperties = DialogProperties(usePlatformDefaultWidth = false)
+        ) { backStackEntry ->
+            val video =
+                requireNotNull(backStackEntry.arguments?.getParcelable<VideoDescriptor>("videoDescriptor"))
+
+            VideoDialog(videoDescriptor = video, onDismiss = {
+                navController.popBackStack(backStackEntry.destination.id, true)
+            })
+        }
+    }
+}
+
+class VideoDescriptorParamType : NavType<VideoDescriptor>(isNullableAllowed = false) {
+    override fun get(bundle: Bundle, key: String): VideoDescriptor? {
+        return bundle.getParcelable(key)
+    }
+
+    override fun parseValue(value: String): VideoDescriptor {
+        return Json.decodeFromString(value)
+    }
+
+    override fun put(bundle: Bundle, key: String, value: VideoDescriptor) {
+        bundle.putParcelable(key, value)
     }
 }
