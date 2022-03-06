@@ -230,6 +230,11 @@ class CommentRepositoryImpl @Inject constructor(
             authorName = AuthorName(author),
             createdAt = Instant.ofEpochMilli(createdAt),
             createdAtDurationString = createdAt.formatDuration(),
+            editedAt = if (editedAt > 0) {
+                Instant.ofEpochMilli(editedAt)
+            } else {
+                null
+            },
             score = Score(score),
             link = link.toUri(),
             postId = PostId(postId),
@@ -332,6 +337,7 @@ class CommentRepositoryImpl @Inject constructor(
             author = "",
             createdAt = now,
             insertedAt = now,
+            editedAt = 0,
             score = count, // TODO this is pretty gross, using the score field to store the child count. Should probably modify the schema to allow for this new field instead.
             link = "",
             controversialIndex = 0,
@@ -392,6 +398,7 @@ class CommentRepositoryImpl @Inject constructor(
             flags = flags,
             author = author,
             createdAt = createdUtc.toLong(),
+            editedAt = edited.toLong(),
             insertedAt = clock.millis(),
             score = score,
             link = permalink,

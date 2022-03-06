@@ -319,6 +319,7 @@ private val DUMMY_COMMENT = Comment(
     AuthorName("Some user"),
     Instant.now(),
     DurationString("1h ago"),
+    null,
     Score(1024),
     "".toUri(),
     PostId("post_id"),
