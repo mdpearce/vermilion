@@ -8,6 +8,7 @@ data class Post(
     val id: PostId,
     val title: PostTitle,
     val summary: PostSummary,
+    val videoPreview: VideoDescriptor?,
     val community: Community,
     val authorName: AuthorName,
     val postedAt: Instant,
@@ -20,3 +21,17 @@ data class Post(
 )
 
 fun Post.isNsfw(): Boolean = flags.contains(PostFlags.NSFW)
+
+data class VideoDescriptor(
+    val width: VideoWidth,
+    val height: VideoHeight,
+    val dash: Uri,
+    val hls: Uri,
+    val fallback: Uri
+)
+
+@JvmInline
+value class VideoHeight(val value: Int)
+
+@JvmInline
+value class VideoWidth(val value: Int)
