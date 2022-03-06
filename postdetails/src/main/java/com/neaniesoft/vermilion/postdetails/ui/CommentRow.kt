@@ -97,7 +97,11 @@ fun CommentRow(
                     CommentFlair(flair = comment.commentFlair, Modifier.padding(end = 8.dp))
 
                     val score = remember {
-                        NumberFormat.getIntegerInstance().format(comment.score.value)
+                        if (comment.flags.contains(CommentFlags.SCORE_HIDDEN)) {
+                            "?"
+                        } else {
+                            NumberFormat.getIntegerInstance().format(comment.score.value)
+                        }
                     }
 
                     Text(
