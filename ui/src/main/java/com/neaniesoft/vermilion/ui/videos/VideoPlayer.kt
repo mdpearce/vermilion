@@ -29,6 +29,7 @@ fun VideoPlayer(video: VideoDescriptor) {
     val player = remember {
         ExoPlayer.Builder(context).build().apply {
             setMediaItem(MediaItem.fromUri(video.dash))
+            prepare()
             playWhenReady = autoPlay
             seekTo(window, position)
         }
