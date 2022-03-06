@@ -27,7 +27,7 @@ import com.neaniesoft.vermilion.dbentities.useraccount.UserAccountRecord
         CommunityRecord::class,
         PostHistoryRecord::class
     ],
-    version = 15
+    version = 16
 )
 abstract class VermilionDatabase : RoomDatabase() {
     abstract fun userAccountDao(): UserAccountDao

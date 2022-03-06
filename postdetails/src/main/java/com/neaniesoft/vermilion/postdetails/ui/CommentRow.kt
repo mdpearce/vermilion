@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -97,7 +98,11 @@ fun CommentRow(
                     CommentFlair(flair = comment.commentFlair, Modifier.padding(end = 8.dp))
 
                     val score = remember {
-                        NumberFormat.getIntegerInstance().format(comment.score.value)
+                        if (comment.flags.contains(CommentFlags.SCORE_HIDDEN)) {
+                            "?"
+                        } else {
+                            NumberFormat.getIntegerInstance().format(comment.score.value)
+                        }
                     }
 
                     Text(
@@ -109,10 +114,21 @@ fun CommentRow(
                     )
                     CommentFlagIcons(flags = comment.flags)
                     Spacer(modifier = Modifier.weight(1.0f))
-                    Text(
-                        text = comment.createdAtDurationString.value,
-                        style = MaterialTheme.typography.caption,
-                    )
+                    Column(horizontalAlignment = Alignment.End) {
+
+                        Text(
+                            text = comment.createdAtDurationString.value,
+                            style = MaterialTheme.typography.caption,
+                        )
+                        if (comment.editedAtDurationString != null) {
+                            Text(
+                                text = "edited ${comment.editedAtDurationString.value}",
+                                style = MaterialTheme.typography.caption,
+                                fontStyle = FontStyle.Italic,
+                                modifier = Modifier.padding(top = 4.dp)
+                            )
+                        }
+                    }
                 }
 
                 Box(Modifier.padding(top = 8.dp)) {
@@ -306,6 +322,16 @@ fun OpCommentRowPreview() {
     }
 }
 
+@Preview
+@Composable
+fun EditedCOmmentRowPreview() {
+    VermilionTheme(darkTheme = true) {
+        Surface {
+            CommentRow(EDITED_DUMMY_COMMENT)
+        }
+    }
+}
+
 private val DUMMY_COMMENT = Comment(
     CommentId("id"),
     CommentContent("This is a pretty long comment that might split over several lines. It's got several sentences and goes on for some time. Still going here."),
@@ -315,6 +341,8 @@ private val DUMMY_COMMENT = Comment(
     AuthorName("Some user"),
     Instant.now(),
     DurationString("1h ago"),
+    null,
+    null,
     Score(1024),
     "".toUri(),
     PostId("post_id"),
@@ -336,3 +364,8 @@ private val STICKED_MOD_DUMMY_COMMENT =
     DUMMY_COMMENT.copy(flags = setOf(CommentFlags.STICKIED, CommentFlags.IS_MOD))
 private val ADMIN_DUMMY_COMMENT = DUMMY_COMMENT.copy(flags = setOf(CommentFlags.IS_ADMIN))
 private val OP_DUMMY_CONTENT = DUMMY_COMMENT.copy(flags = setOf(CommentFlags.IS_OP))
+private val EDITED_DUMMY_COMMENT = DUMMY_COMMENT.copy(
+    flags = setOf(CommentFlags.EDITED),
+    editedAt = Instant.now(),
+    editedAtDurationString = DurationString("moments ago")
+)
