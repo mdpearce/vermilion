@@ -183,7 +183,7 @@ class PostsViewModel @Inject constructor(
 }
 
 @Singleton
-class VideoRouter(
+class VideoRouter @Inject constructor(
     private val matchers: Set<@JvmSuppressWildcards VideoRouteMatcher>
 ) {
     private val logger by logger()
@@ -217,7 +217,7 @@ class YoutubeVideoRouteMatcher @Inject constructor() : VideoRouteMatcher {
                 if (videoId.isNullOrEmpty()) {
                     VideoMatchResult.NoMatch
                 } else {
-                    VideoMatchResult.RouteMatch("")
+                    VideoMatchResult.RouteMatch("YouTube/$videoId")
                 }
             }
             else -> VideoMatchResult.NoMatch

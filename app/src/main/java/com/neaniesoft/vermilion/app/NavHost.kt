@@ -27,6 +27,7 @@ import com.neaniesoft.vermilion.posts.ui.PostsScreen
 import com.neaniesoft.vermilion.ui.images.ImageDialog
 import com.neaniesoft.vermilion.ui.videos.VideoDescriptor
 import com.neaniesoft.vermilion.ui.videos.VideoDialog
+import com.neaniesoft.vermilion.ui.videos.YouTubeDialog
 import kotlinx.coroutines.FlowPreview
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -133,6 +134,22 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
                 requireNotNull(backStackEntry.arguments?.getParcelable<VideoDescriptor>("videoDescriptor"))
 
             VideoDialog(videoDescriptor = video, onDismiss = {
+                navController.popBackStack(backStackEntry.destination.id, true)
+            })
+        }
+
+        // Fullscreen youtube viewer
+        dialog(
+            route = "${VermilionScreen.YouTube}/{videoId}",
+            arguments = listOf(
+                navArgument("videoId") { type = NavType.StringType }
+            ),
+            dialogProperties = DialogProperties(usePlatformDefaultWidth = false)
+        ) { backStackEntry ->
+            val videoId =
+                requireNotNull(backStackEntry.arguments?.getString("videoId"))
+
+            YouTubeDialog(videoId, onDismiss = {
                 navController.popBackStack(backStackEntry.destination.id, true)
             })
         }
