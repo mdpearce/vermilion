@@ -46,10 +46,12 @@ fun YouTubePlayer(videoId: String) {
                     state: PlayerConstants.PlayerState
                 ) {
                     when (state) {
-                        PlayerConstants.PlayerState.PAUSED, PlayerConstants.PlayerState.ENDED -> autoPlay =
-                            false
-                        PlayerConstants.PlayerState.PLAYING, PlayerConstants.PlayerState.BUFFERING -> autoPlay =
-                            true
+                        PlayerConstants.PlayerState.PAUSED, PlayerConstants.PlayerState.ENDED ->
+                            autoPlay =
+                                false
+                        PlayerConstants.PlayerState.PLAYING, PlayerConstants.PlayerState.BUFFERING ->
+                            autoPlay =
+                                true
                         else -> {}
                     }
                 }

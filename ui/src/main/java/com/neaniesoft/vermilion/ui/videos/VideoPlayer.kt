@@ -68,6 +68,6 @@ fun VideoPlayer(video: VideoDescriptor) {
     AndroidView(factory = {
         playerView
     }, update = {
-        playerView.player = player
-    })
+            playerView.player = player
+        })
 }
