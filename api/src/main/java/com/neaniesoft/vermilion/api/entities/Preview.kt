@@ -4,5 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 data class Preview(
     @JsonProperty("images") val images: List<Images>,
+    @JsonProperty("reddit_video_preview") val redditVideoPreview: RedditVideoPreview?,
     @JsonProperty("enabled") val enabled: Boolean
 )
