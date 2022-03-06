@@ -27,7 +27,10 @@ import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.posts.domain.entities.TextPostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.ThumbnailSummary
 import com.neaniesoft.vermilion.posts.domain.entities.UriImage
+import com.neaniesoft.vermilion.posts.domain.entities.VideoDescriptor
+import com.neaniesoft.vermilion.posts.domain.entities.VideoHeight
 import com.neaniesoft.vermilion.posts.domain.entities.VideoPostSummary
+import com.neaniesoft.vermilion.posts.domain.entities.VideoWidth
 import org.commonmark.node.Document
 import org.commonmark.parser.Parser
 import java.time.Clock
@@ -90,6 +93,17 @@ fun PostRecord.toPost(markdownParser: Parser, additionalFlags: Set<PostFlags> = 
                 thumbnail = thumbnailUri?.thumbnail() ?: DefaultThumbnail,
                 LinkHost(linkHost),
                 linkUri = linkUri.toUri()
+            )
+        },
+        videoPreview = if (videoFallback == null) {
+            null
+        } else {
+            VideoDescriptor(
+                width = VideoWidth(requireNotNull(videoWidth)),
+                height = VideoHeight(requireNotNull(videoHeight)),
+                dash = requireNotNull(videoDash).toUri(),
+                hls = requireNotNull(videoHls).toUri(),
+                fallback = requireNotNull(videoFallback).toUri()
             )
         },
         community = if (communityName == FrontPage.routeName) {
@@ -164,6 +178,11 @@ fun Post.toPostRecord(query: String, clock: Clock): PostRecord = PostRecord(
         is TextPostSummary -> summary.previewText.value
         else -> null
     },
+    videoWidth = videoPreview?.width?.value,
+    videoHeight = videoPreview?.height?.value,
+    videoDash = videoPreview?.dash?.toString(),
+    videoHls = videoPreview?.hls?.toString(),
+    videoFallback = videoPreview?.fallback?.toString(),
     communityName = community.routeName,
     communityId = (community as? NamedCommunity)?.id?.value ?: "",
     authorName = authorName.value,
