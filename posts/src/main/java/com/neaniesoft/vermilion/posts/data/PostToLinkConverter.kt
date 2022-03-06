@@ -37,9 +37,9 @@ import com.neaniesoft.vermilion.posts.domain.entities.TextPostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.Thumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.UriImage
 import com.neaniesoft.vermilion.posts.domain.entities.UriThumbnail
+import com.neaniesoft.vermilion.posts.domain.entities.VideoPostSummary
 import com.neaniesoft.vermilion.ui.videos.VideoDescriptor
 import com.neaniesoft.vermilion.ui.videos.VideoHeight
-import com.neaniesoft.vermilion.posts.domain.entities.VideoPostSummary
 import com.neaniesoft.vermilion.ui.videos.VideoWidth
 import com.neaniesoft.vermilion.utils.anonymousLogger
 import org.apache.commons.text.StringEscapeUtils
@@ -170,8 +170,8 @@ internal fun List<Awarding>.toAwardsMap(): Map<Award, AwardCount> =
     associateBy(keySelector = { awarding ->
         Award(AwardName(awarding.name), URL(awarding.iconUrl))
     }, valueTransform = { awarding ->
-        AwardCount(awarding.count)
-    })
+            AwardCount(awarding.count)
+        })
 
 internal fun Link.flags(): Set<PostFlags> {
     return mutableSetOf<PostFlags>().apply {

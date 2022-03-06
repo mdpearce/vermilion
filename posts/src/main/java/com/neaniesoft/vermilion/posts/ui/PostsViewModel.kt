@@ -27,6 +27,7 @@ import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
 import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
 import com.neaniesoft.vermilion.tabs.domain.entities.TabType
 import com.neaniesoft.vermilion.ui.images.ImageRouter
+import com.neaniesoft.vermilion.ui.videos.VideoDescriptor
 import com.neaniesoft.vermilion.utils.logger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
@@ -36,6 +37,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.commonmark.parser.Parser
 import java.net.URLEncoder
 import java.time.Clock
@@ -115,19 +118,25 @@ class PostsViewModel @Inject constructor(
         }
     }
 
-    fun onOpenUri(post: Post, uri: Uri) {
+    fun onMediaClicked(post: Post) {
         viewModelScope.launch {
             postHistoryService.markPostAsRead(post.id)
-            val route = when (post.summary) {
-                is ImagePostSummary -> {
-                    val directUri = imageRouter.directImageUriOrNull(post.link)
-                    if (directUri != null) {
-                        buildImageRoute(directUri)
-                    } else {
-                        customTabRoute(uri)
+            val route = if (post.videoPreview != null) {
+                // We've got a video descriptor, let's show the video player
+                buildVideoRoute(post.videoPreview)
+            } else {
+                // TODO this is gross
+                when (post.summary) {
+                    is ImagePostSummary -> {
+                        val directUri = imageRouter.directImageUriOrNull(post.link)
+                        if (directUri != null) {
+                            buildImageRoute(directUri)
+                        } else {
+                            customTabRoute(post.link)
+                        }
                     }
+                    else -> customTabRoute(post.link)
                 }
-                else -> customTabRoute(uri)
             }
 
             _routeEvents.emit(route)
@@ -136,6 +145,10 @@ class PostsViewModel @Inject constructor(
 
     private fun buildImageRoute(uri: Uri): String {
         return "Image/" + URLEncoder.encode(uri.toString(), "utf-8")
+    }
+
+    private fun buildVideoRoute(video: VideoDescriptor): String {
+        return "Video/" + Uri.encode(Json.encodeToString(video))
     }
 
     fun onOpenCommunity(community: Community) {

@@ -25,6 +25,7 @@ dependencies {
     implementation(project(":tabs"))
     implementation(project(":coreentities"))
     debugImplementation(Deps.COMPOSE_UI_TOOLING)
+    implementation(Deps.KOTLINX_SERIALIZATION_JSON)
 
     implementation(Deps.ROOM_RUNTIME)
     kapt(Deps.ROOM_COMPILER)

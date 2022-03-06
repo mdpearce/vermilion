@@ -27,9 +27,9 @@ import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.posts.domain.entities.TextPostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.ThumbnailSummary
 import com.neaniesoft.vermilion.posts.domain.entities.UriImage
+import com.neaniesoft.vermilion.posts.domain.entities.VideoPostSummary
 import com.neaniesoft.vermilion.ui.videos.VideoDescriptor
 import com.neaniesoft.vermilion.ui.videos.VideoHeight
-import com.neaniesoft.vermilion.posts.domain.entities.VideoPostSummary
 import com.neaniesoft.vermilion.ui.videos.VideoWidth
 import org.commonmark.node.Document
 import org.commonmark.parser.Parser
