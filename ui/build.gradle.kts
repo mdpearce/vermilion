@@ -9,6 +9,7 @@ dependencies {
     implementation(Deps.COMPOSE_UI_TOOLING_PREVIEW)
     implementation(Deps.LIFECYCLE_RUNTIME)
     implementation(Deps.EXOPLAYER)
+    implementation(Deps.ANDROID_YOUTUBE_PLAYER)
     implementation(project(":utils"))
     api(Deps.COMMONMARK)
     implementation(Deps.COMMONMARK_EXT_AUTOLINK)
