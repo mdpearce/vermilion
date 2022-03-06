@@ -15,9 +15,6 @@ import androidx.lifecycle.LifecycleOwner
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ui.StyledPlayerView
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 
 @Composable
 fun VideoPlayer(video: VideoDescriptor) {
@@ -72,60 +69,5 @@ fun VideoPlayer(video: VideoDescriptor) {
         playerView
     }, update = {
         playerView.player = player
-    })
-}
-
-@Composable
-fun YouTubePlayer(videoId: String) {
-    val context = LocalContext.current
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
-
-    // // TODO This should be hoisted out to a state object for observation
-    // var autoPlay by rememberSaveable { mutableStateOf(true) }
-    // var window by rememberSaveable { mutableStateOf(0) }
-    // var position by rememberSaveable { mutableStateOf(0L) }
-
-    // fun updateState() {
-    //     autoPlay = player.playWhenReady
-    //     window = player.currentMediaItemIndex
-    //     position = 0L.coerceAtLeast(player.contentPosition) // ??
-    // }
-
-    val playerView = remember {
-        // StyledPlayerView(context).also { view ->
-        //     lifecycle.addObserver(object : DefaultLifecycleObserver {
-        //         override fun onStart(owner: LifecycleOwner) {
-        //             view.onResume()
-        //             player.playWhenReady = autoPlay
-        //         }
-        //
-        //         override fun onStop(owner: LifecycleOwner) {
-        //             updateState()
-        //             view.onPause()
-        //             player.playWhenReady = false
-        //         }
-        //     })
-        // }
-        YouTubePlayerView(context).apply {
-            lifecycle.addObserver(this)
-            addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
-                override fun onReady(youTubePlayer: YouTubePlayer) {
-                    youTubePlayer.loadVideo(videoId, 0f)
-                }
-            })
-        }
-    }
-
-    DisposableEffect(key1 = Unit) {
-        onDispose {
-            // updateState()
-            playerView.release()
-        }
-    }
-
-    AndroidView(factory = {
-        playerView
-    }, update = {
-        // playerView.player = player
     })
 }
