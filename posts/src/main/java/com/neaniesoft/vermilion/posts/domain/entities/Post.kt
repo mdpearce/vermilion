@@ -2,6 +2,7 @@ package com.neaniesoft.vermilion.posts.domain.entities
 
 import android.net.Uri
 import com.neaniesoft.vermilion.coreentities.Community
+import com.neaniesoft.vermilion.ui.videos.VideoDescriptor
 import java.time.Instant
 
 data class Post(
@@ -21,17 +22,3 @@ data class Post(
 )
 
 fun Post.isNsfw(): Boolean = flags.contains(PostFlags.NSFW)
-
-data class VideoDescriptor(
-    val width: VideoWidth,
-    val height: VideoHeight,
-    val dash: Uri,
-    val hls: Uri,
-    val fallback: Uri
-)
-
-@JvmInline
-value class VideoHeight(val value: Int)
-
-@JvmInline
-value class VideoWidth(val value: Int)
