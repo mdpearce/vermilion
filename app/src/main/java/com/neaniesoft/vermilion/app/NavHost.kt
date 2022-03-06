@@ -125,7 +125,7 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
         dialog(
             route = "${VermilionScreen.Video}/{videoDescriptor}",
             arguments = listOf(
-                navArgument("videoDescriptor") { type = VideoDescriptorParamType() }
+                navArgument("videoDescriptor") { type = VideoDescriptorParamType }
             ),
             dialogProperties = DialogProperties(usePlatformDefaultWidth = false)
         ) { backStackEntry ->
@@ -139,7 +139,7 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
     }
 }
 
-class VideoDescriptorParamType : NavType<VideoDescriptor>(isNullableAllowed = false) {
+object VideoDescriptorParamType : NavType<VideoDescriptor>(isNullableAllowed = false) {
     override fun get(bundle: Bundle, key: String): VideoDescriptor? {
         return bundle.getParcelable(key)
     }
