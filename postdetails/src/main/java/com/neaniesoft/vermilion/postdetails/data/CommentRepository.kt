@@ -235,6 +235,11 @@ class CommentRepositoryImpl @Inject constructor(
             } else {
                 null
             },
+            editedAtDurationString = if (editedAt > 0) {
+                editedAt.formatDuration()
+            } else {
+                null
+            },
             score = Score(score),
             link = link.toUri(),
             postId = PostId(postId),

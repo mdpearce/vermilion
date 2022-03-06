@@ -16,6 +16,7 @@ data class Comment(
     val createdAt: Instant,
     val createdAtDurationString: DurationString,
     val editedAt: Instant?,
+    val editedAtDurationString: DurationString?,
     val score: Score,
     val link: Uri,
     val postId: PostId,
