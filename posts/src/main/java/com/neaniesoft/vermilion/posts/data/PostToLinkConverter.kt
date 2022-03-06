@@ -38,6 +38,9 @@ import com.neaniesoft.vermilion.posts.domain.entities.Thumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.UriImage
 import com.neaniesoft.vermilion.posts.domain.entities.UriThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.VideoPostSummary
+import com.neaniesoft.vermilion.ui.videos.VideoDescriptor
+import com.neaniesoft.vermilion.ui.videos.VideoHeight
+import com.neaniesoft.vermilion.ui.videos.VideoWidth
 import com.neaniesoft.vermilion.utils.anonymousLogger
 import org.apache.commons.text.StringEscapeUtils
 import org.commonmark.node.Document
@@ -52,6 +55,7 @@ fun Link.toPost(markdownParser: Parser): Post {
         PostId(id),
         PostTitle(StringEscapeUtils.unescapeHtml4(title)),
         postSummary(markdownParser),
+        videoPreview(),
         NamedCommunity(CommunityName(subreddit), CommunityId(subredditId)),
         AuthorName(author),
         Instant.ofEpochMilli((created * 1000.0).roundToLong()),
@@ -62,6 +66,20 @@ fun Link.toPost(markdownParser: Parser): Post {
         url.toUri(),
         flair()
     )
+}
+
+internal fun Link.videoPreview(): VideoDescriptor? {
+    val redditVideo = preview?.redditVideoPreview ?: return null
+
+    return with(redditVideo) {
+        VideoDescriptor(
+            width = VideoWidth(width),
+            height = VideoHeight(height),
+            dash = dashUrl.toUri(),
+            hls = hlsUrl.toUri(),
+            fallback = fallbackUrl.toUri()
+        )
+    }
 }
 
 internal fun Link.flair(): PostFlair {

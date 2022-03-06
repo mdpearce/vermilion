@@ -2,7 +2,8 @@ object Deps {
     const val HILT_COMPILER = "com.google.dagger:hilt-compiler:2.41"
     const val HILT_ANDROID = "com.google.dagger:hilt-android:2.41"
     const val HILT_ANDROID_TESTING = "com.google.dagger:hilt-android-testing:2.41"
-    const val LIFECYCLE_VIEWMODEL_COMPOSE = "androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0-alpha01"
+    const val LIFECYCLE_VIEWMODEL_COMPOSE =
+        "androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0-alpha01"
     const val LIFECYCLE_VIEWMODEL = "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.0-alpha01"
     const val LIFECYCLE_RUNTIME = "androidx.lifecycle:lifecycle-runtime-ktx:2.5.0-alpha01"
     const val HILT_NAVIGATION_COMPOSE = "androidx.hilt:hilt-navigation-compose:1.0.0"
@@ -37,7 +38,8 @@ object Deps {
     const val ROOM_KOTLIN = "androidx.room:room-ktx:2.4.2"
     const val ROOM_TESTING = "androidx.room:room-testing:2.4.2"
     const val APP_AUTH = "net.openid:appauth:0.11.1"
-    const val ACCOMPANIST_NAVIGATION_MATERIAL = "com.google.accompanist:accompanist-navigation-material:0.24.1-alpha"
+    const val ACCOMPANIST_NAVIGATION_MATERIAL =
+        "com.google.accompanist:accompanist-navigation-material:0.24.1-alpha"
     const val COIL = "io.coil-kt:coil:1.4.0"
     const val COIL_COMPOSE = "io.coil-kt:coil-compose:1.4.0"
     const val COMMONS_TEXT = "org.apache.commons:commons-text:1.9"
@@ -53,6 +55,12 @@ object Deps {
     const val FIREBASE_BOM = "com.google.firebase:firebase-bom:29.1.0"
     const val FIREBASE_CRASHLYTICS = "com.google.firebase:firebase-crashlytics-ktx"
     const val FIREBASE_ANALYTICS = "com.google.firebase:firebase-analytics-ktx"
-    const val FIREBASE_CRASHLYTICS_GRADLE_PLUGIN = "com.google.firebase:firebase-crashlytics-gradle:2.8.1"
+    const val FIREBASE_CRASHLYTICS_GRADLE_PLUGIN =
+        "com.google.firebase:firebase-crashlytics-gradle:2.8.1"
     const val ACCOMPANIST_SWIPE_REFRESH = "com.google.accompanist:accompanist-swiperefresh:0.23.1"
+    const val EXOPLAYER = "com.google.android.exoplayer:exoplayer:2.17.0"
+    const val KOTLINX_SERIALIZATION_GRADLE_PLUGIN =
+        "org.jetbrains.kotlin:kotlin-serialization:1.6.10"
+    const val KOTLINX_SERIALIZATION_JSON = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2"
+    const val ANDROID_YOUTUBE_PLAYER = "com.pierfrancescosoffritti.androidyoutubeplayer:core:11.0.1"
 }

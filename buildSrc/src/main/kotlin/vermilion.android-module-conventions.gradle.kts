@@ -3,7 +3,10 @@ plugins {
     id("kotlin-android")
     id("kotlin-kapt")
     id("dagger.hilt.android.plugin")
+    id("kotlin-parcelize")
 }
+
+apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
 
 android {
     compileSdk = 31
