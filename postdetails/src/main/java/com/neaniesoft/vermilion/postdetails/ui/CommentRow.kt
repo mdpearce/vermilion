@@ -77,7 +77,7 @@ fun CommentRow(
 
             DepthIndicators(depth = comment.depth.value)
 
-            Column(Modifier.padding(8.dp)) {
+            Column(Modifier.padding(16.dp)) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     CommentAuthor(comment = comment, Modifier.padding(end = 8.dp))
                     CommentTime(comment = comment, Modifier.padding(end = 8.dp))
@@ -205,18 +205,17 @@ data class FlagIcon(
 
 @Composable
 fun DepthIndicators(
-    depth: Int
+    depth: Int,
+    modifier: Modifier = Modifier
 ) {
-    Row {
-        repeat(depth) { count ->
-            Box(modifier = Modifier.width(16.dp), contentAlignment = Alignment.Center) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .width(2.dp)
-                        .background(colorForDepth(count))
-                )
-            }
+    Row(modifier = modifier.padding(start = (depth * 8).dp, top = 2.dp, bottom = 2.dp)) {
+        if (depth != 0) {
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(2.dp)
+                    .background(colorForDepth(depth))
+            )
         }
     }
 }
@@ -282,7 +281,9 @@ fun CommentFlair(flair: CommentFlair, modifier: Modifier = Modifier) {
 @Composable
 fun CommentRowPreview() {
     VermilionTheme(darkTheme = true) {
-        CommentRow(DUMMY_COMMENT, Modifier.fillMaxWidth())
+        Surface {
+            CommentRow(DUMMY_COMMENT, Modifier.fillMaxWidth())
+        }
     }
 }
 
@@ -290,7 +291,9 @@ fun CommentRowPreview() {
 @Composable
 fun DeepCommentRowPreview() {
     VermilionTheme(darkTheme = true) {
-        CommentRow(DEEP_DUMMY_COMMENT, Modifier.fillMaxWidth())
+        Surface {
+            CommentRow(DEEP_DUMMY_COMMENT, Modifier.fillMaxWidth())
+        }
     }
 }
 
