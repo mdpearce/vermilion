@@ -34,6 +34,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.Score
+import com.neaniesoft.vermilion.utils.formatCompact
 import com.neaniesoft.vermilion.utils.logger
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -47,6 +48,8 @@ import java.time.Duration
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 interface CommentRepository {
     suspend fun getFlattenedCommentTreeForPost(
@@ -265,7 +268,9 @@ class CommentRepositoryImpl @Inject constructor(
     }
 
     private fun Long.formatDuration(): DurationString {
-        return DurationString(prettyTime.format(Instant.ofEpochSecond(this)))
+        return DurationString(
+            (clock.millis() - this).toDuration(DurationUnit.MILLISECONDS).formatCompact()
+        )
     }
 
     private fun CommentRecord.getFlags(): Set<CommentFlags> {

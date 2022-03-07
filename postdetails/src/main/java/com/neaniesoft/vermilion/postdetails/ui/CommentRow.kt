@@ -78,9 +78,9 @@ fun CommentRow(
             DepthIndicators(depth = comment.depth.value)
 
             Column(Modifier.padding(8.dp)) {
-                CommentTime(comment = comment, Modifier.padding(bottom = 8.dp))
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     CommentAuthor(comment = comment, Modifier.padding(end = 8.dp))
+                    CommentTime(comment = comment, Modifier.padding(end = 8.dp))
                     CommentFlair(flair = comment.commentFlair, Modifier.padding(end = 8.dp))
                     CommentFlagIcons(flags = comment.flags)
                     Spacer(modifier = Modifier.weight(1.0f))
@@ -352,7 +352,7 @@ private val DUMMY_COMMENT = Comment(
     emptySet(),
     AuthorName("Some user"),
     Instant.now(),
-    DurationString("1 hour ago"),
+    DurationString("23m"),
     null,
     null,
     Score(1024),
@@ -379,5 +379,5 @@ private val OP_DUMMY_CONTENT = DUMMY_COMMENT.copy(flags = setOf(CommentFlags.IS_
 private val EDITED_DUMMY_COMMENT = DUMMY_COMMENT.copy(
     flags = setOf(CommentFlags.EDITED),
     editedAt = Instant.now(),
-    editedAtDurationString = DurationString("moments ago")
+    editedAtDurationString = DurationString("30m")
 )
