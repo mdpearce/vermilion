@@ -10,7 +10,8 @@ import com.neaniesoft.vermilion.ui.images.rememberZoomableState
 fun YouTubeDialog(videoId: String, onDismiss: () -> Unit) {
     Log.d("YouTubeDialog", "Loading video: $videoId")
     val state = rememberZoomableState(maxScale = 6f)
+    val youTubePlayerState = rememberYouTubePlayerState()
     ZoomableDialog(state = state, onDismiss = onDismiss) {
-        YouTubePlayer(videoId = videoId)
+        YouTubePlayer(youTubePlayerState, videoId = videoId)
     }
 }
