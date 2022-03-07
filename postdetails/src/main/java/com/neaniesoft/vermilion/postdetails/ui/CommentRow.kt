@@ -78,14 +78,13 @@ fun CommentRow(
             DepthIndicators(depth = comment.depth.value)
 
             Column(Modifier.padding(8.dp)) {
+                CommentTime(comment = comment, Modifier.padding(bottom = 8.dp))
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-
                     CommentAuthor(comment = comment, Modifier.padding(end = 8.dp))
                     CommentFlair(flair = comment.commentFlair, Modifier.padding(end = 8.dp))
-                    CommentScore(comment = comment, Modifier.padding(end = 8.dp))
                     CommentFlagIcons(flags = comment.flags)
                     Spacer(modifier = Modifier.weight(1.0f))
-                    CommentTime(comment = comment)
+                    CommentScore(comment = comment)
                 }
 
                 Box(Modifier.padding(top = 8.dp)) {
@@ -113,6 +112,7 @@ fun CommentTime(comment: Comment, modifier: Modifier = Modifier) {
     Text(
         text = time,
         style = MaterialTheme.typography.caption,
+        modifier = modifier
     )
 }
 
