@@ -62,7 +62,6 @@ fun VideoPlayer(video: VideoDescriptor) {
 
     DisposableEffect(key1 = Unit) {
         onDispose {
-            updateState()
             player.release()
         }
     }
