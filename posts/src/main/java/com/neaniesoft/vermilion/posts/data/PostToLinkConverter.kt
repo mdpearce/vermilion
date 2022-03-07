@@ -56,6 +56,7 @@ fun Link.toPost(markdownParser: Parser): Post {
         PostTitle(StringEscapeUtils.unescapeHtml4(title)),
         postSummary(markdownParser),
         videoPreview(),
+        attachedVideo(),
         NamedCommunity(CommunityName(subreddit), CommunityId(subredditId)),
         AuthorName(author),
         Instant.ofEpochMilli((created * 1000.0).roundToLong()),
@@ -66,6 +67,20 @@ fun Link.toPost(markdownParser: Parser): Post {
         url.toUri(),
         flair()
     )
+}
+
+internal fun Link.attachedVideo(): VideoDescriptor? {
+    val redditVideo = secureMedia?.redditVideo ?: return null
+
+    return with(redditVideo) {
+        VideoDescriptor(
+            width = VideoWidth(width),
+            height = VideoHeight(height),
+            dash = dashUrl.toUri(),
+            hls = hlsUrl.toUri(),
+            fallback = fallbackUrl.toUri()
+        )
+    }
 }
 
 internal fun Link.videoPreview(): VideoDescriptor? {
@@ -170,8 +185,8 @@ internal fun List<Awarding>.toAwardsMap(): Map<Award, AwardCount> =
     associateBy(keySelector = { awarding ->
         Award(AwardName(awarding.name), URL(awarding.iconUrl))
     }, valueTransform = { awarding ->
-            AwardCount(awarding.count)
-        })
+        AwardCount(awarding.count)
+    })
 
 internal fun Link.flags(): Set<PostFlags> {
     return mutableSetOf<PostFlags>().apply {

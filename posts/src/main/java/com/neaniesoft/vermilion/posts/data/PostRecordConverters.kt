@@ -95,17 +95,24 @@ fun PostRecord.toPost(markdownParser: Parser, additionalFlags: Set<PostFlags> = 
                 linkUri = linkUri.toUri()
             )
         },
-        videoPreview = if (videoFallback == null) {
+        videoPreview = if (previewVideoFallback == null) {
             null
         } else {
             VideoDescriptor(
-                width = VideoWidth(requireNotNull(videoWidth)),
-                height = VideoHeight(requireNotNull(videoHeight)),
-                dash = requireNotNull(videoDash).toUri(),
-                hls = requireNotNull(videoHls).toUri(),
-                fallback = requireNotNull(videoFallback).toUri()
+                width = VideoWidth(requireNotNull(previewVideoWidth)),
+                height = VideoHeight(requireNotNull(previewVideoHeight)),
+                dash = requireNotNull(previewVideoDash).toUri(),
+                hls = requireNotNull(previewVideoHls).toUri(),
+                fallback = requireNotNull(previewVideoFallback).toUri()
             )
         },
+        attachedVideo = VideoDescriptor(
+            width = VideoWidth(requireNotNull(videoWidth)),
+            height = VideoHeight(requireNotNull(videoHeight)),
+            dash = requireNotNull(videoDash).toUri(),
+            hls = requireNotNull(videoHls).toUri(),
+            fallback = requireNotNull(videoFallback).toUri()
+        ),
         community = if (communityName == FrontPage.routeName) {
             FrontPage
         } else {
@@ -178,11 +185,16 @@ fun Post.toPostRecord(query: String, clock: Clock): PostRecord = PostRecord(
         is TextPostSummary -> summary.previewText.value
         else -> null
     },
-    videoWidth = videoPreview?.width?.value,
-    videoHeight = videoPreview?.height?.value,
-    videoDash = videoPreview?.dash?.toString(),
-    videoHls = videoPreview?.hls?.toString(),
-    videoFallback = videoPreview?.fallback?.toString(),
+    previewVideoWidth = videoPreview?.width?.value,
+    previewVideoHeight = videoPreview?.height?.value,
+    previewVideoDash = videoPreview?.dash?.toString(),
+    previewVideoHls = videoPreview?.hls?.toString(),
+    previewVideoFallback = videoPreview?.fallback?.toString(),
+    videoWidth = attachedVideo?.width?.value,
+    videoHeight = attachedVideo?.height?.value,
+    videoDash = attachedVideo?.dash?.toString(),
+    videoHls = attachedVideo?.hls?.toString(),
+    videoFallback = attachedVideo?.fallback?.toString(),
     communityName = community.routeName,
     communityId = (community as? NamedCommunity)?.id?.value ?: "",
     authorName = authorName.value,

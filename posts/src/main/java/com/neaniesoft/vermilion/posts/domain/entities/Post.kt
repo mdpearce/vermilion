@@ -10,6 +10,7 @@ data class Post(
     val title: PostTitle,
     val summary: PostSummary,
     val videoPreview: VideoDescriptor?,
+    val attachedVideo: VideoDescriptor?,
     val community: Community,
     val authorName: AuthorName,
     val postedAt: Instant,

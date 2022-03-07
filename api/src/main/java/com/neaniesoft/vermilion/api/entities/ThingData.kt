@@ -28,6 +28,7 @@ data class Link(
     @JsonProperty("all_awardings") val allAwardings: List<Awarding>,
     @JsonProperty("post_hint") val postHint: String?,
     @JsonProperty("preview") val preview: Preview?,
+    @JsonProperty("secure_media") val secureMedia: SecureMedia?,
     @JsonProperty("link_flair_text") val linkFlairText: String?,
     @JsonProperty("link_flair_text_color") val linkFlairTextColor: String,
     @JsonProperty("link_flair_background_color") val linkFlairBackgroundColor: String?,
@@ -82,3 +83,7 @@ data class SubredditData(
     @JsonProperty("title") val title: String,
     @JsonProperty("user_is_subscriber") val userIsSubscriber: Boolean
 ) : ThingData()
+
+data class SecureMedia(
+    @JsonProperty("reddit_video") val redditVideo: RedditVideo?
+)
