@@ -8,6 +8,7 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
@@ -61,7 +62,7 @@ class YouTubePlayerState(
 }
 
 @Composable
-fun YouTubePlayer(playerState: YouTubePlayerState, videoId: String) {
+fun YouTubePlayer(playerState: YouTubePlayerState, videoId: String, modifier: Modifier = Modifier) {
     val lifecycle = LocalLifecycleOwner.current.lifecycle
 
     AndroidView(factory = {
@@ -92,5 +93,5 @@ fun YouTubePlayer(playerState: YouTubePlayerState, videoId: String) {
                 }
             })
         }
-    }, update = { })
+    }, update = { }, modifier = modifier)
 }
