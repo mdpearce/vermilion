@@ -106,13 +106,17 @@ fun PostRecord.toPost(markdownParser: Parser, additionalFlags: Set<PostFlags> = 
                 fallback = requireNotNull(previewVideoFallback).toUri()
             )
         },
-        attachedVideo = VideoDescriptor(
-            width = VideoWidth(requireNotNull(videoWidth)),
-            height = VideoHeight(requireNotNull(videoHeight)),
-            dash = requireNotNull(videoDash).toUri(),
-            hls = requireNotNull(videoHls).toUri(),
-            fallback = requireNotNull(videoFallback).toUri()
-        ),
+        attachedVideo = if (videoFallback == null) {
+            null
+        } else {
+            VideoDescriptor(
+                width = VideoWidth(requireNotNull(videoWidth)),
+                height = VideoHeight(requireNotNull(videoHeight)),
+                dash = requireNotNull(videoDash).toUri(),
+                hls = requireNotNull(videoHls).toUri(),
+                fallback = requireNotNull(videoFallback).toUri()
+            )
+        },
         community = if (communityName == FrontPage.routeName) {
             FrontPage
         } else {
