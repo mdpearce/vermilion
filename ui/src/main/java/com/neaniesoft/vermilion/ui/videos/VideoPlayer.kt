@@ -14,6 +14,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.StyledPlayerView
 
 @Composable
@@ -30,6 +31,7 @@ fun VideoPlayer(video: VideoDescriptor) {
         ExoPlayer.Builder(context).build().apply {
             setMediaItem(MediaItem.fromUri(video.dash))
             prepare()
+            repeatMode = Player.REPEAT_MODE_ONE
             playWhenReady = autoPlay
             seekTo(window, position)
         }
@@ -68,6 +70,6 @@ fun VideoPlayer(video: VideoDescriptor) {
     AndroidView(factory = {
         playerView
     }, update = {
-            playerView.player = player
-        })
+        playerView.player = player
+    })
 }
