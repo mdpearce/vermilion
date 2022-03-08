@@ -1,5 +1,6 @@
 package com.neaniesoft.vermilion.app
 
+import VermilionAppState
 import android.os.Bundle
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
@@ -41,7 +42,7 @@ import java.net.URLDecoder
 @Composable
 fun VermilionNavHost(
     navController: NavHostController,
-    onAppBarClicked: () -> Unit,
+    appState: VermilionAppState,
     modifier: Modifier = Modifier
 ) {
     NavHost(
@@ -54,6 +55,7 @@ fun VermilionNavHost(
             VermilionScreen.Home.name
         ) {
             PostsScreen(
+                appState,
                 community = com.neaniesoft.vermilion.coreentities.FrontPage,
                 onRoute = { route ->
                     if (route.isNotEmpty()) {
@@ -76,6 +78,7 @@ fun VermilionNavHost(
                 CommunityName(name), CommunityId("")
             )
             PostsScreen(
+                appState,
                 community = community,
                 onRoute = { route ->
                     if (route.isNotEmpty()) {

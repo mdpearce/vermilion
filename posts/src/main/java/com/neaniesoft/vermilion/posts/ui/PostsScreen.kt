@@ -1,5 +1,6 @@
 package com.neaniesoft.vermilion.posts.ui
 
+import VermilionAppState
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,20 +10,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.listSaver
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -44,38 +42,17 @@ import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import kotlinx.coroutines.FlowPreview
 
-@Composable
-fun rememberPostsScreenState(listState: LazyListState): PostsScreenState = rememberSaveable(
-    saver = PostsScreenState.Saver
-) {
-    PostsScreenState(listState)
-}
-
-@Stable
-class PostsScreenState(val listState: LazyListState) {
-    suspend fun onAppBarClicked() {
-        listState.animateScrollToItem(0, 0)
-    }
-
-    companion object {
-        val Saver: Saver<PostsScreenState, *> = listSaver(
-            save = { listOf(it.listState) },
-            restore = { PostsScreenState(it[0]) }
-        )
-    }
-}
-
 @FlowPreview
 @ExperimentalPagingApi
 @Composable
 fun PostsScreen(
-    state: PostsScreenState,
+    appState: VermilionAppState,
     community: Community,
     onRoute: (String) -> Unit,
     viewModel: PostsViewModel = hiltViewModel()
 ) {
     val pagingItems = viewModel.pagingData(community.routeName).collectAsLazyPagingItems()
-    val listState = state.listState
+    val listState = rememberLazyListState()
     val initialScrollPosition = viewModel.restoredScrollPosition.collectAsState(
         initial = null
     )
@@ -97,6 +74,13 @@ fun PostsScreen(
     if (!isScrolling.value) {
         LaunchedEffect(key1 = scrollPosition) {
             viewModel.onScrollStateUpdated(scrollPosition.value)
+        }
+    }
+
+    // Listen to taps on the app bar from the top level scaffold
+    LaunchedEffect(key1 = Unit) {
+        appState.appBarClicks.collect {
+            listState.animateScrollToItem(0, 0)
         }
     }
 

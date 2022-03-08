@@ -14,6 +14,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -33,6 +34,8 @@ import com.neaniesoft.vermilion.tabs.adapters.driving.ui.TabBottomBar
 import com.neaniesoft.vermilion.tabs.domain.entities.ActiveTab
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.launch
+import rememberVermilionAppState
 import java.time.Clock
 
 @FlowPreview
@@ -57,6 +60,7 @@ fun VermilionApp(
             userAccountService.logout()
         }
 
+        val appState = rememberVermilionAppState()
         val navController = rememberNavController()
         val bottomSheetNavigator = rememberBottomSheetNavigator()
         val context = LocalContext.current
@@ -107,6 +111,8 @@ fun VermilionApp(
         val subscribedCommunities by
         viewModel.subscribedCommunities.collectAsState(initial = emptyList())
 
+        val scope = rememberCoroutineScope()
+
         Scaffold(
             scaffoldState = scaffoldState,
             snackbarHost = { scaffoldState.snackbarHostState },
@@ -114,7 +120,7 @@ fun VermilionApp(
                 TopAppBar(
                     elevation = 16.dp,
                     title = { Text(currentScreen.name) },
-                    modifier = Modifier.clickable { }
+                    modifier = Modifier.clickable { scope.launch { appState.onAppBarClicked() } }
                 )
             },
             bottomBar = {
@@ -143,7 +149,7 @@ fun VermilionApp(
             }
         ) { innerPadding ->
             ModalBottomSheetLayout(bottomSheetNavigator) {
-                VermilionNavHost(navController, Modifier.padding(innerPadding))
+                VermilionNavHost(navController, appState, Modifier.padding(innerPadding))
             }
         }
     }
