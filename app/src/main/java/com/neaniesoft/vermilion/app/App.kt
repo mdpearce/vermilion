@@ -2,6 +2,7 @@ package com.neaniesoft.vermilion.app
 
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Scaffold
@@ -110,9 +111,11 @@ fun VermilionApp(
             scaffoldState = scaffoldState,
             snackbarHost = { scaffoldState.snackbarHostState },
             topBar = {
-                TopAppBar(elevation = 16.dp, title = {
-                    Text(currentScreen.name)
-                })
+                TopAppBar(
+                    elevation = 16.dp,
+                    title = { Text(currentScreen.name) },
+                    modifier = Modifier.clickable { }
+                )
             },
             bottomBar = {
                 TabBottomBar(
