@@ -129,25 +129,25 @@ class PostsViewModel @Inject constructor(
     fun onMediaClicked(post: Post) {
         viewModelScope.launch {
             postHistoryService.markPostAsRead(post.id)
-            val route = if (post.videoPreview != null) {
-                // We've got a video descriptor, let's show the video player
-                buildVideoRoute(post.videoPreview)
-            } else {
-                // TODO this is gross
-                when (post.summary) {
-                    is ImagePostSummary -> {
-                        val directUri = imageRouter.directImageUriOrNull(post.link)
-                        if (directUri != null) {
-                            buildImageRoute(directUri)
-                        } else {
-                            customTabRoute(post.link)
-                        }
+
+            val route = when {
+                post.attachedVideo != null -> buildVideoRoute(post.attachedVideo)
+                post.videoPreview != null -> buildVideoRoute(post.videoPreview)
+                post.summary is ImagePostSummary -> {
+                    val directUri = imageRouter.directImageUriOrNull(post.link)
+                    if (directUri != null) {
+                        buildImageRoute(directUri)
+                    } else {
+                        customTabRoute(post.link)
                     }
-                    is VideoPostSummary -> {
-                        // We've got a video post, but no embedded video to load. It must be external, so we'll try to match it to a route
-                        buildVideoRoute(post.link)
-                    }
-                    else -> customTabRoute(post.link)
+                }
+                post.summary is VideoPostSummary -> {
+                    // We've got a video post without an attached video or preview. It must be external, so try to match the URI
+                    buildVideoRoute(post.link)
+                }
+                else -> {
+                    // Finally, if all else fails, just open the link in a custom tab
+                    customTabRoute(post.link)
                 }
             }
 

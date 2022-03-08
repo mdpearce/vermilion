@@ -2,7 +2,7 @@ package com.neaniesoft.vermilion.api.entities
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-data class RedditVideoPreview(
+data class RedditVideo(
     @JsonProperty("bitrate_kbps") val bitrateKbps: Int,
     @JsonProperty("fallback_url") val fallbackUrl: String,
     @JsonProperty("height") val height: Int,

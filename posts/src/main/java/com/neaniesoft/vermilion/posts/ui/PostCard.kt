@@ -368,6 +368,7 @@ internal val DUMMY_TEXT_POST = Post(
         Parser.builder().build().parse(MIXED_MD) as Document
     ),
     null,
+    null,
     NamedCommunity(CommunityName("Subreddit"), CommunityId("")),
     AuthorName("/u/SomeDude"),
     postedAt = Instant.now(),
@@ -391,6 +392,7 @@ internal val DUMMY_LINK_POST = Post(
         DefaultThumbnail,
         LinkHost("somehost")
     ),
+    null,
     null,
     NamedCommunity(CommunityName("Subreddit"), CommunityId("")),
     AuthorName("/u/SomeDude"),
