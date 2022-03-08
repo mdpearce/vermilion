@@ -39,7 +39,11 @@ import java.net.URLDecoder
 @ExperimentalMaterialNavigationApi
 @ExperimentalPagingApi
 @Composable
-fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
+fun VermilionNavHost(
+    navController: NavHostController,
+    onAppBarClicked: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     NavHost(
         navController = navController,
         startDestination = VermilionScreen.Home.name,
