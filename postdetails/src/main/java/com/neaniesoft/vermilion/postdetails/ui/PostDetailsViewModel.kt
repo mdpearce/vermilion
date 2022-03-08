@@ -19,8 +19,10 @@ import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
 import com.neaniesoft.vermilion.tabs.domain.entities.TabType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
@@ -45,6 +47,9 @@ class PostDetailsViewModel @Inject constructor(
 
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()
+
+    private val _scrollToEvents = MutableSharedFlow<Int>()
+    val scrollToEvents = _scrollToEvents.asSharedFlow()
 
     private val postId = PostId(
         savedStateHandle.get<String>("id")
@@ -108,6 +113,9 @@ class PostDetailsViewModel @Inject constructor(
 
     fun refresh() {
         loadComments(true)
+    }
+
+    fun onCommentNavDownClicked(firstVisibleItemIndex: Int) {
     }
 }
 
