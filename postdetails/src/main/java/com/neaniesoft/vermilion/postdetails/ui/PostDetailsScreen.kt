@@ -60,6 +60,12 @@ fun PostDetailsScreen(
         derivedStateOf { columnState.isScrollInProgress }
     }
 
+    LaunchedEffect(key1 = Unit) {
+        viewModel.scrollToEvents.collect {
+            columnState.animateScrollToItem(it, 0)
+        }
+    }
+
     val scrollPosition by remember {
         derivedStateOf {
             ScrollPosition(
