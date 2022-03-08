@@ -16,7 +16,7 @@ fun VideoDialog(videoDescriptor: VideoDescriptor, onDismiss: () -> Unit) {
     ZoomableDialog(state = zoomableState, onDismiss = onDismiss) {
         VideoPlayer(
             state = videoPlayerState,
-            video = videoDescriptor,
+            video = Video.DescriptorVideo(videoDescriptor),
             modifier = Modifier.fillMaxSize()
         )
     }

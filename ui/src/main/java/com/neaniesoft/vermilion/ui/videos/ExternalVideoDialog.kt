@@ -1,7 +1,14 @@
 package com.neaniesoft.vermilion.ui.videos
 
 import android.net.Uri
+import android.util.Log
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
@@ -14,6 +21,7 @@ import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
 import com.github.michaelbull.result.runCatching
 import com.neaniesoft.vermilion.api.RedditApiClientModule
+import com.neaniesoft.vermilion.ui.images.rememberZoomableState
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -33,8 +41,40 @@ import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
 
+@ExperimentalMaterialApi
 @Composable
-fun ExternalVideoDialog(viewModel: ExternalVideoDialogViewModel = hiltViewModel()) {
+fun ExternalVideoDialog(
+    unresolvedUri: Uri,
+    onDismiss: () -> Unit,
+    viewModel: ExternalVideoDialogViewModel = hiltViewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    val zoomableState = rememberZoomableState(maxScale = 6f)
+    val videoPlayerState = rememberVideoPlayerState()
+
+    LaunchedEffect(key1 = unresolvedUri) {
+        viewModel.onResolveExternalUri(unresolvedUri)
+    }
+
+
+    ZoomableDialog(state = zoomableState, onDismiss = onDismiss) {
+        when (val currentState = uiState) {
+            is ExternalVideoDialogState.Loading -> {} // TODO: Put a progress spinner here
+            is ExternalVideoDialogState.ErrorState -> {
+                Log.e(
+                    "ExternalVideoDialog",
+                    "Error: ${currentState.error}"
+                ) // TODO Handle this better
+            }
+            is ExternalVideoDialogState.PlayUriState -> {
+                VideoPlayer(
+                    state = videoPlayerState,
+                    video = Video.UriVideo(currentState.uri),
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+        }
+    }
 }
 
 interface VideoUriResolver {
