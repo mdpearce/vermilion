@@ -1,5 +1,6 @@
 package com.neaniesoft.vermilion.posts.ui
 
+import VermilionAppState
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,6 +46,7 @@ import kotlinx.coroutines.FlowPreview
 @ExperimentalPagingApi
 @Composable
 fun PostsScreen(
+    appState: VermilionAppState,
     community: Community,
     onRoute: (String) -> Unit,
     viewModel: PostsViewModel = hiltViewModel()
@@ -72,6 +74,13 @@ fun PostsScreen(
     if (!isScrolling.value) {
         LaunchedEffect(key1 = scrollPosition) {
             viewModel.onScrollStateUpdated(scrollPosition.value)
+        }
+    }
+
+    // Listen to taps on the app bar from the top level scaffold
+    LaunchedEffect(key1 = Unit) {
+        appState.appBarClicks.collect {
+            listState.animateScrollToItem(0, 0)
         }
     }
 

@@ -1,5 +1,6 @@
 package com.neaniesoft.vermilion.postdetails.ui
 
+import VermilionAppState
 import android.net.Uri
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,6 +30,7 @@ import kotlinx.coroutines.FlowPreview
 @FlowPreview
 @Composable
 fun PostDetailsScreen(
+    appState: VermilionAppState,
     viewModel: PostDetailsViewModel = hiltViewModel(),
     onOpenUri: (Uri) -> Unit,
 ) {
@@ -67,6 +69,12 @@ fun PostDetailsScreen(
                 scrollToPosition.index,
                 scrollToPosition.offset
             )
+        }
+    }
+
+    LaunchedEffect(key1 = Unit) {
+        appState.appBarClicks.collect {
+            columnState.animateScrollToItem(0, 0)
         }
     }
 

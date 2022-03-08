@@ -1,5 +1,6 @@
 package com.neaniesoft.vermilion.app
 
+import VermilionAppState
 import android.os.Bundle
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
@@ -39,7 +40,11 @@ import java.net.URLDecoder
 @ExperimentalMaterialNavigationApi
 @ExperimentalPagingApi
 @Composable
-fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
+fun VermilionNavHost(
+    navController: NavHostController,
+    appState: VermilionAppState,
+    modifier: Modifier = Modifier
+) {
     NavHost(
         navController = navController,
         startDestination = VermilionScreen.Home.name,
@@ -50,6 +55,7 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
             VermilionScreen.Home.name
         ) {
             PostsScreen(
+                appState,
                 community = com.neaniesoft.vermilion.coreentities.FrontPage,
                 onRoute = { route ->
                     if (route.isNotEmpty()) {
@@ -72,6 +78,7 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
                 CommunityName(name), CommunityId("")
             )
             PostsScreen(
+                appState,
                 community = community,
                 onRoute = { route ->
                     if (route.isNotEmpty()) {
@@ -88,7 +95,7 @@ fun VermilionNavHost(navController: NavHostController, modifier: Modifier = Modi
                 navArgument("id") { type = NavType.StringType }
             )
         ) {
-            PostDetailsScreen {
+            PostDetailsScreen(appState = appState) {
                 navController.navigate(customTabRoute(it))
             }
         }
