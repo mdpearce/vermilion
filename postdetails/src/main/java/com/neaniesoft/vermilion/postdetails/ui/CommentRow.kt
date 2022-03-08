@@ -77,7 +77,7 @@ fun CommentRow(
 
             DepthIndicators(depth = comment.depth.value)
 
-            Column(Modifier.padding(16.dp)) {
+            Column(Modifier.padding(8.dp)) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     CommentAuthor(comment = comment, Modifier.padding(end = 8.dp))
                     CommentTime(comment = comment, Modifier.padding(end = 8.dp))
@@ -208,7 +208,7 @@ fun DepthIndicators(
     depth: Int,
     modifier: Modifier = Modifier
 ) {
-    Row(modifier = modifier.padding(start = (depth * 8).dp, top = 2.dp, bottom = 2.dp)) {
+    Row(modifier = modifier.padding(start = (depth * 8).dp, top = 4.dp, bottom = 4.dp)) {
         if (depth != 0) {
             Box(
                 modifier = Modifier

@@ -269,7 +269,7 @@ class CommentRepositoryImpl @Inject constructor(
 
     private fun Long.formatDuration(): DurationString {
         return DurationString(
-            (clock.millis() - this).toDuration(DurationUnit.MILLISECONDS).formatCompact()
+            (clock.millis() - (this * 1000)).toDuration(DurationUnit.MILLISECONDS).formatCompact()
         )
     }
 
