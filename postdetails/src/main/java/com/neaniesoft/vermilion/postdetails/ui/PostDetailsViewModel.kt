@@ -8,6 +8,7 @@ import com.neaniesoft.vermilion.db.VermilionDatabase
 import com.neaniesoft.vermilion.dbentities.posts.PostDao
 import com.neaniesoft.vermilion.postdetails.data.CommentRepository
 import com.neaniesoft.vermilion.postdetails.data.CommentRepositoryResponse
+import com.neaniesoft.vermilion.postdetails.domain.entities.CommentDepth
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentKind
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub
 import com.neaniesoft.vermilion.posts.data.toPost
@@ -19,8 +20,10 @@ import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
 import com.neaniesoft.vermilion.tabs.domain.entities.TabType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
@@ -45,6 +48,9 @@ class PostDetailsViewModel @Inject constructor(
 
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()
+
+    private val _scrollToEvents = MutableSharedFlow<Int>()
+    val scrollToEvents = _scrollToEvents.asSharedFlow()
 
     private val postId = PostId(
         savedStateHandle.get<String>("id")
@@ -108,6 +114,19 @@ class PostDetailsViewModel @Inject constructor(
 
     fun refresh() {
         loadComments(true)
+    }
+
+    fun onCommentNavDownClicked(firstVisibleItemIndex: Int) {
+        viewModelScope.launch {
+            val foundIndex = comments.value.let { list ->
+                list.subList(firstVisibleItemIndex, list.size)
+                    .indexOfFirst { (it as? CommentKind.Full)?.comment?.depth == CommentDepth(0) }
+            }
+            if (foundIndex != -1) {
+                val positionInCommentList = firstVisibleItemIndex + foundIndex + 1
+                _scrollToEvents.emit(positionInCommentList)
+            }
+        }
     }
 }
 
