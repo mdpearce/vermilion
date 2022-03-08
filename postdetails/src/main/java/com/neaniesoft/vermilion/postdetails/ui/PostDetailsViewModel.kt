@@ -8,6 +8,7 @@ import com.neaniesoft.vermilion.db.VermilionDatabase
 import com.neaniesoft.vermilion.dbentities.posts.PostDao
 import com.neaniesoft.vermilion.postdetails.data.CommentRepository
 import com.neaniesoft.vermilion.postdetails.data.CommentRepositoryResponse
+import com.neaniesoft.vermilion.postdetails.domain.entities.CommentDepth
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentKind
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub
 import com.neaniesoft.vermilion.posts.data.toPost
@@ -116,6 +117,16 @@ class PostDetailsViewModel @Inject constructor(
     }
 
     fun onCommentNavDownClicked(firstVisibleItemIndex: Int) {
+        viewModelScope.launch {
+            val foundIndex = comments.value.let { list ->
+                list.subList(firstVisibleItemIndex, list.size)
+                    .indexOfFirst { (it as? CommentKind.Full)?.comment?.depth == CommentDepth(0) }
+            }
+            if (foundIndex != -1) {
+                val positionInCommentList = firstVisibleItemIndex + foundIndex + 1
+                _scrollToEvents.emit(positionInCommentList)
+            }
+        }
     }
 }
 
