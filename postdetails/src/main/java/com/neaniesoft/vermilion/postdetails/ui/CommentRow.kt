@@ -26,6 +26,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -75,60 +77,14 @@ fun CommentRow(
 
             DepthIndicators(depth = comment.depth.value)
 
-            // TODO extract a lot of this out to functions, this is getting unwieldy
             Column(Modifier.padding(8.dp)) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    if (comment.flags.contains(CommentFlags.IS_OP)) {
-                        Text(
-                            text = comment.authorName.value,
-                            style = MaterialTheme.typography.caption,
-                            color = MaterialTheme.colors.primary,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.padding(end = 8.dp)
-                        )
-                    } else {
-                        Text(
-                            text = comment.authorName.value,
-                            style = MaterialTheme.typography.caption,
-                            color = MaterialTheme.colors.secondary,
-                            modifier = Modifier.padding(end = 8.dp)
-                        )
-                    }
-
+                    CommentAuthor(comment = comment, Modifier.padding(end = 8.dp))
+                    CommentTime(comment = comment, Modifier.padding(end = 8.dp))
                     CommentFlair(flair = comment.commentFlair, Modifier.padding(end = 8.dp))
-
-                    val score = remember {
-                        if (comment.flags.contains(CommentFlags.SCORE_HIDDEN)) {
-                            "?"
-                        } else {
-                            NumberFormat.getIntegerInstance().format(comment.score.value)
-                        }
-                    }
-
-                    Text(
-                        text = score,
-                        style = MaterialTheme.typography.caption,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier
-                            .padding(end = 8.dp)
-                    )
                     CommentFlagIcons(flags = comment.flags)
                     Spacer(modifier = Modifier.weight(1.0f))
-                    Column(horizontalAlignment = Alignment.End) {
-
-                        Text(
-                            text = comment.createdAtDurationString.value,
-                            style = MaterialTheme.typography.caption,
-                        )
-                        if (comment.editedAtDurationString != null) {
-                            Text(
-                                text = "edited ${comment.editedAtDurationString.value}",
-                                style = MaterialTheme.typography.caption,
-                                fontStyle = FontStyle.Italic,
-                                modifier = Modifier.padding(top = 4.dp)
-                            )
-                        }
-                    }
+                    CommentScore(comment = comment)
                 }
 
                 Box(Modifier.padding(top = 8.dp)) {
@@ -140,6 +96,62 @@ fun CommentRow(
             }
         }
     }
+}
+
+@Composable
+fun CommentTime(comment: Comment, modifier: Modifier = Modifier) {
+    val time = buildAnnotatedString {
+        append(comment.createdAtDurationString.value)
+        if (comment.editedAtDurationString != null) {
+            append(" ")
+            pushStyle(SpanStyle(fontStyle = FontStyle.Italic))
+            append("(edited ${comment.editedAtDurationString.value})") // TODO use a string resource
+            pop()
+        }
+    }
+    Text(
+        text = time,
+        style = MaterialTheme.typography.caption,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun CommentAuthor(comment: Comment, modifier: Modifier = Modifier) {
+    if (comment.flags.contains(CommentFlags.IS_OP)) {
+        Text(
+            text = comment.authorName.value,
+            style = MaterialTheme.typography.caption,
+            color = MaterialTheme.colors.primary,
+            fontWeight = FontWeight.SemiBold,
+            modifier = modifier
+        )
+    } else {
+        Text(
+            text = comment.authorName.value,
+            style = MaterialTheme.typography.caption,
+            color = MaterialTheme.colors.secondary,
+            modifier = modifier
+        )
+    }
+}
+
+@Composable
+fun CommentScore(comment: Comment, modifier: Modifier = Modifier) {
+    val score = remember {
+        if (comment.flags.contains(CommentFlags.SCORE_HIDDEN)) {
+            "?"
+        } else {
+            NumberFormat.getIntegerInstance().format(comment.score.value)
+        }
+    }
+
+    Text(
+        text = score,
+        style = MaterialTheme.typography.caption,
+        fontWeight = FontWeight.Bold,
+        modifier = modifier
+    )
 }
 
 @Composable
@@ -193,18 +205,17 @@ data class FlagIcon(
 
 @Composable
 fun DepthIndicators(
-    depth: Int
+    depth: Int,
+    modifier: Modifier = Modifier
 ) {
-    Row {
-        repeat(depth) { count ->
-            Box(modifier = Modifier.width(16.dp), contentAlignment = Alignment.Center) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .width(2.dp)
-                        .background(colorForDepth(count))
-                )
-            }
+    Row(modifier = modifier.padding(start = (depth * 8).dp, top = 4.dp, bottom = 4.dp)) {
+        if (depth != 0) {
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(2.dp)
+                    .background(colorForDepth(depth))
+            )
         }
     }
 }
@@ -270,7 +281,9 @@ fun CommentFlair(flair: CommentFlair, modifier: Modifier = Modifier) {
 @Composable
 fun CommentRowPreview() {
     VermilionTheme(darkTheme = true) {
-        CommentRow(DUMMY_COMMENT, Modifier.fillMaxWidth())
+        Surface {
+            CommentRow(DUMMY_COMMENT, Modifier.fillMaxWidth())
+        }
     }
 }
 
@@ -278,7 +291,9 @@ fun CommentRowPreview() {
 @Composable
 fun DeepCommentRowPreview() {
     VermilionTheme(darkTheme = true) {
-        CommentRow(DEEP_DUMMY_COMMENT, Modifier.fillMaxWidth())
+        Surface {
+            CommentRow(DEEP_DUMMY_COMMENT, Modifier.fillMaxWidth())
+        }
     }
 }
 
@@ -340,7 +355,7 @@ private val DUMMY_COMMENT = Comment(
     emptySet(),
     AuthorName("Some user"),
     Instant.now(),
-    DurationString("1h ago"),
+    DurationString("23m"),
     null,
     null,
     Score(1024),
@@ -367,5 +382,5 @@ private val OP_DUMMY_CONTENT = DUMMY_COMMENT.copy(flags = setOf(CommentFlags.IS_
 private val EDITED_DUMMY_COMMENT = DUMMY_COMMENT.copy(
     flags = setOf(CommentFlags.EDITED),
     editedAt = Instant.now(),
-    editedAtDurationString = DurationString("moments ago")
+    editedAtDurationString = DurationString("30m")
 )
