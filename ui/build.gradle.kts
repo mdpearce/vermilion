@@ -10,6 +10,8 @@ dependencies {
     implementation(Deps.LIFECYCLE_RUNTIME)
     implementation(Deps.EXOPLAYER)
     implementation(Deps.ANDROID_YOUTUBE_PLAYER)
+    implementation(Deps.RETROFIT)
+    implementation(Deps.JACKSON_ANNOTATIONS)
     implementation(project(":utils"))
     api(Deps.COMMONMARK)
     implementation(Deps.COMMONMARK_EXT_AUTOLINK)

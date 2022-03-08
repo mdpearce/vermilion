@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
@@ -15,6 +16,8 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import retrofit2.http.GET
+import retrofit2.http.Path
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -80,3 +83,24 @@ abstract class VideoUriResolversModule {
     @IntoSet
     abstract fun bindRedGifsVideoResolver(resolver: RedGifsVideoUriResolver): VideoUriResolver
 }
+
+interface RedGifsApi {
+    @GET("/v2/gifs/{id}")
+    suspend fun getGif(@Path("id") id: String): GifResponse
+}
+
+data class GifResponse(
+    @JsonProperty("gif") val gif: GifInfo
+)
+
+data class GifInfo(
+    @JsonProperty("id") val id: String,
+    @JsonProperty("width") val width: Int,
+    @JsonProperty("height") val height: Int,
+    @JsonProperty("urls") val urls: MediaInfo
+)
+
+data class MediaInfo(
+    @JsonProperty("sd") val sd: String,
+    @JsonProperty("hd") val hd: String
+)
