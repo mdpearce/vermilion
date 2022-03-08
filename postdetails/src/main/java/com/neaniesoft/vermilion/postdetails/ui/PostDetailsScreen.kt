@@ -192,7 +192,7 @@ fun PostDetailsScreenContent(
                 onClick = onCommentNavDownClicked
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_baseline_verified_user_24),
+                    painter = painterResource(id = R.drawable.ic_baseline_keyboard_arrow_down_24),
                     contentDescription = "Next top level comment"
                 )
             }
