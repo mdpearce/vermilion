@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
@@ -26,12 +27,12 @@ fun ExternalVideoDialog(viewModel: ExternalVideoDialogViewModel = hiltViewModel(
 }
 
 interface VideoUriResolver {
-    suspend fun resolve(uri: Uri): Result<Uri, VideoResolverErrors>
+    suspend fun resolve(uri: Uri): Result<Uri, VideoResolverError>
     fun handles(uri: Uri): Boolean
 }
 
-sealed class VideoResolverErrors
-object NoRegisteredResolvers : VideoResolverErrors()
+sealed class VideoResolverError
+object NoRegisteredResolvers : VideoResolverError()
 
 @HiltViewModel
 class ExternalVideoDialogViewModel @Inject constructor(
@@ -61,13 +62,13 @@ class ExternalVideoDialogViewModel @Inject constructor(
 
 sealed class ExternalVideoDialogState {
     object Loading : ExternalVideoDialogState()
-    data class ErrorState(val error: VideoResolverErrors) : ExternalVideoDialogState()
+    data class ErrorState(val error: VideoResolverError) : ExternalVideoDialogState()
     data class PlayUriState(val uri: Uri) : ExternalVideoDialogState()
 }
 
 @Singleton
 class RedGifsVideoUriResolver @Inject constructor() : VideoUriResolver {
-    override suspend fun resolve(uri: Uri): Result<Uri, VideoResolverErrors> {
+    override suspend fun resolve(uri: Uri): Result<Uri, VideoResolverError> {
         TODO("Not yet implemented")
     }
 
@@ -104,3 +105,16 @@ data class MediaInfo(
     @JsonProperty("sd") val sd: String,
     @JsonProperty("hd") val hd: String
 )
+
+@Singleton
+class VideoUriResolverSupervisor @Inject constructor(
+    private val resolvers: Set<@JvmSuppressWildcards VideoUriResolver>
+) {
+    fun canAnyResolverHandle(uri: Uri): Boolean {
+        return resolvers.find { it.handles(uri) } != null
+    }
+
+    suspend fun resolve(uri: Uri): Result<Uri, VideoResolverError> {
+        return resolvers.find { it.handles(uri) }?.resolve(uri) ?: Err(NoRegisteredResolvers)
+    }
+}
