@@ -35,6 +35,7 @@ class RedditApiClientModule {
     companion object {
         const val UNAUTHENTICATED = "unauthenticated"
         const val AUTHENTICATED = "authenticated"
+        const val NO_AUTH = "no_auth"
         const val BASIC_AUTH = "basic_auth"
         const val BEARER_AUTH = "bearer_auth"
 
@@ -112,6 +113,15 @@ class RedditApiClientModule {
             .addInterceptor(authInterceptor)
             .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS))
             .build()
+
+    @Provides
+    @Named(NO_AUTH)
+    fun provideNoAuthOkhttpClient(
+        @Named(USER_AGENT) userAgentInterceptor: Interceptor,
+    ): OkHttpClient = OkHttpClient.Builder()
+        .addInterceptor(userAgentInterceptor)
+        .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS))
+        .build()
 
     @Provides
     fun provideJacksonObjectMapper(): ObjectMapper =

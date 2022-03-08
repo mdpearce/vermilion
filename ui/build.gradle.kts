@@ -13,6 +13,7 @@ dependencies {
     implementation(Deps.RETROFIT)
     implementation(Deps.JACKSON_ANNOTATIONS)
     implementation(project(":utils"))
+    implementation(project(":api"))
     api(Deps.COMMONMARK)
     implementation(Deps.COMMONMARK_EXT_AUTOLINK)
     implementation(Deps.COIL_COMPOSE)

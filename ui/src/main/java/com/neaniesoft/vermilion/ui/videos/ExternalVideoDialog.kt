@@ -2,24 +2,35 @@ package com.neaniesoft.vermilion.ui.videos
 
 import android.net.Uri
 import androidx.compose.runtime.Composable
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.map
+import com.github.michaelbull.result.mapError
 import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
+import com.github.michaelbull.result.runCatching
+import com.neaniesoft.vermilion.api.RedditApiClientModule
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import okhttp3.OkHttpClient
+import retrofit2.Converter
+import retrofit2.Retrofit
+import retrofit2.create
 import retrofit2.http.GET
 import retrofit2.http.Path
 import javax.inject.Inject
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Composable
@@ -33,6 +44,8 @@ interface VideoUriResolver {
 
 sealed class VideoResolverError
 object NoRegisteredResolvers : VideoResolverError()
+object InvalidUriForResolver : VideoResolverError()
+data class ApiError(val cause: Throwable) : VideoResolverError()
 
 @HiltViewModel
 class ExternalVideoDialogViewModel @Inject constructor(
@@ -62,13 +75,33 @@ sealed class ExternalVideoDialogState {
 }
 
 @Singleton
-class RedGifsVideoUriResolver @Inject constructor() : VideoUriResolver {
+class RedGifsVideoUriResolver @Inject constructor(
+    private val api: RedGifsApi
+) : VideoUriResolver {
     override suspend fun resolve(uri: Uri): Result<Uri, VideoResolverError> {
-        TODO("Not yet implemented")
+        if (uri.host != "redgifs.com") {
+            return Err(InvalidUriForResolver)
+        }
+        val pathSegments = uri.pathSegments
+
+        return if (pathSegments.size == 2 && pathSegments[0] == "watch") {
+            getVideoUri(pathSegments[1])
+        } else {
+            Err(InvalidUriForResolver)
+        }
+    }
+
+    private suspend fun getVideoUri(id: String): Result<Uri, VideoResolverError> {
+        return runCatching {
+            api.getGif(id)
+        }.mapError { ApiError(it) }
+            .map { response ->
+                response.gif.urls.hd.toUri()
+            }
     }
 
     override fun handles(uri: Uri): Boolean {
-        TODO("Not yet implemented")
+        return uri.host == "redgifs.com" && uri.pathSegments.size == 2 && uri.pathSegments[0] == "watch"
     }
 }
 
@@ -83,6 +116,32 @@ abstract class VideoUriResolversModule {
 interface RedGifsApi {
     @GET("/v2/gifs/{id}")
     suspend fun getGif(@Path("id") id: String): GifResponse
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+class RedGifsApiModule {
+    companion object {
+        const val RED_GIFS_API = "red_gifs_api"
+        const val RED_GIFS_BASE_URL = "https://api.redgifs.com/"
+    }
+
+    @Provides
+    fun provideRedGifsApi(@Named(RED_GIFS_API) retrofit: Retrofit): RedGifsApi {
+        return retrofit.create()
+    }
+
+    @Provides
+    @Named(RED_GIFS_API)
+    fun provideRedGifsRetrofit(
+        @Named(RedditApiClientModule.NO_AUTH) okHttpClient: OkHttpClient,
+        converterFactory: Converter.Factory
+    ): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(RED_GIFS_BASE_URL)
+            .addConverterFactory(converterFactory)
+            .build()
+    }
 }
 
 data class GifResponse(
@@ -113,3 +172,4 @@ class VideoUriResolverSupervisor @Inject constructor(
         return resolvers.find { it.handles(uri) }?.resolve(uri) ?: Err(NoRegisteredResolvers)
     }
 }
+
