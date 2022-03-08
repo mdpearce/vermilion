@@ -36,7 +36,7 @@ object NoRegisteredResolvers : VideoResolverError()
 
 @HiltViewModel
 class ExternalVideoDialogViewModel @Inject constructor(
-    private val resolvers: Set<@JvmSuppressWildcards VideoUriResolver>
+    private val resolverSupervisor: VideoUriResolverSupervisor
 ) : ViewModel() {
     private val _uiState =
         MutableStateFlow<ExternalVideoDialogState>(ExternalVideoDialogState.Loading)
@@ -45,18 +45,13 @@ class ExternalVideoDialogViewModel @Inject constructor(
     suspend fun onResolveExternalUri(uri: Uri) {
         _uiState.emit(ExternalVideoDialogState.Loading)
 
-        val resolver = resolvers.firstOrNull { it.handles(uri) }
-        if (resolver != null) {
-            resolver.resolve(uri)
-                .onSuccess {
-                    _uiState.emit(ExternalVideoDialogState.PlayUriState(it))
-                }
-                .onFailure {
-                    _uiState.emit(ExternalVideoDialogState.ErrorState(it))
-                }
-        } else {
-            _uiState.emit(ExternalVideoDialogState.ErrorState(NoRegisteredResolvers))
-        }
+        resolverSupervisor.resolve(uri)
+            .onSuccess {
+                _uiState.emit(ExternalVideoDialogState.PlayUriState(it))
+            }
+            .onFailure {
+                _uiState.emit(ExternalVideoDialogState.ErrorState(it))
+            }
     }
 }
 
