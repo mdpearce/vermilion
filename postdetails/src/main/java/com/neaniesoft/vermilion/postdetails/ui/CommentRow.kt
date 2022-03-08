@@ -347,7 +347,7 @@ fun EditedCOmmentRowPreview() {
     }
 }
 
-private val DUMMY_COMMENT = Comment(
+val DUMMY_COMMENT = Comment(
     CommentId("id"),
     CommentContent("This is a pretty long comment that might split over several lines. It's got several sentences and goes on for some time. Still going here."),
     Parser.builder().build()

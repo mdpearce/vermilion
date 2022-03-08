@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.MaterialTheme
@@ -17,14 +18,20 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentKind
+import com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub
+import com.neaniesoft.vermilion.posts.domain.entities.Post
+import com.neaniesoft.vermilion.posts.ui.DUMMY_TEXT_POST
 import com.neaniesoft.vermilion.posts.ui.PostContent
 import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
+import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import kotlinx.coroutines.FlowPreview
 
 @FlowPreview
@@ -78,25 +85,48 @@ fun PostDetailsScreen(
         }
     }
 
+    PostDetailsScreenContent(
+        postDetailsState = postDetailsState,
+        comments = comments,
+        listState = columnState,
+        swipeRefreshState = swipeRefreshState,
+        onRefresh = { viewModel.refresh() },
+        onMediaClicked = { onOpenUri(it.link) },
+        onUriClicked = onOpenUri,
+        onMoreCommentsClicked = { viewModel.onMoreCommentsClicked(it) }
+    )
+}
+
+@Composable
+fun PostDetailsScreenContent(
+    postDetailsState: PostDetailsState,
+    comments: List<CommentKind>,
+    listState: LazyListState,
+    swipeRefreshState: SwipeRefreshState,
+    onRefresh: () -> Unit,
+    onMediaClicked: (Post) -> Unit,
+    onUriClicked: (Uri) -> Unit,
+    onMoreCommentsClicked: (CommentStub) -> Unit
+) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         color = MaterialTheme.colors.surface,
         elevation = 0.dp
     ) {
-        SwipeRefresh(state = swipeRefreshState, onRefresh = { viewModel.refresh() }) {
-            LazyColumn(state = columnState) {
-                when (val currentPostDetailsState = postDetailsState) {
+        SwipeRefresh(state = swipeRefreshState, onRefresh = onRefresh) {
+            LazyColumn(state = listState) {
+                when (postDetailsState) {
                     is PostDetails -> {
                         item {
                             Surface(modifier = Modifier.fillMaxWidth(), elevation = 4.dp) {
                                 PostContent(
-                                    post = currentPostDetailsState.post,
+                                    post = postDetailsState.post,
                                     shouldTruncate = false,
                                     shouldHideNsfw = false,
-                                    onMediaClicked = { onOpenUri(it.link.toString().toUri()) },
+                                    onMediaClicked = onMediaClicked,
                                     onSummaryClicked = {},
                                     onCommunityClicked = {},
-                                    onUriClicked = onOpenUri
+                                    onUriClicked = onUriClicked
                                 )
                             }
                         }
@@ -122,15 +152,42 @@ fun PostDetailsScreen(
                         is CommentKind.Full -> CommentRow(
                             comment = item.comment,
                             Modifier.fillMaxWidth(),
-                            onUriClicked = { onOpenUri(it.toUri()) }
+                            onUriClicked = { onUriClicked(it.toUri()) }
                         )
                         is CommentKind.Stub -> MoreCommentsStubRow(
                             stub = item.stub,
-                            Modifier.fillMaxWidth()
-                        ) { viewModel.onMoreCommentsClicked(it) }
+                            Modifier.fillMaxWidth(),
+                            onClick = onMoreCommentsClicked
+                        )
                     }
                 }
             }
         }
+    }
+}
+
+@Preview
+@Composable
+fun PostDetailsScreenDark() {
+    VermilionTheme(darkTheme = true) {
+        PostDetailsScreenContent(
+            postDetailsState = PostDetails(DUMMY_TEXT_POST),
+            comments = listOf(
+                CommentKind.Full(DUMMY_COMMENT),
+                CommentKind.Full(DUMMY_COMMENT),
+                CommentKind.Full(DUMMY_COMMENT),
+                CommentKind.Full(DUMMY_COMMENT),
+                CommentKind.Full(DUMMY_COMMENT),
+                CommentKind.Full(DUMMY_COMMENT),
+                CommentKind.Full(DUMMY_COMMENT),
+                CommentKind.Full(DUMMY_COMMENT),
+            ),
+            listState = rememberLazyListState(),
+            swipeRefreshState = rememberSwipeRefreshState(isRefreshing = false),
+            onRefresh = { /*TODO*/ },
+            onMediaClicked = {},
+            onUriClicked = {},
+            onMoreCommentsClicked = {}
+        )
     }
 }
