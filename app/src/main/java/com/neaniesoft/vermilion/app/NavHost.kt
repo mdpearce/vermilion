@@ -95,7 +95,7 @@ fun VermilionNavHost(
                 navArgument("id") { type = NavType.StringType }
             )
         ) {
-            PostDetailsScreen {
+            PostDetailsScreen(appState = appState) {
                 navController.navigate(customTabRoute(it))
             }
         }
