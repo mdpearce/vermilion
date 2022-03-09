@@ -1,9 +1,9 @@
 package com.neaniesoft.vermilion.posts.domain
 
 import android.net.Uri
-import com.neaniesoft.vermilion.posts.ui.CustomVideoRouter
+import com.neaniesoft.vermilion.posts.domain.routing.CustomVideoRouter
 import com.neaniesoft.vermilion.ui.images.ImageRouter
-import com.neaniesoft.vermilion.ui.videos.VideoUriResolverSupervisor
+import com.neaniesoft.vermilion.ui.videos.external.resolver.VideoUriResolverSupervisor
 import com.neaniesoft.vermilion.utils.logger
 import dagger.Binds
 import dagger.Module

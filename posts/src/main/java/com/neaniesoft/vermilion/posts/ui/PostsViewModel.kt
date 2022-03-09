@@ -26,14 +26,9 @@ import com.neaniesoft.vermilion.tabs.domain.TabSupervisor
 import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
 import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
 import com.neaniesoft.vermilion.tabs.domain.entities.TabType
-import com.neaniesoft.vermilion.ui.videos.VideoDescriptor
+import com.neaniesoft.vermilion.ui.videos.direct.VideoDescriptor
 import com.neaniesoft.vermilion.utils.logger
-import dagger.Binds
-import dagger.Module
-import dagger.hilt.InstallIn
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.components.SingletonComponent
-import dagger.multibindings.IntoSet
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -46,7 +41,6 @@ import kotlinx.serialization.json.Json
 import org.commonmark.parser.Parser
 import java.time.Clock
 import javax.inject.Inject
-import javax.inject.Singleton
 
 @FlowPreview
 @HiltViewModel
@@ -154,57 +148,4 @@ class PostsViewModel @Inject constructor(
             }
         }
     }
-}
-
-@Singleton
-class CustomVideoRouter @Inject constructor(
-    private val matchers: Set<@JvmSuppressWildcards CustomVideoRouteMatcher>
-) {
-    private val logger by logger()
-
-    fun routeForVideoUri(uri: Uri): String? {
-        matchers.forEach { matcher ->
-            val result = matcher.match(uri)
-            if (result is CustomVideoMatchResult.RouteMatch) {
-                logger.debugIfEnabled { "Matched a direct video route: ${result.route}" }
-                return result.route
-            }
-        }
-        // No match
-        return null
-    }
-}
-
-interface CustomVideoRouteMatcher {
-    fun match(linkUri: Uri): CustomVideoMatchResult
-}
-
-@Singleton
-class YoutubeCustomVideoRouteMatcher @Inject constructor() : CustomVideoRouteMatcher {
-    override fun match(linkUri: Uri): CustomVideoMatchResult {
-        return when (linkUri.host) {
-            "youtu.be", "youtube.com" -> {
-                val videoId = linkUri.pathSegments.lastOrNull()
-                if (videoId.isNullOrEmpty()) {
-                    CustomVideoMatchResult.NoMatch
-                } else {
-                    CustomVideoMatchResult.RouteMatch("YouTube/$videoId")
-                }
-            }
-            else -> CustomVideoMatchResult.NoMatch
-        }
-    }
-}
-
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class CustomVideoRouterModule {
-    @Binds
-    @IntoSet
-    abstract fun bindYoutubeCustomVideoRouteMatcher(impl: YoutubeCustomVideoRouteMatcher): CustomVideoRouteMatcher
-}
-
-sealed class CustomVideoMatchResult {
-    object NoMatch : CustomVideoMatchResult()
-    data class RouteMatch(val route: String) : CustomVideoMatchResult()
 }

@@ -25,10 +25,10 @@ import com.neaniesoft.vermilion.coreentities.NamedCommunity
 import com.neaniesoft.vermilion.postdetails.ui.PostDetailsScreen
 import com.neaniesoft.vermilion.posts.ui.PostsScreen
 import com.neaniesoft.vermilion.ui.images.ImageDialog
-import com.neaniesoft.vermilion.ui.videos.ExternalVideoDialog
-import com.neaniesoft.vermilion.ui.videos.VideoDescriptor
 import com.neaniesoft.vermilion.ui.videos.VideoDialog
 import com.neaniesoft.vermilion.ui.videos.YouTubeDialog
+import com.neaniesoft.vermilion.ui.videos.direct.VideoDescriptor
+import com.neaniesoft.vermilion.ui.videos.external.ExternalVideoDialog
 import kotlinx.coroutines.FlowPreview
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json

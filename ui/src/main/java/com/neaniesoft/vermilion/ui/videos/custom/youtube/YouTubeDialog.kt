@@ -6,6 +6,8 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.neaniesoft.vermilion.ui.images.rememberZoomableState
+import com.neaniesoft.vermilion.ui.videos.custom.youtube.YouTubePlayer
+import com.neaniesoft.vermilion.ui.videos.custom.youtube.rememberYouTubePlayerState
 
 @ExperimentalMaterialApi
 @Composable

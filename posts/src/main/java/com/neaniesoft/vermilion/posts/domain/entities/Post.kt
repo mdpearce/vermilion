@@ -2,7 +2,7 @@ package com.neaniesoft.vermilion.posts.domain.entities
 
 import android.net.Uri
 import com.neaniesoft.vermilion.coreentities.Community
-import com.neaniesoft.vermilion.ui.videos.VideoDescriptor
+import com.neaniesoft.vermilion.ui.videos.direct.VideoDescriptor
 import java.time.Instant
 
 data class Post(
