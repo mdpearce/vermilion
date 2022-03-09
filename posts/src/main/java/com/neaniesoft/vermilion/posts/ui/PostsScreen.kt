@@ -47,6 +47,7 @@ import kotlinx.coroutines.FlowPreview
 fun PostsScreen(
     appState: VermilionAppState,
     community: Community,
+    shouldHideNsfw: Boolean,
     onRoute: (String) -> Unit,
     viewModel: PostsViewModel = hiltViewModel()
 ) {
@@ -100,6 +101,7 @@ fun PostsScreen(
         PostsList(
             listState = listState,
             posts = pagingItems,
+            shouldHideNsfw = shouldHideNsfw,
             onMediaClicked = { post ->
                 viewModel.onMediaClicked(post)
             },
@@ -115,6 +117,7 @@ fun PostsScreen(
 fun PostsList(
     listState: LazyListState,
     posts: LazyPagingItems<Post>,
+    shouldHideNsfw: Boolean,
     onPostClicked: (Post) -> Unit,
     onMediaClicked: (Post) -> Unit,
     onCommunityClicked: (Community) -> Unit
@@ -126,7 +129,13 @@ fun PostsList(
             items(posts) { post ->
                 Box(modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)) {
                     if (post != null) {
-                        PostCard(post = post, onPostClicked, onMediaClicked, onCommunityClicked)
+                        PostCard(
+                            post = post,
+                            onClick = onPostClicked,
+                            onMediaClicked = onMediaClicked,
+                            onCommunityClicked = onCommunityClicked,
+                            shouldHideNsfw = shouldHideNsfw
+                        )
                     } else {
                         PostCardPlaceholder()
                     }

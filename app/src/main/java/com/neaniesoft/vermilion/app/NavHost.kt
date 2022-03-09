@@ -55,13 +55,14 @@ fun VermilionNavHost(
             VermilionScreen.Home.name
         ) {
             PostsScreen(
-                appState,
+                appState = appState,
                 community = com.neaniesoft.vermilion.coreentities.FrontPage,
                 onRoute = { route ->
                     if (route.isNotEmpty()) {
                         navController.navigate(route)
                     }
-                }
+                },
+                shouldHideNsfw = true
             )
         }
 
@@ -78,13 +79,14 @@ fun VermilionNavHost(
                 CommunityName(name), CommunityId("")
             )
             PostsScreen(
-                appState,
+                appState = appState,
                 community = community,
                 onRoute = { route ->
                     if (route.isNotEmpty()) {
                         navController.navigate(route)
                     }
-                }
+                },
+                shouldHideNsfw = false
             )
         }
 

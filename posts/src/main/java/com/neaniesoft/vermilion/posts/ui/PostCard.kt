@@ -73,14 +73,15 @@ fun PostCard(
     onMediaClicked: (Post) -> Unit,
     onCommunityClicked: (Community) -> Unit,
     modifier: Modifier = Modifier,
-    onUriClicked: (Uri) -> Unit = {}
+    onUriClicked: (Uri) -> Unit = {},
+    shouldHideNsfw: Boolean = false
 ) {
     Card(elevation = 2.dp, modifier = modifier.clickable { onClick(post) }) {
         PostContent(
             post = post,
             modifier = modifier,
             shouldTruncate = true,
-            shouldHideNsfw = true,
+            shouldHideNsfw = shouldHideNsfw,
             onMediaClicked,
             onSummaryClicked = onClick,
             onCommunityClicked = onCommunityClicked,
