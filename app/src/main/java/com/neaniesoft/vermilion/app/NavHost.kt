@@ -26,7 +26,7 @@ import com.neaniesoft.vermilion.postdetails.ui.PostDetailsScreen
 import com.neaniesoft.vermilion.posts.ui.PostsScreen
 import com.neaniesoft.vermilion.ui.images.ImageDialog
 import com.neaniesoft.vermilion.ui.videos.VideoDialog
-import com.neaniesoft.vermilion.ui.videos.YouTubeDialog
+import com.neaniesoft.vermilion.ui.videos.custom.youtube.YouTubeDialog
 import com.neaniesoft.vermilion.ui.videos.direct.VideoDescriptor
 import com.neaniesoft.vermilion.ui.videos.external.ExternalVideoDialog
 import kotlinx.coroutines.FlowPreview
