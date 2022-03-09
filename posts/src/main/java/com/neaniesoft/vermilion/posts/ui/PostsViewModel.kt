@@ -166,6 +166,7 @@ class PostsViewModel @Inject constructor(
         }
 
         // If all else fails, just open a custom tab
+        logger.debugIfEnabled { "Did not match any custom routes. Loading custom tab: $uri" }
         return customTabRoute(uri)
     }
 

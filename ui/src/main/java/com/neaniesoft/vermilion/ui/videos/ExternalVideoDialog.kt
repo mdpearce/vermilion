@@ -119,12 +119,9 @@ class RedGifsVideoUriResolver @Inject constructor(
     private val api: RedGifsApi
 ) : VideoUriResolver {
     override suspend fun resolve(uri: Uri): Result<Uri, VideoResolverError> {
-        if (uri.host != "redgifs.com") {
-            return Err(InvalidUriForResolver)
-        }
-        val pathSegments = uri.pathSegments
-
-        return if (pathSegments.size == 2 && pathSegments[0] == "watch") {
+        Log.d("RedGifsVideoUriResolver", "host: ${uri.host}, pathSegments: ${uri.pathSegments}")
+        return if (handles(uri)) {
+            val pathSegments = uri.pathSegments
             getVideoUri(pathSegments[1])
         } else {
             Err(InvalidUriForResolver)
@@ -141,7 +138,9 @@ class RedGifsVideoUriResolver @Inject constructor(
     }
 
     override fun handles(uri: Uri): Boolean {
-        return uri.host == "redgifs.com" && uri.pathSegments.size == 2 && uri.pathSegments[0] == "watch"
+        return (uri.host == "redgifs.com" || uri.host == "www.redgifs.com")
+            && uri.pathSegments.size == 2
+            && uri.pathSegments[0] == "watch"
     }
 }
 
