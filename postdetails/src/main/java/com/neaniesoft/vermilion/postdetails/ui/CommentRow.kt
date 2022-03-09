@@ -279,7 +279,7 @@ fun CommentFlair(flair: CommentFlair, modifier: Modifier = Modifier) {
             Text(
                 text = flair.text.value,
                 modifier = Modifier.padding(4.dp),
-                style = MaterialTheme.typography.caption
+                style = MaterialTheme.typography.overline
             )
         }
     }
