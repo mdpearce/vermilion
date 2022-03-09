@@ -18,6 +18,7 @@ import com.neaniesoft.vermilion.dbentities.posts.PostDao
 import com.neaniesoft.vermilion.dbentities.posts.PostRemoteKeyDao
 import com.neaniesoft.vermilion.posts.data.PostRepository
 import com.neaniesoft.vermilion.posts.data.toPost
+import com.neaniesoft.vermilion.posts.domain.LinkRouter
 import com.neaniesoft.vermilion.posts.domain.PostHistoryService
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
@@ -25,9 +26,7 @@ import com.neaniesoft.vermilion.tabs.domain.TabSupervisor
 import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
 import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
 import com.neaniesoft.vermilion.tabs.domain.entities.TabType
-import com.neaniesoft.vermilion.ui.images.ImageRouter
 import com.neaniesoft.vermilion.ui.videos.VideoDescriptor
-import com.neaniesoft.vermilion.ui.videos.VideoUriResolverSupervisor
 import com.neaniesoft.vermilion.utils.logger
 import dagger.Binds
 import dagger.Module
@@ -45,7 +44,6 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.commonmark.parser.Parser
-import java.net.URLEncoder
 import java.time.Clock
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -61,9 +59,7 @@ class PostsViewModel @Inject constructor(
     private val clock: Clock,
     private val markdownParser: Parser,
     private val tabSupervisor: TabSupervisor,
-    private val imageRouter: ImageRouter,
-    private val customVideoRouter: CustomVideoRouter,
-    private val videoUriResolver: VideoUriResolverSupervisor,
+    private val linkRouter: LinkRouter,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val pagingDataMap: MutableMap<String, Flow<PagingData<Post>>> = mutableMapOf()
@@ -140,34 +136,12 @@ class PostsViewModel @Inject constructor(
         }
     }
 
-    private fun buildImageRoute(uri: Uri): String {
-        return "Image/" + URLEncoder.encode(uri.toString(), "utf-8")
-    }
-
     private fun buildVideoRoute(video: VideoDescriptor): String {
         return "Video/" + Uri.encode(Json.encodeToString(video))
     }
 
-    private fun buildExternalVideoRoute(uri: Uri): String {
-        return "ExternalVideo/" + Uri.encode(uri.toString())
-    }
-
     private fun buildLinkRoute(uri: Uri): String {
-        if (videoUriResolver.canAnyResolverHandle(uri)) {
-            return buildExternalVideoRoute(uri)
-        }
-        val customVideoRoute = customVideoRouter.routeForVideoUri(uri)
-        if (customVideoRoute != null) {
-            return customVideoRoute
-        }
-        val directImageUri = imageRouter.directImageUriOrNull(uri)
-        if (directImageUri != null) {
-            return buildImageRoute(directImageUri)
-        }
-
-        // If all else fails, just open a custom tab
-        logger.debugIfEnabled { "Did not match any custom routes. Loading custom tab: $uri" }
-        return customTabRoute(uri)
+        return linkRouter.routeForLink(uri)
     }
 
     fun onOpenCommunity(community: Community) {
@@ -180,9 +154,6 @@ class PostsViewModel @Inject constructor(
             }
         }
     }
-
-    private fun customTabRoute(uri: Uri): String =
-        "CustomTab/" + URLEncoder.encode(uri.toString(), "utf-8")
 }
 
 @Singleton
