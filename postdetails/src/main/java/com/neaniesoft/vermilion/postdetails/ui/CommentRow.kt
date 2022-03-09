@@ -94,7 +94,6 @@ fun CommentRow(
                     Modifier.padding(top = 8.dp, start = 4.dp)
                 )
 
-
                 Box(Modifier.padding(top = 8.dp, start = 8.dp)) {
                     MarkdownDocument(
                         document = comment.contentMarkdown as Document,
