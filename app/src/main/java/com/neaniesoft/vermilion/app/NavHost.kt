@@ -26,6 +26,7 @@ import com.neaniesoft.vermilion.coreentities.NamedCommunity
 import com.neaniesoft.vermilion.postdetails.ui.PostDetailsScreen
 import com.neaniesoft.vermilion.posts.ui.PostsScreen
 import com.neaniesoft.vermilion.ui.images.ImageDialog
+import com.neaniesoft.vermilion.ui.videos.ExternalVideoDialog
 import com.neaniesoft.vermilion.ui.videos.VideoDescriptor
 import com.neaniesoft.vermilion.ui.videos.VideoDialog
 import com.neaniesoft.vermilion.ui.videos.YouTubeDialog
@@ -141,6 +142,21 @@ fun VermilionNavHost(
                 requireNotNull(backStackEntry.arguments?.getParcelable<VideoDescriptor>("videoDescriptor"))
 
             VideoDialog(videoDescriptor = video, onDismiss = {
+                navController.popBackStack(backStackEntry.destination.id, true)
+            })
+        }
+
+        // Fullscreen external video viewer
+        dialog(
+            route = "${VermilionScreen.ExternalVideo}/{uri}",
+            arguments = listOf(
+                navArgument("uri") { type = NavType.StringType }
+            ),
+            dialogProperties = DialogProperties(usePlatformDefaultWidth = false)
+        ) { backStackEntry ->
+            val uri = requireNotNull(backStackEntry.arguments?.getString("uri")).toUri()
+
+            ExternalVideoDialog(uri, onDismiss = {
                 navController.popBackStack(backStackEntry.destination.id, true)
             })
         }

@@ -19,16 +19,15 @@ import com.neaniesoft.vermilion.dbentities.posts.PostRemoteKeyDao
 import com.neaniesoft.vermilion.posts.data.PostRepository
 import com.neaniesoft.vermilion.posts.data.toPost
 import com.neaniesoft.vermilion.posts.domain.PostHistoryService
-import com.neaniesoft.vermilion.posts.domain.entities.ImagePostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
-import com.neaniesoft.vermilion.posts.domain.entities.VideoPostSummary
 import com.neaniesoft.vermilion.tabs.domain.TabSupervisor
 import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
 import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
 import com.neaniesoft.vermilion.tabs.domain.entities.TabType
 import com.neaniesoft.vermilion.ui.images.ImageRouter
 import com.neaniesoft.vermilion.ui.videos.VideoDescriptor
+import com.neaniesoft.vermilion.ui.videos.VideoUriResolverSupervisor
 import com.neaniesoft.vermilion.utils.logger
 import dagger.Binds
 import dagger.Module
@@ -63,7 +62,8 @@ class PostsViewModel @Inject constructor(
     private val markdownParser: Parser,
     private val tabSupervisor: TabSupervisor,
     private val imageRouter: ImageRouter,
-    private val videoRouter: VideoRouter,
+    private val customVideoRouter: CustomVideoRouter,
+    private val videoUriResolver: VideoUriResolverSupervisor,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val pagingDataMap: MutableMap<String, Flow<PagingData<Post>>> = mutableMapOf()
@@ -130,25 +130,10 @@ class PostsViewModel @Inject constructor(
         viewModelScope.launch {
             postHistoryService.markPostAsRead(post.id)
 
-            val route = when {
-                post.attachedVideo != null -> buildVideoRoute(post.attachedVideo)
-                post.videoPreview != null -> buildVideoRoute(post.videoPreview)
-                post.summary is ImagePostSummary -> {
-                    val directUri = imageRouter.directImageUriOrNull(post.link)
-                    if (directUri != null) {
-                        buildImageRoute(directUri)
-                    } else {
-                        customTabRoute(post.link)
-                    }
-                }
-                post.summary is VideoPostSummary -> {
-                    // We've got a video post without an attached video or preview. It must be external, so try to match the URI
-                    buildVideoRoute(post.link)
-                }
-                else -> {
-                    // Finally, if all else fails, just open the link in a custom tab
-                    customTabRoute(post.link)
-                }
+            val route = if (post.attachedVideo != null) {
+                buildVideoRoute(post.attachedVideo)
+            } else {
+                buildLinkRoute(post.link)
             }
 
             _routeEvents.emit(route)
@@ -163,8 +148,25 @@ class PostsViewModel @Inject constructor(
         return "Video/" + Uri.encode(Json.encodeToString(video))
     }
 
-    private fun buildVideoRoute(videoUri: Uri): String {
-        return videoRouter.routeForVideoUri(videoUri)
+    private fun buildExternalVideoRoute(uri: Uri): String {
+        return "ExternalVideo/" + Uri.encode(uri.toString())
+    }
+
+    private fun buildLinkRoute(uri: Uri): String {
+        if (videoUriResolver.canAnyResolverHandle(uri)) {
+            return buildExternalVideoRoute(uri)
+        }
+        val customVideoRoute = customVideoRouter.routeForVideoUri(uri)
+        if (customVideoRoute != null) {
+            return customVideoRoute
+        }
+        val directImageUri = imageRouter.directImageUriOrNull(uri)
+        if (directImageUri != null) {
+            return buildImageRoute(directImageUri)
+        }
+
+        // If all else fails, just open a custom tab
+        return customTabRoute(uri)
     }
 
     fun onOpenCommunity(community: Community) {
@@ -183,57 +185,54 @@ class PostsViewModel @Inject constructor(
 }
 
 @Singleton
-class VideoRouter @Inject constructor(
-    private val matchers: Set<@JvmSuppressWildcards VideoRouteMatcher>
+class CustomVideoRouter @Inject constructor(
+    private val matchers: Set<@JvmSuppressWildcards CustomVideoRouteMatcher>
 ) {
     private val logger by logger()
 
-    private fun customTabRoute(uri: Uri): String =
-        "CustomTab/" + URLEncoder.encode(uri.toString(), "utf-8")
-
-    fun routeForVideoUri(uri: Uri): String {
+    fun routeForVideoUri(uri: Uri): String? {
         matchers.forEach { matcher ->
             val result = matcher.match(uri)
-            if (result is VideoMatchResult.RouteMatch) {
+            if (result is CustomVideoMatchResult.RouteMatch) {
                 logger.debugIfEnabled { "Matched a direct video route: ${result.route}" }
                 return result.route
             }
         }
-        // No match, fall back to a custom tab
-        return customTabRoute(uri)
+        // No match
+        return null
     }
 }
 
-interface VideoRouteMatcher {
-    fun match(linkUri: Uri): VideoMatchResult
+interface CustomVideoRouteMatcher {
+    fun match(linkUri: Uri): CustomVideoMatchResult
 }
 
 @Singleton
-class YoutubeVideoRouteMatcher @Inject constructor() : VideoRouteMatcher {
-    override fun match(linkUri: Uri): VideoMatchResult {
+class YoutubeCustomVideoRouteMatcher @Inject constructor() : CustomVideoRouteMatcher {
+    override fun match(linkUri: Uri): CustomVideoMatchResult {
         return when (linkUri.host) {
             "youtu.be", "youtube.com" -> {
                 val videoId = linkUri.pathSegments.lastOrNull()
                 if (videoId.isNullOrEmpty()) {
-                    VideoMatchResult.NoMatch
+                    CustomVideoMatchResult.NoMatch
                 } else {
-                    VideoMatchResult.RouteMatch("YouTube/$videoId")
+                    CustomVideoMatchResult.RouteMatch("YouTube/$videoId")
                 }
             }
-            else -> VideoMatchResult.NoMatch
+            else -> CustomVideoMatchResult.NoMatch
         }
     }
 }
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class VideoRouterModule {
+abstract class CustomVideoRouterModule {
     @Binds
     @IntoSet
-    abstract fun bindYoutubeVideoRouteMatcher(impl: YoutubeVideoRouteMatcher): VideoRouteMatcher
+    abstract fun bindYoutubeCustomVideoRouteMatcher(impl: YoutubeCustomVideoRouteMatcher): CustomVideoRouteMatcher
 }
 
-sealed class VideoMatchResult {
-    object NoMatch : VideoMatchResult()
-    data class RouteMatch(val route: String) : VideoMatchResult()
+sealed class CustomVideoMatchResult {
+    object NoMatch : CustomVideoMatchResult()
+    data class RouteMatch(val route: String) : CustomVideoMatchResult()
 }

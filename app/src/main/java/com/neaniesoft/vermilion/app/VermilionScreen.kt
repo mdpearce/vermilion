@@ -8,6 +8,7 @@ enum class VermilionScreen {
     CustomTab,
     Image,
     Video,
+    ExternalVideo,
     YouTube;
 
     companion object {
@@ -19,6 +20,7 @@ enum class VermilionScreen {
             CustomTab.name -> CustomTab
             Image.name -> Image
             Video.name -> Video
+            ExternalVideo.name -> ExternalVideo
             YouTube.name -> YouTube
             null -> Home
             else -> throw IllegalArgumentException("Unrecognized route: $route")
