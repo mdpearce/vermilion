@@ -19,16 +19,16 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.bottomSheet
 import com.neaniesoft.vermilion.accounts.adapters.driving.ui.UserAccountScreen
 import com.neaniesoft.vermilion.app.customtabs.customTab
-import com.neaniesoft.vermilion.app.customtabs.customTabRoute
 import com.neaniesoft.vermilion.coreentities.CommunityId
 import com.neaniesoft.vermilion.coreentities.CommunityName
 import com.neaniesoft.vermilion.coreentities.NamedCommunity
 import com.neaniesoft.vermilion.postdetails.ui.PostDetailsScreen
 import com.neaniesoft.vermilion.posts.ui.PostsScreen
 import com.neaniesoft.vermilion.ui.images.ImageDialog
-import com.neaniesoft.vermilion.ui.videos.VideoDescriptor
 import com.neaniesoft.vermilion.ui.videos.VideoDialog
-import com.neaniesoft.vermilion.ui.videos.YouTubeDialog
+import com.neaniesoft.vermilion.ui.videos.custom.youtube.YouTubeDialog
+import com.neaniesoft.vermilion.ui.videos.direct.VideoDescriptor
+import com.neaniesoft.vermilion.ui.videos.external.ExternalVideoDialog
 import kotlinx.coroutines.FlowPreview
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -95,8 +95,8 @@ fun VermilionNavHost(
                 navArgument("id") { type = NavType.StringType }
             )
         ) {
-            PostDetailsScreen(appState = appState) {
-                navController.navigate(customTabRoute(it))
+            PostDetailsScreen(appState = appState) { route ->
+                navController.navigate(route)
             }
         }
 
@@ -141,6 +141,21 @@ fun VermilionNavHost(
                 requireNotNull(backStackEntry.arguments?.getParcelable<VideoDescriptor>("videoDescriptor"))
 
             VideoDialog(videoDescriptor = video, onDismiss = {
+                navController.popBackStack(backStackEntry.destination.id, true)
+            })
+        }
+
+        // Fullscreen external video viewer
+        dialog(
+            route = "${VermilionScreen.ExternalVideo}/{uri}",
+            arguments = listOf(
+                navArgument("uri") { type = NavType.StringType }
+            ),
+            dialogProperties = DialogProperties(usePlatformDefaultWidth = false)
+        ) { backStackEntry ->
+            val uri = requireNotNull(backStackEntry.arguments?.getString("uri")).toUri()
+
+            ExternalVideoDialog(uri, onDismiss = {
                 navController.popBackStack(backStackEntry.destination.id, true)
             })
         }

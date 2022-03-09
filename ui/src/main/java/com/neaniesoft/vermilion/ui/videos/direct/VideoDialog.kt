@@ -6,6 +6,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.neaniesoft.vermilion.ui.images.rememberZoomableState
+import com.neaniesoft.vermilion.ui.videos.direct.VideoDescriptor
 
 @ExperimentalMaterialApi
 @Composable
@@ -16,7 +17,7 @@ fun VideoDialog(videoDescriptor: VideoDescriptor, onDismiss: () -> Unit) {
     ZoomableDialog(state = zoomableState, onDismiss = onDismiss) {
         VideoPlayer(
             state = videoPlayerState,
-            video = videoDescriptor,
+            video = Video.DescriptorVideo(videoDescriptor),
             modifier = Modifier.fillMaxSize()
         )
     }

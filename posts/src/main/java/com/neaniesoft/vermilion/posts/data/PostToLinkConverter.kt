@@ -38,9 +38,9 @@ import com.neaniesoft.vermilion.posts.domain.entities.Thumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.UriImage
 import com.neaniesoft.vermilion.posts.domain.entities.UriThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.VideoPostSummary
-import com.neaniesoft.vermilion.ui.videos.VideoDescriptor
-import com.neaniesoft.vermilion.ui.videos.VideoHeight
-import com.neaniesoft.vermilion.ui.videos.VideoWidth
+import com.neaniesoft.vermilion.ui.videos.direct.VideoDescriptor
+import com.neaniesoft.vermilion.ui.videos.direct.VideoHeight
+import com.neaniesoft.vermilion.ui.videos.direct.VideoWidth
 import com.neaniesoft.vermilion.utils.anonymousLogger
 import org.apache.commons.text.StringEscapeUtils
 import org.commonmark.node.Document

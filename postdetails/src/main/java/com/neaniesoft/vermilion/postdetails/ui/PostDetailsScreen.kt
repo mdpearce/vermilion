@@ -48,7 +48,7 @@ import kotlinx.coroutines.FlowPreview
 fun PostDetailsScreen(
     appState: VermilionAppState,
     viewModel: PostDetailsViewModel = hiltViewModel(),
-    onOpenUri: (Uri) -> Unit,
+    onRoute: (String) -> Unit,
 ) {
     val postDetailsState by viewModel.post.collectAsState()
     val comments by viewModel.comments.collectAsState()
@@ -60,6 +60,12 @@ fun PostDetailsScreen(
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isRefreshing)
     val isScrolling by remember {
         derivedStateOf { columnState.isScrollInProgress }
+    }
+
+    LaunchedEffect(key1 = Unit) {
+        viewModel.routeEvents.collect {
+            onRoute(it)
+        }
     }
 
     LaunchedEffect(key1 = Unit) {
@@ -106,8 +112,8 @@ fun PostDetailsScreen(
         listState = columnState,
         swipeRefreshState = swipeRefreshState,
         onRefresh = { viewModel.refresh() },
-        onMediaClicked = { onOpenUri(it.link) },
-        onUriClicked = onOpenUri,
+        onMediaClicked = { viewModel.onOpenUri(it.link) },
+        onUriClicked = { viewModel.onOpenUri(it) },
         onMoreCommentsClicked = { viewModel.onMoreCommentsClicked(it) },
         onCommentNavDownClicked = { viewModel.onCommentNavDownClicked(columnState.firstVisibleItemIndex) }
     )

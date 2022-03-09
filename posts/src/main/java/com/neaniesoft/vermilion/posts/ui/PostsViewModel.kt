@@ -18,24 +18,17 @@ import com.neaniesoft.vermilion.dbentities.posts.PostDao
 import com.neaniesoft.vermilion.dbentities.posts.PostRemoteKeyDao
 import com.neaniesoft.vermilion.posts.data.PostRepository
 import com.neaniesoft.vermilion.posts.data.toPost
+import com.neaniesoft.vermilion.posts.domain.LinkRouter
 import com.neaniesoft.vermilion.posts.domain.PostHistoryService
-import com.neaniesoft.vermilion.posts.domain.entities.ImagePostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
-import com.neaniesoft.vermilion.posts.domain.entities.VideoPostSummary
 import com.neaniesoft.vermilion.tabs.domain.TabSupervisor
 import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
 import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
 import com.neaniesoft.vermilion.tabs.domain.entities.TabType
-import com.neaniesoft.vermilion.ui.images.ImageRouter
-import com.neaniesoft.vermilion.ui.videos.VideoDescriptor
+import com.neaniesoft.vermilion.ui.videos.direct.VideoDescriptor
 import com.neaniesoft.vermilion.utils.logger
-import dagger.Binds
-import dagger.Module
-import dagger.hilt.InstallIn
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.components.SingletonComponent
-import dagger.multibindings.IntoSet
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -46,10 +39,8 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.commonmark.parser.Parser
-import java.net.URLEncoder
 import java.time.Clock
 import javax.inject.Inject
-import javax.inject.Singleton
 
 @FlowPreview
 @HiltViewModel
@@ -62,8 +53,7 @@ class PostsViewModel @Inject constructor(
     private val clock: Clock,
     private val markdownParser: Parser,
     private val tabSupervisor: TabSupervisor,
-    private val imageRouter: ImageRouter,
-    private val videoRouter: VideoRouter,
+    private val linkRouter: LinkRouter,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val pagingDataMap: MutableMap<String, Flow<PagingData<Post>>> = mutableMapOf()
@@ -130,41 +120,22 @@ class PostsViewModel @Inject constructor(
         viewModelScope.launch {
             postHistoryService.markPostAsRead(post.id)
 
-            val route = when {
-                post.attachedVideo != null -> buildVideoRoute(post.attachedVideo)
-                post.videoPreview != null -> buildVideoRoute(post.videoPreview)
-                post.summary is ImagePostSummary -> {
-                    val directUri = imageRouter.directImageUriOrNull(post.link)
-                    if (directUri != null) {
-                        buildImageRoute(directUri)
-                    } else {
-                        customTabRoute(post.link)
-                    }
-                }
-                post.summary is VideoPostSummary -> {
-                    // We've got a video post without an attached video or preview. It must be external, so try to match the URI
-                    buildVideoRoute(post.link)
-                }
-                else -> {
-                    // Finally, if all else fails, just open the link in a custom tab
-                    customTabRoute(post.link)
-                }
+            val route = if (post.attachedVideo != null) {
+                buildVideoRoute(post.attachedVideo)
+            } else {
+                buildLinkRoute(post.link)
             }
 
             _routeEvents.emit(route)
         }
     }
 
-    private fun buildImageRoute(uri: Uri): String {
-        return "Image/" + URLEncoder.encode(uri.toString(), "utf-8")
-    }
-
     private fun buildVideoRoute(video: VideoDescriptor): String {
         return "Video/" + Uri.encode(Json.encodeToString(video))
     }
 
-    private fun buildVideoRoute(videoUri: Uri): String {
-        return videoRouter.routeForVideoUri(videoUri)
+    private fun buildLinkRoute(uri: Uri): String {
+        return linkRouter.routeForLink(uri)
     }
 
     fun onOpenCommunity(community: Community) {
@@ -177,63 +148,4 @@ class PostsViewModel @Inject constructor(
             }
         }
     }
-
-    private fun customTabRoute(uri: Uri): String =
-        "CustomTab/" + URLEncoder.encode(uri.toString(), "utf-8")
-}
-
-@Singleton
-class VideoRouter @Inject constructor(
-    private val matchers: Set<@JvmSuppressWildcards VideoRouteMatcher>
-) {
-    private val logger by logger()
-
-    private fun customTabRoute(uri: Uri): String =
-        "CustomTab/" + URLEncoder.encode(uri.toString(), "utf-8")
-
-    fun routeForVideoUri(uri: Uri): String {
-        matchers.forEach { matcher ->
-            val result = matcher.match(uri)
-            if (result is VideoMatchResult.RouteMatch) {
-                logger.debugIfEnabled { "Matched a direct video route: ${result.route}" }
-                return result.route
-            }
-        }
-        // No match, fall back to a custom tab
-        return customTabRoute(uri)
-    }
-}
-
-interface VideoRouteMatcher {
-    fun match(linkUri: Uri): VideoMatchResult
-}
-
-@Singleton
-class YoutubeVideoRouteMatcher @Inject constructor() : VideoRouteMatcher {
-    override fun match(linkUri: Uri): VideoMatchResult {
-        return when (linkUri.host) {
-            "youtu.be", "youtube.com" -> {
-                val videoId = linkUri.pathSegments.lastOrNull()
-                if (videoId.isNullOrEmpty()) {
-                    VideoMatchResult.NoMatch
-                } else {
-                    VideoMatchResult.RouteMatch("YouTube/$videoId")
-                }
-            }
-            else -> VideoMatchResult.NoMatch
-        }
-    }
-}
-
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class VideoRouterModule {
-    @Binds
-    @IntoSet
-    abstract fun bindYoutubeVideoRouteMatcher(impl: YoutubeVideoRouteMatcher): VideoRouteMatcher
-}
-
-sealed class VideoMatchResult {
-    object NoMatch : VideoMatchResult()
-    data class RouteMatch(val route: String) : VideoMatchResult()
 }

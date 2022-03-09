@@ -1,5 +1,6 @@
 package com.neaniesoft.vermilion.postdetails.ui
 
+import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,6 +13,7 @@ import com.neaniesoft.vermilion.postdetails.domain.entities.CommentDepth
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentKind
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub
 import com.neaniesoft.vermilion.posts.data.toPost
+import com.neaniesoft.vermilion.posts.domain.LinkRouter
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.tabs.domain.TabSupervisor
@@ -38,6 +40,7 @@ class PostDetailsViewModel @Inject constructor(
     private val commentRepository: CommentRepository,
     private val markdownParser: Parser,
     private val tabSupervisor: TabSupervisor,
+    private val linkRouter: LinkRouter,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val _post: MutableStateFlow<PostDetailsState> = MutableStateFlow(Empty)
@@ -51,6 +54,9 @@ class PostDetailsViewModel @Inject constructor(
 
     private val _scrollToEvents = MutableSharedFlow<Int>()
     val scrollToEvents = _scrollToEvents.asSharedFlow()
+
+    private val _routeEvents = MutableSharedFlow<String>()
+    val routeEvents = _routeEvents.asSharedFlow()
 
     private val postId = PostId(
         savedStateHandle.get<String>("id")
@@ -127,6 +133,12 @@ class PostDetailsViewModel @Inject constructor(
                 _scrollToEvents.emit(positionInCommentList)
             }
         }
+    }
+
+    fun onOpenUri(uri: Uri) {
+        val route = linkRouter.routeForLink(uri)
+
+        viewModelScope.launch { _routeEvents.emit(route) }
     }
 }
 

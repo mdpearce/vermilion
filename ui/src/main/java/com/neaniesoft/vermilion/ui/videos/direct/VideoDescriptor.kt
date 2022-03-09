@@ -1,4 +1,4 @@
-package com.neaniesoft.vermilion.ui.videos
+package com.neaniesoft.vermilion.ui.videos.direct
 
 import android.net.Uri
 import android.os.Parcelable

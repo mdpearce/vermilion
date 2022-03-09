@@ -1,4 +1,4 @@
-package com.neaniesoft.vermilion.ui.videos
+package com.neaniesoft.vermilion.ui.videos.custom.youtube
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable

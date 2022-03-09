@@ -68,7 +68,7 @@ class VideoPlayerState(
 }
 
 @Composable
-fun VideoPlayer(state: VideoPlayerState, video: VideoDescriptor, modifier: Modifier = Modifier) {
+fun VideoPlayer(state: VideoPlayerState, video: Video, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current.lifecycle
 
@@ -77,10 +77,14 @@ fun VideoPlayer(state: VideoPlayerState, video: VideoDescriptor, modifier: Modif
     }
 
     LaunchedEffect(key1 = video) {
+        val uri = when (video) {
+            is Video.DescriptorVideo -> video.descriptor.dash
+            is Video.UriVideo -> video.uri
+        }
         player.apply {
             repeatMode = Player.REPEAT_MODE_ONE
             playWhenReady = state.autoPlay
-            setMediaItem(MediaItem.fromUri(video.dash))
+            setMediaItem(MediaItem.fromUri(uri))
             prepare()
             seekTo(state.position)
         }
