@@ -19,7 +19,6 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.bottomSheet
 import com.neaniesoft.vermilion.accounts.adapters.driving.ui.UserAccountScreen
 import com.neaniesoft.vermilion.app.customtabs.customTab
-import com.neaniesoft.vermilion.app.customtabs.customTabRoute
 import com.neaniesoft.vermilion.coreentities.CommunityId
 import com.neaniesoft.vermilion.coreentities.CommunityName
 import com.neaniesoft.vermilion.coreentities.NamedCommunity
@@ -96,8 +95,8 @@ fun VermilionNavHost(
                 navArgument("id") { type = NavType.StringType }
             )
         ) {
-            PostDetailsScreen(appState = appState) {
-                navController.navigate(customTabRoute(it))
+            PostDetailsScreen(appState = appState) { route ->
+                navController.navigate(route)
             }
         }
 

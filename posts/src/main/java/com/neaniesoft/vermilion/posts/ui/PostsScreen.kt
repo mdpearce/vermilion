@@ -19,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,9 +55,10 @@ fun PostsScreen(
     val initialScrollPosition = viewModel.restoredScrollPosition.collectAsState(
         initial = null
     )
-    val routeEvent by viewModel.routeEvents.collectAsState(initial = "")
-    LaunchedEffect(key1 = routeEvent) {
-        onRoute(routeEvent)
+    LaunchedEffect(key1 = Unit) {
+        viewModel.routeEvents.collect {
+            onRoute(it)
+        }
     }
 
     val isScrolling = remember {
