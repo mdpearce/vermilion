@@ -47,6 +47,22 @@ class ExoPlayerState(
     var duration: Long by mutableStateOf(C.TIME_UNSET)
         private set
 
+    internal fun onDurationUpdated(newDuration: Long) {
+        duration = newDuration
+    }
+
+    internal fun onIsPlayingUpdated(newValue: Boolean) {
+        isPlaying = newValue
+    }
+
+    internal fun onPlaybackStateChanged(newState: Int) {
+        playbackState = newState
+    }
+
+    internal fun onPositionChanged(newPosition: Long) {
+        position = newPosition
+    }
+
     companion object {
         val Saver: Saver<ExoPlayerState, *> = listSaver(
             save = { state ->
