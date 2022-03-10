@@ -77,17 +77,24 @@ fun CommentRow(
 
             DepthIndicators(depth = comment.depth.value)
 
-            Column(Modifier.padding(8.dp)) {
-                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.padding(top = 8.dp, bottom = 8.dp, end = 8.dp)) {
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(start = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     CommentAuthor(comment = comment, Modifier.padding(end = 8.dp))
+                    CommentScore(comment = comment, Modifier.padding(end = 8.dp))
                     CommentTime(comment = comment, Modifier.padding(end = 8.dp))
-                    CommentFlair(flair = comment.commentFlair, Modifier.padding(end = 8.dp))
                     CommentFlagIcons(flags = comment.flags)
-                    Spacer(modifier = Modifier.weight(1.0f))
-                    CommentScore(comment = comment)
                 }
+                CommentFlair(
+                    flair = comment.commentFlair,
+                    Modifier.padding(top = 8.dp, start = 4.dp)
+                )
 
-                Box(Modifier.padding(top = 8.dp)) {
+                Box(Modifier.padding(top = 8.dp, start = 8.dp)) {
                     MarkdownDocument(
                         document = comment.contentMarkdown as Document,
                         onUriClicked = onUriClicked
@@ -271,7 +278,7 @@ fun CommentFlair(flair: CommentFlair, modifier: Modifier = Modifier) {
             Text(
                 text = flair.text.value,
                 modifier = Modifier.padding(4.dp),
-                style = MaterialTheme.typography.caption
+                style = MaterialTheme.typography.overline
             )
         }
     }
