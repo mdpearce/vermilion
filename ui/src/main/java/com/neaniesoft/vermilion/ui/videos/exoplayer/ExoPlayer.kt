@@ -45,6 +45,7 @@ class ExoPlayerState(
         private set
 
     var duration: Long by mutableStateOf(C.TIME_UNSET)
+        private set
 
     companion object {
         val Saver: Saver<ExoPlayerState, *> = listSaver(
