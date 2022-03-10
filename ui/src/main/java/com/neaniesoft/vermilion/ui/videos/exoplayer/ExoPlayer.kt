@@ -14,7 +14,7 @@ import com.google.android.exoplayer2.Player
 
 @Composable
 fun rememberExoPlayerState(
-    initialMediaItem: MediaItem,
+    initialMediaItem: MediaItem? = null,
     initialPosition: Long = 0,
     initialPlayWhenReady: Boolean = true,
     initialRepeatMode: Int = Player.REPEAT_MODE_OFF
@@ -29,12 +29,12 @@ fun rememberExoPlayerState(
 
 @Stable
 class ExoPlayerState(
-    initialMediaItem: MediaItem,
+    initialMediaItem: MediaItem? = null,
     initialPosition: Long = 0,
     initialPlayWhenReady: Boolean = true,
     initialRepeatMode: Int = Player.REPEAT_MODE_OFF
 ) {
-    var mediaItem: MediaItem by mutableStateOf(initialMediaItem)
+    var mediaItem: MediaItem? by mutableStateOf(initialMediaItem)
 
     var position: Long by mutableStateOf(initialPosition)
         private set
@@ -80,7 +80,7 @@ class ExoPlayerState(
             },
             restore = {
                 ExoPlayerState(
-                    initialMediaItem = it[0] as MediaItem,
+                    initialMediaItem = it[0] as MediaItem?,
                     initialPosition = it[1] as Long,
                     initialPlayWhenReady = it[2] as Boolean,
                     initialRepeatMode = it[3] as Int
@@ -91,5 +91,6 @@ class ExoPlayerState(
 }
 
 @Composable
-fun ExoPlayer() {
+fun ExoPlayer(state: ExoPlayerState = rememberExoPlayerState()) {
+
 }
