@@ -17,11 +17,13 @@ fun rememberExoPlayerState(
     initialMediaItem: MediaItem,
     initialPosition: Long = 0,
     initialPlayWhenReady: Boolean = true,
+    initialRepeatMode: Int = Player.REPEAT_MODE_OFF
 ): ExoPlayerState = rememberSaveable(saver = ExoPlayerState.Saver) {
     ExoPlayerState(
         initialMediaItem = initialMediaItem,
         initialPosition = initialPosition,
-        initialPlayWhenReady = initialPlayWhenReady
+        initialPlayWhenReady = initialPlayWhenReady,
+        initialRepeatMode = initialRepeatMode
     )
 }
 
@@ -29,7 +31,8 @@ fun rememberExoPlayerState(
 class ExoPlayerState(
     initialMediaItem: MediaItem,
     initialPosition: Long = 0,
-    initialPlayWhenReady: Boolean = true
+    initialPlayWhenReady: Boolean = true,
+    initialRepeatMode: Int = Player.REPEAT_MODE_OFF
 ) {
     var mediaItem: MediaItem by mutableStateOf(initialMediaItem)
 
@@ -46,6 +49,8 @@ class ExoPlayerState(
 
     var duration: Long by mutableStateOf(C.TIME_UNSET)
         private set
+
+    var repeatMode: Int by mutableStateOf(initialRepeatMode)
 
     internal fun onDurationUpdated(newDuration: Long) {
         duration = newDuration
@@ -69,14 +74,16 @@ class ExoPlayerState(
                 listOf(
                     state.mediaItem,
                     state.position,
-                    state.playWhenReady
+                    state.playWhenReady,
+                    state.repeatMode
                 )
             },
             restore = {
                 ExoPlayerState(
                     initialMediaItem = it[0] as MediaItem,
                     initialPosition = it[1] as Long,
-                    initialPlayWhenReady = it[2] as Boolean
+                    initialPlayWhenReady = it[2] as Boolean,
+                    initialRepeatMode = it[3] as Int
                 )
             }
         )
