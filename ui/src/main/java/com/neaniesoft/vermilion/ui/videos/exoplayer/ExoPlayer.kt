@@ -1,13 +1,17 @@
 package com.neaniesoft.vermilion.ui.videos.exoplayer
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
@@ -92,5 +96,26 @@ class ExoPlayerState(
 
 @Composable
 fun ExoPlayer(state: ExoPlayerState = rememberExoPlayerState()) {
+    val context = LocalContext.current
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
 
+    val exoPlayer = remember {
+        com.google.android.exoplayer2.ExoPlayer.Builder(context).build()
+    }
+
+    LaunchedEffect(state.mediaItem) {
+        val mediaItem = state.mediaItem
+        if (mediaItem != null) {
+            exoPlayer.setMediaItem(mediaItem)
+            exoPlayer.seekTo(state.position)
+        }
+    }
+
+    LaunchedEffect(state.repeatMode) {
+        exoPlayer.repeatMode = state.repeatMode
+    }
+
+    LaunchedEffect(state.playWhenReady) {
+        exoPlayer.playWhenReady = state.playWhenReady
+    }
 }
