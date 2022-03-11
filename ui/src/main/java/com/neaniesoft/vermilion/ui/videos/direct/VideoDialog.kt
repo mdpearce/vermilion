@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Surface
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,6 +16,8 @@ import com.neaniesoft.vermilion.ui.images.rememberZoomableState
 import com.neaniesoft.vermilion.ui.videos.ZoomableDialog
 import com.neaniesoft.vermilion.ui.videos.exoplayer.ExoPlayer
 import com.neaniesoft.vermilion.ui.videos.exoplayer.rememberExoPlayerState
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 @ExperimentalMaterialApi
 @Composable
@@ -44,8 +46,10 @@ fun VideoDialog(videoDescriptor: VideoDescriptor, onDismiss: () -> Unit) {
 }
 
 @Composable
-fun VideoCounter(timeRemaining: Long) {
-    Surface(Modifier.padding(8.dp)) {
-        Text(text = "$timeRemaining")
-    }
+fun VideoCounter(secondsRemaining: Long) {
+    val duration = secondsRemaining.toDuration(DurationUnit.SECONDS)
+    val timeRemainingString = "%d:%02d".format(
+        duration.inWholeMinutes,
+        duration.toComponents { _, seconds, _ -> seconds })
+    Text(text = timeRemainingString, modifier = Modifier.padding(8.dp), style = MaterialTheme.typography.body1)
 }
