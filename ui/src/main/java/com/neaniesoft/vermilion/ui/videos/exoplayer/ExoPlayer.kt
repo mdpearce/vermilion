@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -220,6 +221,9 @@ fun ExoPlayer(state: ExoPlayerState = rememberExoPlayerState()) {
 fun ExoPlayerWithControls(exoPlayerState: ExoPlayerState = rememberExoPlayerState()) {
     Box(contentAlignment = Alignment.Center) {
         ExoPlayer(exoPlayerState)
+        if (exoPlayerState.isBuffering) {
+            CircularProgressIndicator()
+        }
         Box(
             contentAlignment = Alignment.BottomCenter,
             modifier = Modifier
