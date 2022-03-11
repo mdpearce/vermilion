@@ -1,4 +1,4 @@
-package com.neaniesoft.vermilion.ui.videos
+package com.neaniesoft.vermilion.ui.dialogs
 
 import android.util.Log
 import androidx.compose.foundation.gestures.Orientation
