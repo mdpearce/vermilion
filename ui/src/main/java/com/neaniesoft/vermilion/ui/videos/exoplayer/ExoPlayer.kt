@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,6 +28,7 @@ import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.neaniesoft.vermilion.utils.anonymousLogger
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+import kotlin.math.ceil
 
 @Composable
 fun rememberExoPlayerState(
@@ -69,6 +71,14 @@ class ExoPlayerState(
     var repeatMode: Int by mutableStateOf(initialRepeatMode)
 
     var isMuted: Boolean by mutableStateOf(initialMuteState)
+
+    val millisRemaining: Long by derivedStateOf {
+        duration.coerceAtLeast(0) - position
+    }
+
+    val secondsRemaining: Long by derivedStateOf {
+        ceil(millisRemaining / 1000.0).toLong()
+    }
 
     internal fun onDurationUpdated(newDuration: Long) {
         duration = newDuration

@@ -36,8 +36,7 @@ fun VideoDialog(videoDescriptor: VideoDescriptor, onDismiss: () -> Unit) {
                     .padding(16.dp)
             ) {
                 VideoCounter(
-                    currentPosition = exoPlayerState.position,
-                    duration = exoPlayerState.duration
+                    exoPlayerState.secondsRemaining
                 )
             }
         }
@@ -45,8 +44,8 @@ fun VideoDialog(videoDescriptor: VideoDescriptor, onDismiss: () -> Unit) {
 }
 
 @Composable
-fun VideoCounter(currentPosition: Long, duration: Long) {
+fun VideoCounter(timeRemaining: Long) {
     Surface(Modifier.padding(8.dp)) {
-        Text(text = "$currentPosition / $duration")
+        Text(text = "$timeRemaining")
     }
 }
