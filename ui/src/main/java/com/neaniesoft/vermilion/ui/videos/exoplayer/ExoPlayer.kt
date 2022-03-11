@@ -170,6 +170,7 @@ fun ExoPlayer(state: ExoPlayerState = rememberExoPlayerState()) {
     AndroidView(factory = {
         StyledPlayerView(context)
     }) { playerView ->
+        playerView.useController = false
         lifecycle.addObserver(object : DefaultLifecycleObserver {
             override fun onStart(owner: LifecycleOwner) {
                 playerView.onPause()
