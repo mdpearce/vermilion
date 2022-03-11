@@ -1,6 +1,6 @@
 package com.neaniesoft.vermilion.ui.videos.exoplayer
 
-import android.os.Bundle
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -32,14 +32,14 @@ import kotlin.math.ceil
 
 @Composable
 fun rememberExoPlayerState(
-    initialMediaItem: MediaItem? = null,
+    initialMediaUri: Uri? = null,
     initialPosition: Long = 0,
     initialPlayWhenReady: Boolean = true,
     initialRepeatMode: Int = Player.REPEAT_MODE_OFF,
     initialMuteState: Boolean = false
 ): ExoPlayerState = rememberSaveable(saver = ExoPlayerState.Saver) {
     ExoPlayerState(
-        initialMediaItem = initialMediaItem,
+        initialMediaUri = initialMediaUri,
         initialPosition = initialPosition,
         initialPlayWhenReady = initialPlayWhenReady,
         initialRepeatMode = initialRepeatMode,
@@ -49,13 +49,13 @@ fun rememberExoPlayerState(
 
 @Stable
 class ExoPlayerState(
-    initialMediaItem: MediaItem? = null,
+    initialMediaUri: Uri? = null,
     initialPosition: Long = 0,
     initialPlayWhenReady: Boolean = true,
     initialRepeatMode: Int = Player.REPEAT_MODE_OFF,
     initialMuteState: Boolean = false
 ) {
-    var mediaItem: MediaItem? by mutableStateOf(initialMediaItem)
+    var mediaUri: Uri? by mutableStateOf(initialMediaUri)
 
     var position: Long by mutableStateOf(initialPosition)
         private set
@@ -96,7 +96,7 @@ class ExoPlayerState(
         val Saver: Saver<ExoPlayerState, *> = listSaver(
             save = { state ->
                 listOf(
-                    state.mediaItem?.toBundle(),
+                    state.mediaUri,
                     state.position,
                     state.playWhenReady,
                     state.repeatMode,
@@ -104,11 +104,8 @@ class ExoPlayerState(
                 )
             },
             restore = {
-                val mediaItemBundle = it[0] as Bundle?
-                val mediaItem =
-                    mediaItemBundle?.let { bundle -> MediaItem.CREATOR.fromBundle(bundle) }
                 ExoPlayerState(
-                    initialMediaItem = mediaItem,
+                    initialMediaUri = it[0] as Uri?,
                     initialPosition = it[1] as Long,
                     initialPlayWhenReady = it[2] as Boolean,
                     initialRepeatMode = it[3] as Int,
@@ -157,12 +154,14 @@ fun ExoPlayer(state: ExoPlayerState = rememberExoPlayerState()) {
         }
     }
 
-    LaunchedEffect(state.mediaItem) {
-        val mediaItem = state.mediaItem
+    LaunchedEffect(state.mediaUri) {
+        val mediaItem = state.mediaUri?.let { uri -> MediaItem.fromUri(uri) }
         if (mediaItem != null) {
             player.setMediaItem(mediaItem)
             player.prepare()
             player.seekTo(state.position)
+        } else {
+            player.clearMediaItems()
         }
     }
 

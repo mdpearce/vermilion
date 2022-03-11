@@ -17,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.google.android.exoplayer2.MediaItem
 import com.neaniesoft.vermilion.ui.R
 import com.neaniesoft.vermilion.ui.images.rememberZoomableState
 import com.neaniesoft.vermilion.ui.videos.ZoomableDialog
@@ -32,7 +31,7 @@ fun VideoDialog(videoDescriptor: VideoDescriptor, onDismiss: () -> Unit) {
     Log.d("VideoDialog", "Loading video: $videoDescriptor")
     val zoomableState = rememberZoomableState(maxScale = 6f)
     val exoPlayerState = rememberExoPlayerState(
-        initialMediaItem = MediaItem.fromUri(videoDescriptor.dash)
+        initialMediaUri = videoDescriptor.dash
     )
 
     ZoomableDialog(state = zoomableState, onDismiss = onDismiss) {
