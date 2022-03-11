@@ -1,6 +1,16 @@
 package com.neaniesoft.vermilion.ui.videos.exoplayer
 
 import android.net.Uri
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -13,8 +23,12 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -25,17 +39,20 @@ import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.Player.STATE_READY
 import com.google.android.exoplayer2.Timeline
 import com.google.android.exoplayer2.ui.StyledPlayerView
+import com.neaniesoft.vermilion.ui.R
 import com.neaniesoft.vermilion.utils.anonymousLogger
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlin.math.ceil
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 @Composable
 fun rememberExoPlayerState(
     initialMediaUri: Uri? = null,
     initialPosition: Long = 0,
     initialPlayWhenReady: Boolean = true,
-    initialRepeatMode: Int = Player.REPEAT_MODE_OFF,
+    initialRepeatMode: Int = Player.REPEAT_MODE_ALL,
     initialMuteState: Boolean = false
 ): ExoPlayerState = rememberSaveable(saver = ExoPlayerState.Saver) {
     ExoPlayerState(
@@ -194,5 +211,65 @@ fun ExoPlayer(state: ExoPlayerState = rememberExoPlayerState()) {
                 playerView.onResume()
             }
         })
+    }
+}
+
+@Composable
+fun ExoPlayerWithControls(exoPlayerState: ExoPlayerState = rememberExoPlayerState()) {
+    Box(contentAlignment = Alignment.Center) {
+        ExoPlayer(exoPlayerState)
+        Box(
+            contentAlignment = Alignment.BottomCenter,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            VideoControlRow(
+                secondsRemaining = exoPlayerState.secondsRemaining,
+                isPlaying = exoPlayerState.playWhenReady,
+                onPlayPauseClick = {
+                    exoPlayerState.playWhenReady = !exoPlayerState.playWhenReady
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun VideoControlRow(secondsRemaining: Long, isPlaying: Boolean, onPlayPauseClick: () -> Unit) {
+    Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+        PlayPauseButton(isPlaying = isPlaying, onPlayPauseClick)
+        VideoCounter(secondsRemaining = secondsRemaining)
+    }
+}
+
+@Composable
+fun VideoCounter(secondsRemaining: Long) {
+    val duration = secondsRemaining.toDuration(DurationUnit.SECONDS)
+    val timeRemainingString = "%d:%02d".format(
+        duration.inWholeMinutes,
+        duration.toComponents { _, seconds, _ -> seconds })
+    Text(
+        text = timeRemainingString,
+        modifier = Modifier.padding(8.dp),
+        style = MaterialTheme.typography.body1
+    )
+}
+
+@Composable
+fun PlayPauseButton(
+    isPlaying: Boolean,
+    onClick: () -> Unit
+) {
+    val iconResource = painterResource(
+        id = if (isPlaying) {
+            R.drawable.ic_baseline_pause_circle_filled_24
+        } else {
+            R.drawable.ic_baseline_play_circle_filled_24
+        }
+    )
+
+    IconButton(onClick = onClick) {
+        Icon(painter = iconResource, contentDescription = "Play/Pause")
     }
 }
