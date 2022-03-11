@@ -199,7 +199,6 @@ fun ExoPlayer(state: ExoPlayerState = rememberExoPlayerState()) {
         }
     }
 
-
     AndroidView(factory = {
         StyledPlayerView(context)
     }) { playerView ->
@@ -254,7 +253,8 @@ fun VideoCounter(secondsRemaining: Long) {
     val duration = secondsRemaining.toDuration(DurationUnit.SECONDS)
     val timeRemainingString = "%d:%02d".format(
         duration.inWholeMinutes,
-        duration.toComponents { _, seconds, _ -> seconds })
+        duration.toComponents { _, seconds, _ -> seconds }
+    )
     Text(
         text = timeRemainingString,
         modifier = Modifier.padding(8.dp),
