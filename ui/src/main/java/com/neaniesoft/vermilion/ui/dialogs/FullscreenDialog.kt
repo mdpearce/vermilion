@@ -11,8 +11,8 @@ import androidx.compose.material.Surface
 import androidx.compose.material.rememberSwipeableState
 import androidx.compose.material.swipeable
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,15 +44,12 @@ fun FullscreenDialog(onDismiss: () -> Unit, content: @Composable () -> Unit) {
             }
         }
 
-        val flingStarted by remember {
-            derivedStateOf { swipeableState.isAnimationRunning && swipeableState.direction < 0 }
+        LaunchedEffect(key1 = swipeableState.currentValue) {
+            if (swipeableState.currentValue != 0) {
+                Log.d("VideoDialog", "Dismissing")
+                onDismiss()
+            }
         }
-
-        if (flingStarted) {
-            Log.d("VideoDialog", "Dismissing")
-            onDismiss()
-        }
-
         Box(
             Modifier
                 .fillMaxSize()
