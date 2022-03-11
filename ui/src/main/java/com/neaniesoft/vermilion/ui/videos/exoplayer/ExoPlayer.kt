@@ -1,5 +1,6 @@
 package com.neaniesoft.vermilion.ui.videos.exoplayer
 
+import android.os.Bundle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -85,7 +86,7 @@ class ExoPlayerState(
         val Saver: Saver<ExoPlayerState, *> = listSaver(
             save = { state ->
                 listOf(
-                    state.mediaItem,
+                    state.mediaItem?.toBundle(),
                     state.position,
                     state.playWhenReady,
                     state.repeatMode,
@@ -93,8 +94,11 @@ class ExoPlayerState(
                 )
             },
             restore = {
+                val mediaItemBundle = it[0] as Bundle?
+                val mediaItem =
+                    mediaItemBundle?.let { bundle -> MediaItem.CREATOR.fromBundle(bundle) }
                 ExoPlayerState(
-                    initialMediaItem = it[0] as MediaItem?,
+                    initialMediaItem = mediaItem,
                     initialPosition = it[1] as Long,
                     initialPlayWhenReady = it[2] as Boolean,
                     initialRepeatMode = it[3] as Int,
@@ -171,6 +175,7 @@ fun ExoPlayer(state: ExoPlayerState = rememberExoPlayerState()) {
         StyledPlayerView(context)
     }) { playerView ->
         playerView.useController = false
+        playerView.player = player
         lifecycle.addObserver(object : DefaultLifecycleObserver {
             override fun onStart(owner: LifecycleOwner) {
                 playerView.onPause()
