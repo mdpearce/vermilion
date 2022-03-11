@@ -82,6 +82,8 @@ class ExoPlayerState(
     var playbackState: Int by mutableStateOf(Player.STATE_IDLE)
         private set
 
+    val isBuffering: Boolean by derivedStateOf { playbackState == Player.STATE_BUFFERING }
+
     var duration: Long by mutableStateOf(C.TIME_UNSET)
         private set
 
