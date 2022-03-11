@@ -1,4 +1,4 @@
-package com.neaniesoft.vermilion.ui.videos
+package com.neaniesoft.vermilion.ui.videos.direct
 
 import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
@@ -6,7 +6,10 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.neaniesoft.vermilion.ui.images.rememberZoomableState
-import com.neaniesoft.vermilion.ui.videos.direct.VideoDescriptor
+import com.neaniesoft.vermilion.ui.videos.Video
+import com.neaniesoft.vermilion.ui.videos.VideoPlayer
+import com.neaniesoft.vermilion.ui.videos.ZoomableDialog
+import com.neaniesoft.vermilion.ui.videos.rememberVideoPlayerState
 
 @ExperimentalMaterialApi
 @Composable
