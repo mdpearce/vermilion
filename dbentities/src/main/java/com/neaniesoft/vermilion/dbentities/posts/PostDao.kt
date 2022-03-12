@@ -5,6 +5,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 
 @Dao
 interface PostDao {
@@ -29,4 +30,7 @@ interface PostDao {
 
     @Query("SELECT count(id) FROM posts WHERE `query` == :query")
     suspend fun postCount(query: String): Int
+
+    @Update
+    suspend fun update(post: PostRecord): Int
 }
