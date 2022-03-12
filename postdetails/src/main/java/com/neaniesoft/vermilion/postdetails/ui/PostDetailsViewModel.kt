@@ -4,7 +4,6 @@ import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.room.withTransaction
 import com.neaniesoft.vermilion.db.VermilionDatabase
 import com.neaniesoft.vermilion.dbentities.posts.PostDao
 import com.neaniesoft.vermilion.postdetails.data.CommentRepository
@@ -78,13 +77,8 @@ class PostDetailsViewModel @Inject constructor(
 
     private fun loadPostFromDb(id: PostId) {
         viewModelScope.launch {
-            val post = database.withTransaction {
-                postDao.postWithId(id.value)
-            }
-            if (post == null) {
-                _post.emit(Error)
-            } else {
-                _post.emit(PostDetails(post.toPost(markdownParser)))
+            postDao.postWithIdFlow(id.value).collect { record ->
+                _post.emit(PostDetails(record.toPost(markdownParser)))
             }
         }
     }
