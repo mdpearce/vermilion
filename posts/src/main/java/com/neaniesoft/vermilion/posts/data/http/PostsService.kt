@@ -2,6 +2,7 @@ package com.neaniesoft.vermilion.posts.data.http
 
 import com.neaniesoft.vermilion.posts.data.entities.PostsResponse
 import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -25,6 +26,7 @@ interface PostsService {
         @Query("count") count: Int?
     ): PostsResponse
 
+    @FormUrlEncoded
     @POST("api/vote")
     suspend fun vote(
         @Field("dir") direction: Int,
