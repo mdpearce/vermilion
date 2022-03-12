@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -29,6 +31,7 @@ import com.neaniesoft.vermilion.coreentities.Community
 import com.neaniesoft.vermilion.coreentities.NamedCommunity
 import com.neaniesoft.vermilion.posts.R
 import com.neaniesoft.vermilion.posts.domain.entities.Post
+import com.neaniesoft.vermilion.posts.domain.entities.isUpVoted
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import org.ocpsoft.prettytime.PrettyTime
 import java.text.NumberFormat
@@ -111,6 +114,7 @@ fun PostDetails(
             modifier = Modifier.padding(end = 16.dp)
         )
         VoteSaveBlock(
+            isUpVoted = post.isUpVoted(),
             onUpVoteClicked = { onUpVoteClicked(post) },
             onDownVoteClicked = { onDownVoteClicked(post) },
             onSaveClicked = { onSaveClicked(post) }
@@ -120,6 +124,7 @@ fun PostDetails(
 
 @Composable
 fun VoteSaveBlock(
+    isUpVoted: Boolean,
     onUpVoteClicked: () -> Unit,
     onDownVoteClicked: () -> Unit,
     onSaveClicked: () -> Unit
@@ -132,9 +137,14 @@ fun VoteSaveBlock(
                 .size(64.dp)
         ) {
             IconButton(onClick = onUpVoteClicked) {
+                val tint = if (isUpVoted) {
+                    MaterialTheme.colors.primary
+                } else {
+                    LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                }
                 Icon(
                     painter = painterResource(id = R.drawable.ic_baseline_arrow_upward_24),
-                    contentDescription = "Up vote", tint = MaterialTheme.colors.primary
+                    contentDescription = "Up vote", tint = tint
                 )
             }
         }

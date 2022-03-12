@@ -20,6 +20,7 @@ import com.neaniesoft.vermilion.posts.data.PostRepository
 import com.neaniesoft.vermilion.posts.data.toPost
 import com.neaniesoft.vermilion.posts.domain.LinkRouter
 import com.neaniesoft.vermilion.posts.domain.PostHistoryService
+import com.neaniesoft.vermilion.posts.domain.PostVotingService
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.tabs.domain.TabSupervisor
@@ -52,6 +53,7 @@ class PostsViewModel @Inject constructor(
     private val markdownParser: Parser,
     private val tabSupervisor: TabSupervisor,
     private val linkRouter: LinkRouter,
+    private val postVotingService: PostVotingService,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val pagingDataMap: MutableMap<String, Flow<PagingData<Post>>> = mutableMapOf()
@@ -154,5 +156,13 @@ class PostsViewModel @Inject constructor(
             else -> { // do nothing
             }
         }
+    }
+
+    fun onUriClicked(uri: Uri) {
+        viewModelScope.launch { _routeEvents.emit(buildLinkRoute(uri)) }
+    }
+
+    fun onUpVoteClicked(post: Post) {
+        viewModelScope.launch { postVotingService.toggleUpVote(post) }
     }
 }

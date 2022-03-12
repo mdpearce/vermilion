@@ -5,6 +5,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PostDao {
@@ -24,9 +25,20 @@ interface PostDao {
     @Query("SELECT * from posts WHERE `postId` == :postId ORDER BY insertedAt DESC LIMIT 1")
     suspend fun postWithId(postId: String): PostRecord?
 
+    @Query("SELECT * from posts WHERE `postId` == :postId ORDER BY insertedAt DESC LIMIT 1")
+    fun postWithIdFlow(postId: String): Flow<PostRecord>
+
     @Query("DELETE FROM posts")
     suspend fun deleteAll()
 
     @Query("SELECT count(id) FROM posts WHERE `query` == :query")
     suspend fun postCount(query: String): Int
+
+    @Query("UPDATE posts SET flags = :flags WHERE postId == :postId")
+    suspend fun updateFlags(postId: String, flags: String): Int
 }
+
+data class PostRecordWithUpdatedFlags(
+    val id: Int,
+    val flags: String
+)

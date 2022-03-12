@@ -115,7 +115,8 @@ fun PostDetailsScreen(
         onMediaClicked = { viewModel.onOpenUri(it.link) },
         onUriClicked = { viewModel.onOpenUri(it) },
         onMoreCommentsClicked = { viewModel.onMoreCommentsClicked(it) },
-        onCommentNavDownClicked = { viewModel.onCommentNavDownClicked(columnState.firstVisibleItemIndex) }
+        onCommentNavDownClicked = { viewModel.onCommentNavDownClicked(columnState.firstVisibleItemIndex) },
+        onUpVoteClicked = { viewModel.onUpVoteClicked(it) }
     )
 }
 
@@ -129,7 +130,8 @@ fun PostDetailsScreenContent(
     onMediaClicked: (Post) -> Unit,
     onUriClicked: (Uri) -> Unit,
     onMoreCommentsClicked: (CommentStub) -> Unit,
-    onCommentNavDownClicked: () -> Unit
+    onCommentNavDownClicked: () -> Unit,
+    onUpVoteClicked: (Post) -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -153,7 +155,8 @@ fun PostDetailsScreenContent(
                                     onMediaClicked = onMediaClicked,
                                     onSummaryClicked = {},
                                     onCommunityClicked = {},
-                                    onUriClicked = onUriClicked
+                                    onUriClicked = onUriClicked,
+                                    onUpVoteClicked = onUpVoteClicked
                                 )
                             }
                         }
@@ -234,7 +237,8 @@ fun PostDetailsScreenDark() {
             onMediaClicked = {},
             onUriClicked = {},
             onMoreCommentsClicked = {},
-            onCommentNavDownClicked = {}
+            onCommentNavDownClicked = {},
+            onUpVoteClicked = {}
         )
     }
 }
