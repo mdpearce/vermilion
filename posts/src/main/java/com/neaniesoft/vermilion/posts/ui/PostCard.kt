@@ -34,9 +34,8 @@ import com.neaniesoft.vermilion.posts.R
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.CommentCount
 import com.neaniesoft.vermilion.posts.domain.entities.DefaultThumbnail
-import com.neaniesoft.vermilion.posts.domain.entities.ImagePostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.LinkHost
-import com.neaniesoft.vermilion.posts.domain.entities.LinkPostSummary
+import com.neaniesoft.vermilion.posts.domain.entities.MarkdownText
 import com.neaniesoft.vermilion.posts.domain.entities.NoThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.NsfwThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.Post
@@ -47,17 +46,11 @@ import com.neaniesoft.vermilion.posts.domain.entities.PostFlairText
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlairTextColor
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.PostTitle
-import com.neaniesoft.vermilion.posts.domain.entities.PreviewSummary
-import com.neaniesoft.vermilion.posts.domain.entities.PreviewText
 import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.posts.domain.entities.SelfThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.SpoilerThumbnail
-import com.neaniesoft.vermilion.posts.domain.entities.TextPostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.Thumbnail
-import com.neaniesoft.vermilion.posts.domain.entities.ThumbnailSummary
-import com.neaniesoft.vermilion.posts.domain.entities.UriImage
 import com.neaniesoft.vermilion.posts.domain.entities.UriThumbnail
-import com.neaniesoft.vermilion.posts.domain.entities.VideoPostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.isNsfw
 import com.neaniesoft.vermilion.ui.theme.AlmostBlack
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
@@ -101,49 +94,20 @@ fun PostContent(
     onCommunityClicked: (Community) -> Unit,
     onUriClicked: (Uri) -> Unit
 ) {
-    // Log.d("PostContent", "Drawing content")
     Column(modifier = modifier.padding(0.dp)) {
-        val summary = post.summary
-        when (summary) {
-            is ImagePostSummary -> {
-                ImageSummary(
-                    image = summary.preview ?: UriImage("".toUri(), 0, 0),
-                    isNsfw = if (shouldHideNsfw) {
-                        post.isNsfw()
-                    } else {
-                        false
-                    }
-                ) { onMediaClicked(post) }
-            }
-            is LinkPostSummary -> {
-                if (summary.preview != null) {
-                    ImageSummary(
-                        image = summary.preview,
-                        isNsfw = if (shouldHideNsfw) {
-                            post.isNsfw()
-                        } else {
-                            false
-                        }
-                    ) {
-                        onMediaClicked(post)
-                    }
+
+        if (post.imagePreview != null) {
+            ImageSummary(
+                image = post.imagePreview,
+                isNsfw = if (shouldHideNsfw) {
+                    post.isNsfw()
+                } else {
+                    false
                 }
-            }
-            is VideoPostSummary -> {
-                VideoSummary(
-                    image = summary.preview ?: UriImage("".toUri(), 0, 0),
-                    isNsfw = if (shouldHideNsfw) {
-                        post.isNsfw()
-                    } else {
-                        false
-                    }
-                ) { onMediaClicked(post) }
-            }
-            is TextPostSummary -> {
-                // Do nothing, we draw the text post summary after the header
+            ) {
+                onMediaClicked(post)
             }
         }
-
         val contentAlpha = remember {
             if (post.flags.contains(PostFlags.VIEWED)) {
                 0.5f
@@ -167,15 +131,9 @@ fun PostContent(
                         .weight(0.1f)
                         .alpha(contentAlpha)
                 )
-                val hasPreview = when (post.summary) {
-                    is PreviewSummary -> post.summary.preview != null
-                    else -> false
-                }
+                val hasPreview = post.imagePreview != null
 
-                val thumbnail = when (post.summary) {
-                    is ThumbnailSummary -> post.summary.thumbnail
-                    else -> NoThumbnail
-                }
+                val thumbnail = post.thumbnail
 
                 if (!hasPreview && thumbnail !is NoThumbnail) {
                     Thumbnail(
@@ -214,9 +172,9 @@ fun PostContent(
                     )
                 }
             }
-            if (summary is TextPostSummary) {
+            if (post.text != null) {
                 TextSummary(
-                    content = summary.previewTextMarkdown,
+                    content = post.text.markdown,
                     shouldTruncate,
                     modifier = Modifier.alpha(contentAlpha),
                     onUriClicked = { onUriClicked(it.toUri()) }
@@ -364,10 +322,11 @@ private const val DUMMY_CONTENT =
 val DUMMY_TEXT_POST = Post(
     PostId(""),
     PostTitle("Some post with a very long title that is likely to split across multiple lines"),
-    TextPostSummary(
-        PreviewText(DUMMY_CONTENT),
-        Parser.builder().build().parse(DUMMY_CONTENT) as Document
-    ),
+    null,
+    null,
+    NoThumbnail,
+    LinkHost("some.host"),
+    MarkdownText(DUMMY_CONTENT, Parser.builder().build().parse(DUMMY_CONTENT) as Document),
     null,
     null,
     NamedCommunity(CommunityName("Subreddit"), CommunityId("")),
@@ -382,30 +341,11 @@ val DUMMY_TEXT_POST = Post(
         PostFlairText("Some flair"),
         PostFlairBackgroundColor(0),
         PostFlairTextColor.DARK
-    )
+    ),
+    Post.Type.TEXT
 )
 
-val DUMMY_LINK_POST = Post(
-    PostId(""),
-    PostTitle("Some post with a very long title that is likely to split across multiple lines"),
-    LinkPostSummary(
-        null,
-        DefaultThumbnail,
-        LinkHost("somehost")
-    ),
-    null,
-    null,
-    NamedCommunity(CommunityName("Subreddit"), CommunityId("")),
-    AuthorName("/u/SomeDude"),
-    postedAt = Instant.now(),
-    awardCounts = emptyMap(),
-    CommentCount(123),
-    Score(1024),
-    flags = emptySet(),
-    "http://reddit.com/".toUri(),
-    PostFlair.TextFlair(
-        PostFlairText("Some flair"),
-        PostFlairBackgroundColor(0),
-        PostFlairTextColor.DARK
-    )
+val DUMMY_LINK_POST = DUMMY_TEXT_POST.copy(
+    text = null,
+    type = Post.Type.LINK
 )

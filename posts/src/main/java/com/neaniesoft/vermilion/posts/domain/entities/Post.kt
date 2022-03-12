@@ -8,7 +8,11 @@ import java.time.Instant
 data class Post(
     val id: PostId,
     val title: PostTitle,
-    val summary: PostSummary,
+    val imagePreview: UriImage?,
+    val animatedImagePreview: AnimatedImagePreview?,
+    val thumbnail: Thumbnail,
+    val linkHost: LinkHost,
+    val text: MarkdownText?,
     val videoPreview: VideoDescriptor?,
     val attachedVideo: VideoDescriptor?,
     val community: Community,
@@ -19,7 +23,12 @@ data class Post(
     val score: Score,
     val flags: Set<PostFlags>,
     val link: Uri,
-    val flair: PostFlair
-)
+    val flair: PostFlair,
+    val type: Type
+) {
+    enum class Type {
+        TEXT, IMAGE, LINK, VIDEO
+    }
+}
 
 fun Post.isNsfw(): Boolean = flags.contains(PostFlags.NSFW)
