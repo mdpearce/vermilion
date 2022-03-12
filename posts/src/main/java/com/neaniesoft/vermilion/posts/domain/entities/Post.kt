@@ -24,8 +24,13 @@ data class Post(
     val score: Score,
     val flags: Set<PostFlags>,
     val link: Uri,
-    val flair: PostFlair
-)
+    val flair: PostFlair,
+    val type: Type
+) {
+    enum class Type {
+        TEXT, IMAGE, LINK, VIDEO
+    }
+}
 
 fun Post.isNsfw(): Boolean = flags.contains(PostFlags.NSFW)
 

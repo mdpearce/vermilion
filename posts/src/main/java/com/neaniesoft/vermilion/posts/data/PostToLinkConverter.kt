@@ -67,7 +67,18 @@ fun Link.toPost(markdownParser: Parser): Post {
         Score(score),
         flags(),
         url.toUri(),
-        flair()
+        flair(),
+        postHint?.let {
+            when {
+                it.endsWith("link") -> Post.Type.LINK
+                it.endsWith("video") -> Post.Type.VIDEO
+                it.endsWith("image") -> Post.Type.IMAGE
+                it.endsWith("self") -> Post.Type.TEXT
+                else -> {
+                    Post.Type.LINK
+                }
+            }
+        } ?: Post.Type.LINK
     )
 }
 
