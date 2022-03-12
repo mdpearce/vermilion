@@ -22,13 +22,24 @@ class PostVotingService @Inject constructor(
     @Named(CoroutinesModule.IO_DISPATCHER) private val coroutineDispatcher: CoroutineDispatcher
 ) {
     suspend fun upVote(post: Post) {
-        val flags = post.flags + PostFlags.UP_VOTED
+        val flags = post.flags + PostFlags.UP_VOTED - PostFlags.DOWN_VOTED
 
         withContext(coroutineDispatcher) {
             database.withTransaction {
                 postDao.updateFlags(post.id.value, flags.joinToString(",") { it.name })
             }
             postsService.vote(1, post.id.fullName())
+        }
+    }
+
+    suspend fun unVote(post: Post) {
+        val flags = post.flags - PostFlags.UP_VOTED - PostFlags.DOWN_VOTED
+
+        withContext(coroutineDispatcher) {
+            database.withTransaction {
+                postDao.updateFlags(post.id.value, flags.joinToString(",") { it.name })
+            }
+            postsService.vote(0, post.id.fullName())
         }
     }
 }
