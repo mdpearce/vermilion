@@ -209,7 +209,6 @@ fun PostContent(
 @Composable
 fun PostTypeIndicator(type: Post.Type, modifier: Modifier = Modifier) {
     val resource = when (type) {
-        Post.Type.IMAGE -> R.drawable.ic_baseline_image_24
         Post.Type.LINK -> R.drawable.ic_baseline_link_24
         Post.Type.VIDEO -> R.drawable.ic_baseline_ondemand_video_24
         else -> 0
