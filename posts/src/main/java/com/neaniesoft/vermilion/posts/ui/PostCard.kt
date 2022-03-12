@@ -4,25 +4,32 @@ import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import coil.compose.rememberImagePainter
@@ -34,9 +41,8 @@ import com.neaniesoft.vermilion.posts.R
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.CommentCount
 import com.neaniesoft.vermilion.posts.domain.entities.DefaultThumbnail
-import com.neaniesoft.vermilion.posts.domain.entities.ImagePostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.LinkHost
-import com.neaniesoft.vermilion.posts.domain.entities.LinkPostSummary
+import com.neaniesoft.vermilion.posts.domain.entities.MarkdownText
 import com.neaniesoft.vermilion.posts.domain.entities.NoThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.NsfwThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.Post
@@ -47,17 +53,11 @@ import com.neaniesoft.vermilion.posts.domain.entities.PostFlairText
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlairTextColor
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.PostTitle
-import com.neaniesoft.vermilion.posts.domain.entities.PreviewSummary
-import com.neaniesoft.vermilion.posts.domain.entities.PreviewText
 import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.posts.domain.entities.SelfThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.SpoilerThumbnail
-import com.neaniesoft.vermilion.posts.domain.entities.TextPostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.Thumbnail
-import com.neaniesoft.vermilion.posts.domain.entities.ThumbnailSummary
-import com.neaniesoft.vermilion.posts.domain.entities.UriImage
 import com.neaniesoft.vermilion.posts.domain.entities.UriThumbnail
-import com.neaniesoft.vermilion.posts.domain.entities.VideoPostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.isNsfw
 import com.neaniesoft.vermilion.ui.theme.AlmostBlack
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
@@ -72,8 +72,9 @@ fun PostCard(
     onClick: (Post) -> Unit,
     onMediaClicked: (Post) -> Unit,
     onCommunityClicked: (Community) -> Unit,
+    onUriClicked: (Uri) -> Unit,
+    onUpVoteClicked: (Post) -> Unit,
     modifier: Modifier = Modifier,
-    onUriClicked: (Uri) -> Unit = {},
     shouldHideNsfw: Boolean = false
 ) {
     Card(elevation = 2.dp, modifier = modifier.clickable { onClick(post) }) {
@@ -85,7 +86,8 @@ fun PostCard(
             onMediaClicked,
             onSummaryClicked = onClick,
             onCommunityClicked = onCommunityClicked,
-            onUriClicked = onUriClicked
+            onUriClicked = onUriClicked,
+            onUpVoteClicked = onUpVoteClicked
         )
     }
 }
@@ -99,51 +101,35 @@ fun PostContent(
     onMediaClicked: (Post) -> Unit,
     onSummaryClicked: (Post) -> Unit,
     onCommunityClicked: (Community) -> Unit,
-    onUriClicked: (Uri) -> Unit
+    onUriClicked: (Uri) -> Unit,
+    onUpVoteClicked: (Post) -> Unit
 ) {
-    // Log.d("PostContent", "Drawing content")
     Column(modifier = modifier.padding(0.dp)) {
-        val summary = post.summary
-        when (summary) {
-            is ImagePostSummary -> {
+
+        if (post.imagePreview != null) {
+            Box(contentAlignment = Alignment.BottomStart) {
                 ImageSummary(
-                    image = summary.preview ?: UriImage("".toUri(), 0, 0),
+                    image = post.imagePreview,
                     isNsfw = if (shouldHideNsfw) {
                         post.isNsfw()
                     } else {
                         false
                     }
-                ) { onMediaClicked(post) }
-            }
-            is LinkPostSummary -> {
-                if (summary.preview != null) {
-                    ImageSummary(
-                        image = summary.preview,
-                        isNsfw = if (shouldHideNsfw) {
-                            post.isNsfw()
-                        } else {
-                            false
-                        }
-                    ) {
-                        onMediaClicked(post)
-                    }
+                ) {
+                    onMediaClicked(post)
+                }
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Bottom,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                ) {
+                    LinkHostChip(host = post.linkHost)
+                    PostTypeIndicator(type = post.type)
                 }
             }
-            is VideoPostSummary -> {
-                VideoSummary(
-                    image = summary.preview ?: UriImage("".toUri(), 0, 0),
-                    isNsfw = if (shouldHideNsfw) {
-                        post.isNsfw()
-                    } else {
-                        false
-                    }
-                ) { onMediaClicked(post) }
-            }
-            is TextPostSummary -> {
-                // Do nothing, we draw the text post summary after the header
-            }
         }
-
         val contentAlpha = remember {
             if (post.flags.contains(PostFlags.VIEWED)) {
                 0.5f
@@ -151,6 +137,7 @@ fun PostContent(
                 1.0f
             }
         }
+        val hasPreview = post.imagePreview != null
 
         Column(Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp)) {
             Row(
@@ -167,15 +154,8 @@ fun PostContent(
                         .weight(0.1f)
                         .alpha(contentAlpha)
                 )
-                val hasPreview = when (post.summary) {
-                    is PreviewSummary -> post.summary.preview != null
-                    else -> false
-                }
 
-                val thumbnail = when (post.summary) {
-                    is ThumbnailSummary -> post.summary.thumbnail
-                    else -> NoThumbnail
-                }
+                val thumbnail = post.thumbnail
 
                 if (!hasPreview && thumbnail !is NoThumbnail) {
                     Thumbnail(
@@ -184,39 +164,21 @@ fun PostContent(
                     ) { onMediaClicked(post) }
                 }
             }
-            if (post.flair is PostFlair.TextFlair) {
-                val flairBackgroundColor =
-                    if (post.flair.backgroundColor == PostFlairBackgroundColor(0)) {
-                        MaterialTheme.colors.surface
-                    } else {
-                        Color(post.flair.backgroundColor.value)
-                    }
-                val flairTextColor =
-                    if (post.flair.backgroundColor == PostFlairBackgroundColor(0)) {
-                        MaterialTheme.colors.onSurface
-                    } else {
-                        when (post.flair.textColor) {
-                            PostFlairTextColor.DARK -> AlmostBlack
-                            PostFlairTextColor.LIGHT -> Color.White
-                        }
-                    }
-                Surface(
-                    color = flairBackgroundColor,
-                    contentColor = flairTextColor,
-                    shape = MaterialTheme.shapes.small,
-                    elevation = 2.dp,
-                    modifier = Modifier.padding(bottom = 4.dp)
-                ) {
-                    Text(
-                        text = post.flair.text.value,
-                        modifier = Modifier.padding(4.dp),
-                        style = MaterialTheme.typography.caption
-                    )
+
+            Row(
+                Modifier
+                    .padding(bottom = 4.dp)
+                    .fillMaxWidth()
+            ) {
+                if (!hasPreview) {
+                    LinkHostChip(host = post.linkHost, modifier = Modifier.padding(end = 8.dp))
                 }
+                PostFlair(flair = post.flair)
             }
-            if (summary is TextPostSummary) {
+
+            if (post.text != null) {
                 TextSummary(
-                    content = summary.previewTextMarkdown,
+                    content = post.text.markdown,
                     shouldTruncate,
                     modifier = Modifier.alpha(contentAlpha),
                     onUriClicked = { onUriClicked(it.toUri()) }
@@ -233,9 +195,106 @@ fun PostContent(
                     .fillMaxWidth()
                     .padding(bottom = 8.dp),
                 onCommunityClicked = onCommunityClicked,
-                onUpVoteClicked = {},
+                onUpVoteClicked = onUpVoteClicked,
                 onDownVoteClicked = {},
                 onSaveClicked = {}
+            )
+        }
+    }
+}
+
+@Composable
+fun Chip(
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colors.surface,
+    contentColor: Color = MaterialTheme.colors.onSurface,
+    elevation: Dp = 0.dp,
+    content: @Composable () -> Unit
+) {
+    Surface(
+        color = color,
+        contentColor = contentColor,
+        shape = MaterialTheme.shapes.small.copy(CornerSize(50)),
+        elevation = elevation,
+        modifier = modifier
+    ) {
+        Box(modifier = Modifier.padding(top = 4.dp, bottom = 4.dp, start = 8.dp, end = 8.dp)) {
+            content()
+        }
+    }
+}
+
+@Composable
+fun PostFlair(flair: PostFlair, modifier: Modifier = Modifier) {
+    if (flair is PostFlair.TextFlair) {
+        val flairBackgroundColor =
+            if (flair.backgroundColor == PostFlairBackgroundColor(0)) {
+                MaterialTheme.colors.surface
+            } else {
+                Color(flair.backgroundColor.value)
+            }
+        val flairTextColor =
+            if (flair.backgroundColor == PostFlairBackgroundColor(0)) {
+                MaterialTheme.colors.onSurface
+            } else {
+                when (flair.textColor) {
+                    PostFlairTextColor.DARK -> AlmostBlack
+                    PostFlairTextColor.LIGHT -> Color.White
+                }
+            }
+        Chip(
+            color = flairBackgroundColor,
+            contentColor = flairTextColor,
+            elevation = 4.dp,
+            modifier = modifier
+        ) {
+            Text(
+                text = flair.text.value,
+                modifier = Modifier.padding(4.dp),
+                style = MaterialTheme.typography.caption
+            )
+        }
+    }
+}
+
+@Composable
+fun LinkHostChip(host: LinkHost, modifier: Modifier = Modifier) {
+    if (!host.value.startsWith("self.")) {
+        Chip(
+            modifier = modifier,
+            elevation = 4.dp
+        ) {
+            Text(
+                text = host.value,
+                style = MaterialTheme.typography.caption,
+                modifier = Modifier.padding(4.dp)
+            )
+        }
+    } else {
+        Spacer(modifier = Modifier.width(16.dp))
+    }
+}
+
+@Composable
+fun PostTypeIndicator(type: Post.Type, modifier: Modifier = Modifier) {
+    val resource = when (type) {
+        Post.Type.LINK -> R.drawable.ic_baseline_link_24
+        Post.Type.VIDEO -> R.drawable.ic_baseline_ondemand_video_24
+        else -> 0
+    }
+    if (resource != 0) {
+        val painter = painterResource(
+            id = resource
+        )
+        Surface(
+            shape = MaterialTheme.shapes.small.copy(all = CornerSize(50)),
+            modifier = modifier,
+            elevation = 4.dp
+        ) {
+            Icon(
+                painter = painter,
+                contentDescription = type.name,
+                modifier = Modifier.padding(8.dp)
             )
         }
     }
@@ -281,7 +340,7 @@ fun PostCardPlaceholder() {
 @Composable
 fun PostCardPreview() {
     VermilionTheme {
-        PostCard(post = DUMMY_TEXT_POST, {}, {}, {})
+        PostCard(post = DUMMY_TEXT_POST, {}, {}, {}, {}, {})
     }
 }
 
@@ -289,7 +348,7 @@ fun PostCardPreview() {
 @Composable
 fun PostCardPreviewDark() {
     VermilionTheme(darkTheme = true) {
-        PostCard(post = DUMMY_TEXT_POST, {}, {}, {})
+        PostCard(post = DUMMY_TEXT_POST, {}, {}, {}, {}, {})
     }
 }
 
@@ -308,7 +367,7 @@ fun TextPostSummaryPreview() {
 @Composable
 fun ThumbnailPostPreview() {
     VermilionTheme(darkTheme = true) {
-        PostCard(post = DUMMY_LINK_POST, onClick = {}, onMediaClicked = {}, {})
+        PostCard(post = DUMMY_LINK_POST, onClick = {}, onMediaClicked = {}, {}, {}, {})
     }
 }
 
@@ -364,10 +423,11 @@ private const val DUMMY_CONTENT =
 val DUMMY_TEXT_POST = Post(
     PostId(""),
     PostTitle("Some post with a very long title that is likely to split across multiple lines"),
-    TextPostSummary(
-        PreviewText(DUMMY_CONTENT),
-        Parser.builder().build().parse(DUMMY_CONTENT) as Document
-    ),
+    null,
+    null,
+    NoThumbnail,
+    LinkHost("some.host"),
+    MarkdownText(DUMMY_CONTENT, Parser.builder().build().parse(DUMMY_CONTENT) as Document),
     null,
     null,
     NamedCommunity(CommunityName("Subreddit"), CommunityId("")),
@@ -382,30 +442,11 @@ val DUMMY_TEXT_POST = Post(
         PostFlairText("Some flair"),
         PostFlairBackgroundColor(0),
         PostFlairTextColor.DARK
-    )
+    ),
+    Post.Type.TEXT
 )
 
-val DUMMY_LINK_POST = Post(
-    PostId(""),
-    PostTitle("Some post with a very long title that is likely to split across multiple lines"),
-    LinkPostSummary(
-        null,
-        DefaultThumbnail,
-        LinkHost("somehost")
-    ),
-    null,
-    null,
-    NamedCommunity(CommunityName("Subreddit"), CommunityId("")),
-    AuthorName("/u/SomeDude"),
-    postedAt = Instant.now(),
-    awardCounts = emptyMap(),
-    CommentCount(123),
-    Score(1024),
-    flags = emptySet(),
-    "http://reddit.com/".toUri(),
-    PostFlair.TextFlair(
-        PostFlairText("Some flair"),
-        PostFlairBackgroundColor(0),
-        PostFlairTextColor.DARK
-    )
+val DUMMY_LINK_POST = DUMMY_TEXT_POST.copy(
+    text = null,
+    type = Post.Type.LINK
 )

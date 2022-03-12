@@ -1,6 +1,7 @@
-package com.neaniesoft.vermilion.ui.videos
+package com.neaniesoft.vermilion.ui.dialogs
 
-import android.util.Log
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,36 +18,62 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.neaniesoft.vermilion.ui.theme.AlmostBlack
+import com.neaniesoft.vermilion.utils.anonymousLogger
 import kotlin.math.roundToInt
+
+private const val SwipeAwayAnimationDuration = 100
 
 @ExperimentalMaterialApi
 @Composable
 fun FullscreenDialog(onDismiss: () -> Unit, content: @Composable () -> Unit) {
-    Surface(Modifier.fillMaxSize(), color = AlmostBlack) {
-        val swipeableState = rememberSwipeableState(initialValue = 0)
+    val logger by anonymousLogger("FullscreenDialog")
+
+    val animationSpec = tween<Float>(
+        durationMillis = SwipeAwayAnimationDuration,
+        easing = FastOutLinearInEasing
+    )
+
+    val swipeableState = rememberSwipeableState(initialValue = 0, animationSpec = animationSpec)
+    val alpha = remember {
+        derivedStateOf {
+            if (swipeableState.progress.from == 0 && swipeableState.progress.to == 0) {
+                1f
+            } else {
+                1f - swipeableState.progress.fraction
+            }
+        }
+    }
+
+    Surface(
+        Modifier
+            .fillMaxSize()
+            .alpha(alpha = alpha.value),
+        color = AlmostBlack
+    ) {
         val sizePx = with(LocalDensity.current) {
-            LocalConfiguration.current.screenHeightDp.dp.toPx() / 2f
+            LocalConfiguration.current.screenHeightDp.dp.toPx()
         }
         val anchors = mapOf(0f to 0, sizePx to 1, 0 - sizePx to 2)
 
-        val alpha = remember {
+        val scale = remember {
             derivedStateOf {
                 if (swipeableState.progress.from == 0 && swipeableState.progress.to == 0) {
                     1f
                 } else {
-                    1f - swipeableState.progress.fraction
+                    1f - (swipeableState.progress.fraction / 2)
                 }
             }
         }
 
         LaunchedEffect(key1 = swipeableState.currentValue) {
             if (swipeableState.currentValue != 0) {
-                Log.d("VideoDialog", "Dismissing")
+                logger.debugIfEnabled { "Dismissing" }
                 onDismiss()
             }
         }
@@ -64,7 +91,8 @@ fun FullscreenDialog(onDismiss: () -> Unit, content: @Composable () -> Unit) {
                 Modifier
                     .fillMaxSize()
                     .offset { IntOffset(0, swipeableState.offset.value.roundToInt()) }
-                    .alpha(alpha.value),
+                    .scale(scale.value.coerceAtLeast(0f)),
+                // .alpha(alpha.value.coerceAtLeast(0f)),
                 contentAlignment = Alignment.Center
             ) {
                 content()

@@ -4,7 +4,6 @@ import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.room.withTransaction
 import com.neaniesoft.vermilion.db.VermilionDatabase
 import com.neaniesoft.vermilion.dbentities.posts.PostDao
 import com.neaniesoft.vermilion.postdetails.data.CommentRepository
@@ -14,6 +13,7 @@ import com.neaniesoft.vermilion.postdetails.domain.entities.CommentKind
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub
 import com.neaniesoft.vermilion.posts.data.toPost
 import com.neaniesoft.vermilion.posts.domain.LinkRouter
+import com.neaniesoft.vermilion.posts.domain.PostVotingService
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.tabs.domain.TabSupervisor
@@ -41,6 +41,7 @@ class PostDetailsViewModel @Inject constructor(
     private val markdownParser: Parser,
     private val tabSupervisor: TabSupervisor,
     private val linkRouter: LinkRouter,
+    private val postVotingService: PostVotingService,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val _post: MutableStateFlow<PostDetailsState> = MutableStateFlow(Empty)
@@ -76,13 +77,8 @@ class PostDetailsViewModel @Inject constructor(
 
     private fun loadPostFromDb(id: PostId) {
         viewModelScope.launch {
-            val post = database.withTransaction {
-                postDao.postWithId(id.value)
-            }
-            if (post == null) {
-                _post.emit(Error)
-            } else {
-                _post.emit(PostDetails(post.toPost(markdownParser)))
+            postDao.postWithIdFlow(id.value).collect { record ->
+                _post.emit(PostDetails(record.toPost(markdownParser)))
             }
         }
     }
@@ -139,6 +135,12 @@ class PostDetailsViewModel @Inject constructor(
         val route = linkRouter.routeForLink(uri)
 
         viewModelScope.launch { _routeEvents.emit(route) }
+    }
+
+    fun onUpVoteClicked(post: Post) {
+        viewModelScope.launch {
+            postVotingService.toggleUpVote(post)
+        }
     }
 }
 

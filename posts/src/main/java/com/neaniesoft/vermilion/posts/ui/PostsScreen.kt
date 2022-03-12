@@ -1,6 +1,7 @@
 package com.neaniesoft.vermilion.posts.ui
 
 import VermilionAppState
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -108,7 +109,9 @@ fun PostsScreen(
             onPostClicked = { post ->
                 viewModel.onOpenPostDetails(post.id)
             },
-            onCommunityClicked = { community -> viewModel.onOpenCommunity(community) }
+            onCommunityClicked = { community -> viewModel.onOpenCommunity(community) },
+            onUriClicked = { viewModel.onUriClicked(it) },
+            onUpVoteClicked = { viewModel.onUpVoteClicked(it) }
         )
     }
 }
@@ -120,7 +123,9 @@ fun PostsList(
     shouldHideNsfw: Boolean,
     onPostClicked: (Post) -> Unit,
     onMediaClicked: (Post) -> Unit,
-    onCommunityClicked: (Community) -> Unit
+    onCommunityClicked: (Community) -> Unit,
+    onUriClicked: (Uri) -> Unit,
+    onUpVoteClicked: (Post) -> Unit
 ) {
     val isRefreshing = posts.loadState.refresh is LoadState.Loading
     val refreshState = rememberSwipeRefreshState(isRefreshing = isRefreshing)
@@ -134,7 +139,9 @@ fun PostsList(
                             onClick = onPostClicked,
                             onMediaClicked = onMediaClicked,
                             onCommunityClicked = onCommunityClicked,
-                            shouldHideNsfw = shouldHideNsfw
+                            shouldHideNsfw = shouldHideNsfw,
+                            onUriClicked = onUriClicked,
+                            onUpVoteClicked = onUpVoteClicked
                         )
                     } else {
                         PostCardPlaceholder()

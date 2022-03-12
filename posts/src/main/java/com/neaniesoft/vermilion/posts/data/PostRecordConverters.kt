@@ -8,12 +8,11 @@ import com.neaniesoft.vermilion.coreentities.NamedCommunity
 import com.neaniesoft.vermilion.dbentities.posts.PostRecord
 import com.neaniesoft.vermilion.dbentities.posts.PostType
 import com.neaniesoft.vermilion.dbentities.posts.PostWithHistory
+import com.neaniesoft.vermilion.posts.domain.entities.AnimatedImagePreview
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.CommentCount
 import com.neaniesoft.vermilion.posts.domain.entities.DefaultThumbnail
-import com.neaniesoft.vermilion.posts.domain.entities.ImagePostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.LinkHost
-import com.neaniesoft.vermilion.posts.domain.entities.LinkPostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlags
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlair
@@ -22,16 +21,11 @@ import com.neaniesoft.vermilion.posts.domain.entities.PostFlairText
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlairTextColor
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.PostTitle
-import com.neaniesoft.vermilion.posts.domain.entities.PreviewText
 import com.neaniesoft.vermilion.posts.domain.entities.Score
-import com.neaniesoft.vermilion.posts.domain.entities.TextPostSummary
-import com.neaniesoft.vermilion.posts.domain.entities.ThumbnailSummary
 import com.neaniesoft.vermilion.posts.domain.entities.UriImage
-import com.neaniesoft.vermilion.posts.domain.entities.VideoPostSummary
 import com.neaniesoft.vermilion.ui.videos.direct.VideoDescriptor
 import com.neaniesoft.vermilion.ui.videos.direct.VideoHeight
 import com.neaniesoft.vermilion.ui.videos.direct.VideoWidth
-import org.commonmark.node.Document
 import org.commonmark.parser.Parser
 import java.time.Clock
 import java.time.Instant
@@ -52,49 +46,23 @@ fun PostRecord.toPost(markdownParser: Parser, additionalFlags: Set<PostFlags> = 
     return Post(
         id = PostId(postId),
         title = PostTitle(title),
-        summary = when (postType) {
-            PostType.IMAGE -> ImagePostSummary(
-                preview =
-                UriImage(
-                    previewUri?.toUri()
-                        ?: throw IllegalStateException("Image post with no preview returned from db"),
-                    previewWidth ?: 0,
-                    previewHeight ?: 0
-
-                ),
-                thumbnail = thumbnailUri?.thumbnail() ?: DefaultThumbnail,
-                LinkHost(linkHost),
-                fullSizeUri = linkUri.toUri()
-            )
-            PostType.LINK -> LinkPostSummary(
-                linkHost = LinkHost(linkHost),
-                thumbnail = thumbnailUri?.thumbnail() ?: DefaultThumbnail,
-                preview = previewUri?.let { uri ->
-                    UriImage(
-                        uri.toUri(),
-                        previewWidth ?: 0,
-                        previewHeight ?: 0
-                    )
-                }
-            )
-            PostType.TEXT -> TextPostSummary(
-                previewText = PreviewText(previewText ?: ""),
-                previewTextMarkdown = markdownParser.parse(previewText ?: "") as Document
-            )
-            PostType.VIDEO -> VideoPostSummary(
-                preview =
-                UriImage(
-                    previewUri?.toUri()
-                        ?: throw IllegalStateException("Video post with no preview returned from db"),
-                    previewWidth ?: 0,
-                    previewHeight ?: 0
-
-                ),
-                thumbnail = thumbnailUri?.thumbnail() ?: DefaultThumbnail,
-                LinkHost(linkHost),
-                linkUri = linkUri.toUri()
+        imagePreview = previewUri?.let {
+            UriImage(
+                it.toUri(),
+                previewWidth ?: 0,
+                previewHeight ?: 0
             )
         },
+        animatedImagePreview = animatedPreviewUri?.let {
+            AnimatedImagePreview(
+                it.toUri(),
+                animatedPreviewWidth ?: 0,
+                animatedPreviewHeight ?: 0
+            )
+        },
+        thumbnail = thumbnailUri?.thumbnail() ?: DefaultThumbnail,
+        linkHost = LinkHost(linkHost),
+        text = previewText?.markdownText(markdownParser),
         videoPreview = if (previewVideoFallback == null) {
             null
         } else {
@@ -145,6 +113,12 @@ fun PostRecord.toPost(markdownParser: Parser, additionalFlags: Set<PostFlags> = 
                     }
                 )
             }
+        },
+        type = when (postType) {
+            PostType.TEXT -> Post.Type.TEXT
+            PostType.IMAGE -> Post.Type.IMAGE
+            PostType.LINK -> Post.Type.LINK
+            PostType.VIDEO -> Post.Type.VIDEO
         }
     )
 }
@@ -155,45 +129,27 @@ fun Post.toPostRecord(query: String, clock: Clock): PostRecord = PostRecord(
     query = query,
     insertedAt = clock.millis(),
     title = title.value,
-    postType = when (summary) {
-        is TextPostSummary -> PostType.TEXT
-        is ImagePostSummary -> PostType.IMAGE
-        is LinkPostSummary -> PostType.LINK
-        is VideoPostSummary -> PostType.VIDEO
+    postType = when (type) {
+        Post.Type.TEXT -> PostType.TEXT
+        Post.Type.IMAGE -> PostType.IMAGE
+        Post.Type.LINK -> PostType.LINK
+        Post.Type.VIDEO -> PostType.VIDEO
     },
     linkHost = link.host ?: "",
-    thumbnailUri = when (summary) {
-        is ThumbnailSummary -> summary.thumbnail.identifier
-        else -> null
-    },
-    previewUri = when (summary) {
-        is ImagePostSummary -> summary.preview?.uri.toString()
-        is VideoPostSummary -> summary.preview?.uri.toString()
-        is LinkPostSummary -> summary.preview?.uri?.toString()
-        else -> null
-    },
-    previewWidth = when (summary) {
-        is ImagePostSummary -> summary.preview?.width
-        is VideoPostSummary -> summary.preview?.width
-        is LinkPostSummary -> summary.preview?.width
-        else -> null
-    },
-    previewHeight = when (summary) {
-        is ImagePostSummary -> summary.preview?.height
-        is VideoPostSummary -> summary.preview?.height
-        is LinkPostSummary -> summary.preview?.height
-        else -> null
-    },
+    thumbnailUri = thumbnail.identifier,
+    previewUri = imagePreview?.uri?.toString(),
+    previewWidth = imagePreview?.width,
+    previewHeight = imagePreview?.height,
     linkUri = link.toString(),
-    previewText = when (summary) {
-        is TextPostSummary -> summary.previewText.value
-        else -> null
-    },
+    previewText = text?.raw,
     previewVideoWidth = videoPreview?.width?.value,
     previewVideoHeight = videoPreview?.height?.value,
     previewVideoDash = videoPreview?.dash?.toString(),
     previewVideoHls = videoPreview?.hls?.toString(),
     previewVideoFallback = videoPreview?.fallback?.toString(),
+    animatedPreviewWidth = animatedImagePreview?.width,
+    animatedPreviewHeight = animatedImagePreview?.height,
+    animatedPreviewUri = animatedImagePreview?.uri?.toString(),
     videoWidth = attachedVideo?.width?.value,
     videoHeight = attachedVideo?.height?.value,
     videoDash = attachedVideo?.dash?.toString(),

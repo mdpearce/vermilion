@@ -20,6 +20,7 @@ import com.neaniesoft.vermilion.posts.data.PostRepository
 import com.neaniesoft.vermilion.posts.data.toPost
 import com.neaniesoft.vermilion.posts.domain.LinkRouter
 import com.neaniesoft.vermilion.posts.domain.PostHistoryService
+import com.neaniesoft.vermilion.posts.domain.PostVotingService
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.tabs.domain.TabSupervisor
@@ -36,8 +37,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import org.commonmark.parser.Parser
 import java.time.Clock
 import javax.inject.Inject
@@ -54,6 +53,7 @@ class PostsViewModel @Inject constructor(
     private val markdownParser: Parser,
     private val tabSupervisor: TabSupervisor,
     private val linkRouter: LinkRouter,
+    private val postVotingService: PostVotingService,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val pagingDataMap: MutableMap<String, Flow<PagingData<Post>>> = mutableMapOf()
@@ -121,8 +121,13 @@ class PostsViewModel @Inject constructor(
             postHistoryService.markPostAsRead(post.id)
 
             val route = if (post.attachedVideo != null) {
+                logger.debugIfEnabled { "Found attached video, loading video directly" }
                 buildVideoRoute(post.attachedVideo)
+            } else if (post.type == Post.Type.IMAGE && post.animatedImagePreview != null) {
+                logger.debugIfEnabled { "Found image with animated preview, loading video with animated preview" }
+                buildVideoRoute(post.animatedImagePreview.uri)
             } else {
+                logger.debugIfEnabled { "Falling back to link route" }
                 buildLinkRoute(post.link)
             }
 
@@ -131,7 +136,11 @@ class PostsViewModel @Inject constructor(
     }
 
     private fun buildVideoRoute(video: VideoDescriptor): String {
-        return "Video/" + Uri.encode(Json.encodeToString(video))
+        return "Video/" + Uri.encode(video.dash.toString())
+    }
+
+    private fun buildVideoRoute(uri: Uri): String {
+        return "Video/" + Uri.encode(uri.toString())
     }
 
     private fun buildLinkRoute(uri: Uri): String {
@@ -147,5 +156,13 @@ class PostsViewModel @Inject constructor(
             else -> { // do nothing
             }
         }
+    }
+
+    fun onUriClicked(uri: Uri) {
+        viewModelScope.launch { _routeEvents.emit(buildLinkRoute(uri)) }
+    }
+
+    fun onUpVoteClicked(post: Post) {
+        viewModelScope.launch { postVotingService.toggleUpVote(post) }
     }
 }
