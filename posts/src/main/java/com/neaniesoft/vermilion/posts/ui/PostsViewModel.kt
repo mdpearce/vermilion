@@ -119,8 +119,13 @@ class PostsViewModel @Inject constructor(
             postHistoryService.markPostAsRead(post.id)
 
             val route = if (post.attachedVideo != null) {
+                logger.debugIfEnabled { "Found attached video, loading video directly" }
                 buildVideoRoute(post.attachedVideo)
+            } else if (post.type == Post.Type.IMAGE && post.animatedImagePreview != null) {
+                logger.debugIfEnabled { "Found image with animated preview, loading video with animated preview" }
+                buildVideoRoute(post.animatedImagePreview.uri)
             } else {
+                logger.debugIfEnabled { "Falling back to link route" }
                 buildLinkRoute(post.link)
             }
 
@@ -130,6 +135,10 @@ class PostsViewModel @Inject constructor(
 
     private fun buildVideoRoute(video: VideoDescriptor): String {
         return "Video/" + Uri.encode(video.dash.toString())
+    }
+
+    private fun buildVideoRoute(uri: Uri): String {
+        return "Video/" + Uri.encode(uri.toString())
     }
 
     private fun buildLinkRoute(uri: Uri): String {
