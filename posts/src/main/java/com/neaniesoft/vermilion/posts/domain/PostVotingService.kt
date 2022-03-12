@@ -21,25 +21,27 @@ class PostVotingService @Inject constructor(
     private val postsService: PostsService,
     @Named(CoroutinesModule.IO_DISPATCHER) private val coroutineDispatcher: CoroutineDispatcher
 ) {
-    suspend fun upVote(post: Post) {
-        val flags = post.flags + PostFlags.UP_VOTED - PostFlags.DOWN_VOTED
+    suspend fun upVote(post: Post) = vote(1, post)
 
-        withContext(coroutineDispatcher) {
-            database.withTransaction {
-                postDao.updateFlags(post.id.value, flags.joinToString(",") { it.name })
-            }
-            postsService.vote(1, post.id.fullName())
+    suspend fun unVote(post: Post) = vote(0, post)
+
+    suspend fun downVote(post: Post) = vote(-1, post)
+
+    private suspend fun vote(
+        direction: Int,
+        post: Post,
+    ) {
+        val flags = when (direction) {
+            -1 -> post.flags + PostFlags.DOWN_VOTED - PostFlags.UP_VOTED
+            0 -> post.flags - PostFlags.UP_VOTED - PostFlags.DOWN_VOTED
+            1 -> post.flags + PostFlags.UP_VOTED - PostFlags.DOWN_VOTED
+            else -> throw IllegalArgumentException("Unexpected vote direction $direction")
         }
-    }
-
-    suspend fun unVote(post: Post) {
-        val flags = post.flags - PostFlags.UP_VOTED - PostFlags.DOWN_VOTED
-
         withContext(coroutineDispatcher) {
             database.withTransaction {
                 postDao.updateFlags(post.id.value, flags.joinToString(",") { it.name })
             }
-            postsService.vote(0, post.id.fullName())
+            postsService.vote(direction, post.id.fullName())
         }
     }
 }
