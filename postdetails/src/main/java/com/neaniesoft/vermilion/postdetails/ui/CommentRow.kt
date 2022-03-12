@@ -145,12 +145,14 @@ fun CommentAuthor(comment: Comment, modifier: Modifier = Modifier) {
 
 @Composable
 fun CommentScore(comment: Comment, modifier: Modifier = Modifier) {
-    val score = remember {
-        if (comment.flags.contains(CommentFlags.SCORE_HIDDEN)) {
-            "?"
-        } else {
-            NumberFormat.getIntegerInstance().format(comment.score.value)
-        }
+    val formatter = remember {
+        NumberFormat.getIntegerInstance()
+    }
+
+    val score = if (comment.flags.contains(CommentFlags.SCORE_HIDDEN)) {
+        "?"
+    } else {
+        formatter.format(comment.score.value)
     }
 
     Text(
