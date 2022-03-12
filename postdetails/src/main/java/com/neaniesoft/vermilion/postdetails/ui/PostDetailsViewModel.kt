@@ -140,6 +140,10 @@ class PostDetailsViewModel @Inject constructor(
 
         viewModelScope.launch { _routeEvents.emit(route) }
     }
+
+    fun onUpVoteClicked(post: Post) {
+
+    }
 }
 
 sealed class PostDetailsState

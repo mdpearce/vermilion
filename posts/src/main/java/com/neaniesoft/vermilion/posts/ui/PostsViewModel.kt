@@ -155,4 +155,13 @@ class PostsViewModel @Inject constructor(
             }
         }
     }
+
+    fun onUriClicked(uri: Uri) {
+        viewModelScope.launch { _routeEvents.emit(buildLinkRoute(uri)) }
+    }
+
+    fun onUpVoteClicked(post: Post) {
+
+
+    }
 }
