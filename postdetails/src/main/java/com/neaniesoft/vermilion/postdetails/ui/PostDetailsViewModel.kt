@@ -14,6 +14,7 @@ import com.neaniesoft.vermilion.postdetails.domain.entities.CommentKind
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub
 import com.neaniesoft.vermilion.posts.data.toPost
 import com.neaniesoft.vermilion.posts.domain.LinkRouter
+import com.neaniesoft.vermilion.posts.domain.PostVotingService
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.tabs.domain.TabSupervisor
@@ -41,6 +42,7 @@ class PostDetailsViewModel @Inject constructor(
     private val markdownParser: Parser,
     private val tabSupervisor: TabSupervisor,
     private val linkRouter: LinkRouter,
+    private val postVotingService: PostVotingService,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val _post: MutableStateFlow<PostDetailsState> = MutableStateFlow(Empty)
@@ -142,6 +144,9 @@ class PostDetailsViewModel @Inject constructor(
     }
 
     fun onUpVoteClicked(post: Post) {
+        viewModelScope.launch {
+            postVotingService.toggleUpVote(post)
+        }
     }
 }
 
