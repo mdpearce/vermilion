@@ -36,8 +36,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import org.commonmark.parser.Parser
 import java.time.Clock
 import javax.inject.Inject
@@ -131,7 +129,7 @@ class PostsViewModel @Inject constructor(
     }
 
     private fun buildVideoRoute(video: VideoDescriptor): String {
-        return "Video/" + Uri.encode(Json.encodeToString(video))
+        return "Video/" + Uri.encode(video.dash.toString())
     }
 
     private fun buildLinkRoute(uri: Uri): String {
