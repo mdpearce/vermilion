@@ -4,19 +4,23 @@ import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
@@ -97,15 +101,18 @@ fun PostContent(
     Column(modifier = modifier.padding(0.dp)) {
 
         if (post.imagePreview != null) {
-            ImageSummary(
-                image = post.imagePreview,
-                isNsfw = if (shouldHideNsfw) {
-                    post.isNsfw()
-                } else {
-                    false
+            Box(contentAlignment = Alignment.BottomEnd) {
+                ImageSummary(
+                    image = post.imagePreview,
+                    isNsfw = if (shouldHideNsfw) {
+                        post.isNsfw()
+                    } else {
+                        false
+                    }
+                ) {
+                    onMediaClicked(post)
                 }
-            ) {
-                onMediaClicked(post)
+                PostTypeIndicator(type = post.type, Modifier.padding(16.dp))
             }
         }
         val contentAlpha = remember {
@@ -194,6 +201,30 @@ fun PostContent(
                 onUpVoteClicked = {},
                 onDownVoteClicked = {},
                 onSaveClicked = {}
+            )
+        }
+    }
+}
+
+@Composable
+fun PostTypeIndicator(type: Post.Type, modifier: Modifier = Modifier) {
+    val resource = when (type) {
+        Post.Type.LINK -> R.drawable.ic_baseline_link_24
+        Post.Type.VIDEO -> R.drawable.ic_baseline_ondemand_video_24
+        else -> 0
+    }
+    if (resource != 0) {
+        val painter = painterResource(
+            id = resource
+        )
+        Surface(
+            shape = MaterialTheme.shapes.small.copy(all = CornerSize(50)),
+            modifier = modifier
+        ) {
+            Icon(
+                painter = painter,
+                contentDescription = type.name,
+                modifier = Modifier.padding(8.dp)
             )
         }
     }
