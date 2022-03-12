@@ -7,10 +7,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
@@ -27,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import coil.compose.rememberImagePainter
@@ -101,7 +104,7 @@ fun PostContent(
     Column(modifier = modifier.padding(0.dp)) {
 
         if (post.imagePreview != null) {
-            Box(contentAlignment = Alignment.BottomEnd) {
+            Box(contentAlignment = Alignment.BottomStart) {
                 ImageSummary(
                     image = post.imagePreview,
                     isNsfw = if (shouldHideNsfw) {
@@ -112,7 +115,16 @@ fun PostContent(
                 ) {
                     onMediaClicked(post)
                 }
-                PostTypeIndicator(type = post.type, Modifier.padding(16.dp))
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Bottom,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                ) {
+                    LinkHostChip(host = post.linkHost)
+                    PostTypeIndicator(type = post.type)
+                }
             }
         }
         val contentAlpha = remember {
@@ -122,6 +134,8 @@ fun PostContent(
                 1.0f
             }
         }
+        val hasPreview = post.imagePreview != null
+
 
         Column(Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp)) {
             Row(
@@ -138,7 +152,6 @@ fun PostContent(
                         .weight(0.1f)
                         .alpha(contentAlpha)
                 )
-                val hasPreview = post.imagePreview != null
 
                 val thumbnail = post.thumbnail
 
@@ -149,36 +162,18 @@ fun PostContent(
                     ) { onMediaClicked(post) }
                 }
             }
-            if (post.flair is PostFlair.TextFlair) {
-                val flairBackgroundColor =
-                    if (post.flair.backgroundColor == PostFlairBackgroundColor(0)) {
-                        MaterialTheme.colors.surface
-                    } else {
-                        Color(post.flair.backgroundColor.value)
-                    }
-                val flairTextColor =
-                    if (post.flair.backgroundColor == PostFlairBackgroundColor(0)) {
-                        MaterialTheme.colors.onSurface
-                    } else {
-                        when (post.flair.textColor) {
-                            PostFlairTextColor.DARK -> AlmostBlack
-                            PostFlairTextColor.LIGHT -> Color.White
-                        }
-                    }
-                Surface(
-                    color = flairBackgroundColor,
-                    contentColor = flairTextColor,
-                    shape = MaterialTheme.shapes.small,
-                    elevation = 2.dp,
-                    modifier = Modifier.padding(bottom = 4.dp)
-                ) {
-                    Text(
-                        text = post.flair.text.value,
-                        modifier = Modifier.padding(4.dp),
-                        style = MaterialTheme.typography.caption
-                    )
+
+            Row(
+                Modifier
+                    .padding(bottom = 4.dp)
+                    .fillMaxWidth()
+            ) {
+                if (!hasPreview) {
+                    LinkHostChip(host = post.linkHost, modifier = Modifier.padding(end = 8.dp))
                 }
+                PostFlair(flair = post.flair)
             }
+
             if (post.text != null) {
                 TextSummary(
                     content = post.text.markdown,
@@ -207,6 +202,78 @@ fun PostContent(
 }
 
 @Composable
+fun Chip(
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colors.surface,
+    contentColor: Color = MaterialTheme.colors.onSurface,
+    elevation: Dp = 0.dp,
+    content: @Composable () -> Unit
+) {
+    Surface(
+        color = color,
+        contentColor = contentColor,
+        shape = MaterialTheme.shapes.small.copy(CornerSize(50)),
+        elevation = elevation,
+        modifier = modifier
+    ) {
+        Box(modifier = Modifier.padding(top = 4.dp, bottom = 4.dp, start = 8.dp, end = 8.dp)) {
+            content()
+        }
+    }
+}
+
+@Composable
+fun PostFlair(flair: PostFlair, modifier: Modifier = Modifier) {
+    if (flair is PostFlair.TextFlair) {
+        val flairBackgroundColor =
+            if (flair.backgroundColor == PostFlairBackgroundColor(0)) {
+                MaterialTheme.colors.surface
+            } else {
+                Color(flair.backgroundColor.value)
+            }
+        val flairTextColor =
+            if (flair.backgroundColor == PostFlairBackgroundColor(0)) {
+                MaterialTheme.colors.onSurface
+            } else {
+                when (flair.textColor) {
+                    PostFlairTextColor.DARK -> AlmostBlack
+                    PostFlairTextColor.LIGHT -> Color.White
+                }
+            }
+        Chip(
+            color = flairBackgroundColor,
+            contentColor = flairTextColor,
+            elevation = 4.dp,
+            modifier = modifier
+        ) {
+            Text(
+                text = flair.text.value,
+                modifier = Modifier.padding(4.dp),
+                style = MaterialTheme.typography.caption
+            )
+        }
+    }
+}
+
+@Composable
+fun LinkHostChip(host: LinkHost, modifier: Modifier = Modifier) {
+    if (!host.value.startsWith("self.")) {
+        Chip(
+            modifier = modifier,
+            elevation = 4.dp
+        ) {
+            Text(
+                text = host.value,
+                style = MaterialTheme.typography.caption,
+                modifier = Modifier.padding(4.dp)
+            )
+        }
+    } else {
+        Spacer(modifier = Modifier.width(16.dp))
+    }
+}
+
+@Composable
 fun PostTypeIndicator(type: Post.Type, modifier: Modifier = Modifier) {
     val resource = when (type) {
         Post.Type.LINK -> R.drawable.ic_baseline_link_24
@@ -219,7 +286,8 @@ fun PostTypeIndicator(type: Post.Type, modifier: Modifier = Modifier) {
         )
         Surface(
             shape = MaterialTheme.shapes.small.copy(all = CornerSize(50)),
-            modifier = modifier
+            modifier = modifier,
+            elevation = 4.dp
         ) {
             Icon(
                 painter = painter,
