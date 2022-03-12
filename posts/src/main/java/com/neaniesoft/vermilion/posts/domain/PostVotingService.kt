@@ -25,7 +25,7 @@ class PostVotingService @Inject constructor(
     private val postsService: PostsService,
     @Named(CoroutinesModule.IO_DISPATCHER) private val coroutineDispatcher: CoroutineDispatcher
 ) {
-    val logger by logger()
+    private val logger by logger()
 
     suspend fun toggleUpVote(post: Post) {
         if (post.isUpVoted()) {
