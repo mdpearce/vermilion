@@ -7,6 +7,7 @@ import com.neaniesoft.vermilion.posts.data.http.PostsService
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlags
 import com.neaniesoft.vermilion.posts.domain.entities.fullName
+import com.neaniesoft.vermilion.posts.domain.entities.isDownVoted
 import com.neaniesoft.vermilion.posts.domain.entities.isUpVoted
 import com.neaniesoft.vermilion.utils.CoroutinesModule
 import com.neaniesoft.vermilion.utils.logger
@@ -35,7 +36,11 @@ class PostVotingService @Inject constructor(
     }
 
     suspend fun toggleDownVote(post: Post) {
-        TODO()
+        if (post.isDownVoted()) {
+            vote(0, post)
+        } else {
+            vote(1, post)
+        }
     }
 
     private suspend fun vote(
