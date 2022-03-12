@@ -163,6 +163,6 @@ class PostsViewModel @Inject constructor(
     }
 
     fun onUpVoteClicked(post: Post) {
-        viewModelScope.launch { postVotingService.upVote(post) }
+        viewModelScope.launch { postVotingService.toggleUpVote(post) }
     }
 }

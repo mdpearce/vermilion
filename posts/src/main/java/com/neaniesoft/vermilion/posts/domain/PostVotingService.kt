@@ -7,6 +7,7 @@ import com.neaniesoft.vermilion.posts.data.http.PostsService
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlags
 import com.neaniesoft.vermilion.posts.domain.entities.fullName
+import com.neaniesoft.vermilion.posts.domain.entities.isUpVoted
 import com.neaniesoft.vermilion.utils.CoroutinesModule
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -21,11 +22,17 @@ class PostVotingService @Inject constructor(
     private val postsService: PostsService,
     @Named(CoroutinesModule.IO_DISPATCHER) private val coroutineDispatcher: CoroutineDispatcher
 ) {
-    suspend fun upVote(post: Post) = vote(1, post)
+    suspend fun toggleUpVote(post: Post) {
+        if (post.isUpVoted()) {
+            vote(0, post)
+        } else {
+            vote(1, post)
+        }
+    }
 
-    suspend fun unVote(post: Post) = vote(0, post)
-
-    suspend fun downVote(post: Post) = vote(-1, post)
+    suspend fun toggleDownVote(post: Post) {
+        TODO()
+    }
 
     private suspend fun vote(
         direction: Int,
