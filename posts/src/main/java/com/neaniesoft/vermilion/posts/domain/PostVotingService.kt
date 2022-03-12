@@ -39,7 +39,7 @@ class PostVotingService @Inject constructor(
         if (post.isDownVoted()) {
             vote(0, post)
         } else {
-            vote(1, post)
+            vote(-1, post)
         }
     }
 
