@@ -33,6 +33,7 @@ data class Link(
     @JsonProperty("link_flair_text_color") val linkFlairTextColor: String,
     @JsonProperty("link_flair_background_color") val linkFlairBackgroundColor: String?,
     @JsonProperty("link_flair_type") val linkFlairType: String,
+    @JsonProperty("likes") val likes: Boolean?
 ) : ThingData()
 
 data class CommentData(

@@ -213,8 +213,8 @@ internal fun List<Awarding>.toAwardsMap(): Map<Award, AwardCount> =
     associateBy(keySelector = { awarding ->
         Award(AwardName(awarding.name), URL(awarding.iconUrl))
     }, valueTransform = { awarding ->
-            AwardCount(awarding.count)
-        })
+        AwardCount(awarding.count)
+    })
 
 internal fun Link.flags(): Set<PostFlags> {
     return mutableSetOf<PostFlags>().apply {
@@ -226,6 +226,11 @@ internal fun Link.flags(): Set<PostFlags> {
         }
         if (saved) {
             add(PostFlags.SAVED)
+        }
+        if (likes == true) {
+            add(PostFlags.UP_VOTED)
+        } else if (likes == false) {
+            add(PostFlags.DOWN_VOTED)
         }
     }
 }
