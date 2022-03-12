@@ -98,7 +98,8 @@ fun PostContent(
 
         if (post.imagePreview != null) {
             ImageSummary(
-                image = post.imagePreview, isNsfw = if (shouldHideNsfw) {
+                image = post.imagePreview,
+                isNsfw = if (shouldHideNsfw) {
                     post.isNsfw()
                 } else {
                     false
