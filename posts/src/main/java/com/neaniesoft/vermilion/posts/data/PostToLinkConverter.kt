@@ -10,15 +10,15 @@ import com.neaniesoft.vermilion.coreentities.CommunityId
 import com.neaniesoft.vermilion.coreentities.CommunityName
 import com.neaniesoft.vermilion.coreentities.NamedCommunity
 import com.neaniesoft.vermilion.posts.domain.choosePreviewImage
+import com.neaniesoft.vermilion.posts.domain.entities.AnimatedImagePreview
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.Award
 import com.neaniesoft.vermilion.posts.domain.entities.AwardCount
 import com.neaniesoft.vermilion.posts.domain.entities.AwardName
 import com.neaniesoft.vermilion.posts.domain.entities.CommentCount
 import com.neaniesoft.vermilion.posts.domain.entities.DefaultThumbnail
-import com.neaniesoft.vermilion.posts.domain.entities.ImagePostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.LinkHost
-import com.neaniesoft.vermilion.posts.domain.entities.LinkPostSummary
+import com.neaniesoft.vermilion.posts.domain.entities.MarkdownText
 import com.neaniesoft.vermilion.posts.domain.entities.NsfwThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlags
@@ -27,34 +27,36 @@ import com.neaniesoft.vermilion.posts.domain.entities.PostFlairBackgroundColor
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlairText
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlairTextColor
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
-import com.neaniesoft.vermilion.posts.domain.entities.PostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.PostTitle
-import com.neaniesoft.vermilion.posts.domain.entities.PreviewText
 import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.posts.domain.entities.SelfThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.SpoilerThumbnail
-import com.neaniesoft.vermilion.posts.domain.entities.TextPostSummary
 import com.neaniesoft.vermilion.posts.domain.entities.Thumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.UriImage
 import com.neaniesoft.vermilion.posts.domain.entities.UriThumbnail
-import com.neaniesoft.vermilion.posts.domain.entities.VideoPostSummary
 import com.neaniesoft.vermilion.ui.videos.direct.VideoDescriptor
 import com.neaniesoft.vermilion.ui.videos.direct.VideoHeight
 import com.neaniesoft.vermilion.ui.videos.direct.VideoWidth
-import com.neaniesoft.vermilion.utils.anonymousLogger
 import org.apache.commons.text.StringEscapeUtils
 import org.commonmark.node.Document
 import org.commonmark.parser.Parser
 import java.net.URL
 import java.time.Instant
-import java.util.Locale
 import kotlin.math.roundToLong
 
 fun Link.toPost(markdownParser: Parser): Post {
     return Post(
         PostId(id),
         PostTitle(StringEscapeUtils.unescapeHtml4(title)),
-        postSummary(markdownParser),
+        preview?.uriImage(),
+        preview?.animatedImagePreview(),
+        thumbnail.thumbnail(),
+        LinkHost(domain),
+        if (selfText.isNotEmpty()) {
+            selfText.markdownText(markdownParser)
+        } else {
+            null
+        },
         videoPreview(),
         attachedVideo(),
         NamedCommunity(CommunityName(subreddit), CommunityId(subredditId)),
@@ -115,49 +117,53 @@ internal fun Link.flair(): PostFlair {
     }
 }
 
-internal fun Link.postSummary(markdownParser: Parser): PostSummary {
-    val hint = postHint?.lowercase(Locale.ENGLISH) ?: ""
-    return when {
-        hint.endsWith("image") -> {
-            ImagePostSummary(
-                preview?.uriImage(),
-                thumbnail.thumbnail(),
-                LinkHost(domain),
-                Uri.parse(url)
-            )
-        }
-        hint.endsWith("self") || selfText.isNotEmpty() -> {
-            val text = StringEscapeUtils.unescapeHtml4(selfText)
-            TextPostSummary(
-                PreviewText(text),
-                markdownParser.parse(text) as Document
-            )
-        }
-        hint.endsWith("video") -> {
-            VideoPostSummary(
-                preview?.uriImage(),
-                thumbnail.thumbnail(),
-                LinkHost(domain),
-                Uri.parse(url)
-            )
-        }
-        hint.endsWith("link") -> {
-            LinkPostSummary(
-                preview?.uriImage(),
-                thumbnail.thumbnail(),
-                LinkHost(domain)
-            )
-        }
-        else -> {
-            val logger by anonymousLogger("postSummary()")
-            logger.debugIfEnabled { "Unrecognised post hint ($hint), defaulting to link post type" }
-            LinkPostSummary(
-                preview?.uriImage(),
-                thumbnail.thumbnail(),
-                LinkHost(domain)
-            )
-        }
-    }
+// internal fun Link.postSummary(markdownParser: Parser): PostSummary {
+//     val hint = postHint?.lowercase(Locale.ENGLISH) ?: ""
+//     return when {
+//         hint.endsWith("image") -> {
+//             ImagePostSummary(
+//                 preview?.uriImage(),
+//                 thumbnail.thumbnail(),
+//                 LinkHost(domain),
+//                 Uri.parse(url)
+//             )
+//         }
+//         hint.endsWith("self") || selfText.isNotEmpty() -> {
+//             val text = StringEscapeUtils.unescapeHtml4(selfText)
+//             TextPostSummary(
+//                 PreviewText(text),
+//                 markdownParser.parse(text) as Document
+//             )
+//         }
+//         hint.endsWith("video") -> {
+//             VideoPostSummary(
+//                 preview?.uriImage(),
+//                 thumbnail.thumbnail(),
+//                 LinkHost(domain),
+//                 Uri.parse(url)
+//             )
+//         }
+//         hint.endsWith("link") -> {
+//             LinkPostSummary(
+//                 preview?.uriImage(),
+//                 thumbnail.thumbnail(),
+//                 LinkHost(domain)
+//             )
+//         }
+//         else -> {
+//             val logger by anonymousLogger("postSummary()")
+//             logger.debugIfEnabled { "Unrecognised post hint ($hint), defaulting to link post type" }
+//             LinkPostSummary(
+//                 preview?.uriImage(),
+//                 thumbnail.thumbnail(),
+//                 LinkHost(domain)
+//             )
+//         }
+//     }
+// }
+
+internal fun String.markdownText(markdownParser: Parser): MarkdownText {
+    return MarkdownText(raw = this, markdown = markdownParser.parse(this) as Document)
 }
 
 internal fun Preview.uriImage(): UriImage? {
@@ -166,6 +172,17 @@ internal fun Preview.uriImage(): UriImage? {
             Uri.parse(StringEscapeUtils.unescapeHtml4(it.url)),
             it.width,
             it.height
+        )
+    }?.choosePreviewImage()
+}
+
+internal fun Preview.animatedImagePreview(): AnimatedImagePreview? {
+    val image = images.firstOrNull()?.variants?.get("mp4")
+    return image?.resolutions?.map {
+        AnimatedImagePreview(
+            Uri.parse(StringEscapeUtils.unescapeHtml4(it.url)),
+            width = it.width,
+            height = it.height
         )
     }?.choosePreviewImage()
 }
@@ -185,8 +202,8 @@ internal fun List<Awarding>.toAwardsMap(): Map<Award, AwardCount> =
     associateBy(keySelector = { awarding ->
         Award(AwardName(awarding.name), URL(awarding.iconUrl))
     }, valueTransform = { awarding ->
-            AwardCount(awarding.count)
-        })
+        AwardCount(awarding.count)
+    })
 
 internal fun Link.flags(): Set<PostFlags> {
     return mutableSetOf<PostFlags>().apply {
