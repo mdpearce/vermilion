@@ -142,7 +142,6 @@ class PostDetailsViewModel @Inject constructor(
     }
 
     fun onUpVoteClicked(post: Post) {
-
     }
 }
 
