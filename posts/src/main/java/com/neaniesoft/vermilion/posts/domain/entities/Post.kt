@@ -3,6 +3,7 @@ package com.neaniesoft.vermilion.posts.domain.entities
 import android.net.Uri
 import com.neaniesoft.vermilion.coreentities.Community
 import com.neaniesoft.vermilion.ui.videos.direct.VideoDescriptor
+import org.commonmark.node.Document
 import java.time.Instant
 
 data class Post(
@@ -32,3 +33,14 @@ data class Post(
 }
 
 fun Post.isNsfw(): Boolean = flags.contains(PostFlags.NSFW)
+
+data class AnimatedImagePreview(
+    val uri: Uri,
+    val width: Int,
+    val height: Int
+)
+
+data class MarkdownText(
+    val raw: String,
+    val markdown: Document
+)
