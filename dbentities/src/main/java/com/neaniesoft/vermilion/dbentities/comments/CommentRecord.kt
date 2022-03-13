@@ -24,5 +24,6 @@ data class CommentRecord(
     val upVotes: Int,
     val flairText: String?,
     val flairBackgroundColor: Int,
-    val flairTextColor: String
+    val flairTextColor: String,
+    val threadIdentifier: String?
 )

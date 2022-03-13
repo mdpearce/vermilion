@@ -21,6 +21,8 @@ import com.neaniesoft.vermilion.app.customtabs.customTab
 import com.neaniesoft.vermilion.coreentities.CommunityId
 import com.neaniesoft.vermilion.coreentities.CommunityName
 import com.neaniesoft.vermilion.coreentities.NamedCommunity
+import com.neaniesoft.vermilion.postdetails.domain.entities.CommentId
+import com.neaniesoft.vermilion.postdetails.ui.CommentThreadScreen
 import com.neaniesoft.vermilion.postdetails.ui.PostDetailsScreen
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.ui.PostsScreen
@@ -98,6 +100,25 @@ fun VermilionNavHost(
             PostDetailsScreen(postId = postId, appState = appState, onRoute = { route ->
                 navController.navigate(route)
             })
+        }
+
+        // Post with individual comment thread
+        composable(
+            "${VermilionScreen.CommentThread.name}/{postId}/{commentId}",
+            arguments = listOf(
+                navArgument("postId") { type = NavType.StringType },
+                navArgument("commentId") { type = NavType.StringType }
+            )
+        ) {
+            val postId = PostId(requireNotNull(it.arguments?.getString("postId")))
+            val commentId = CommentId(requireNotNull(it.arguments?.getString("commentId")))
+            CommentThreadScreen(
+                postId = postId,
+                commentId = commentId,
+                appState = appState,
+                onRoute = { route ->
+                    navController.navigate(route)
+                })
         }
 
         // Account/Settings

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.neaniesoft.vermilion.postdetails.data.CommentRepository
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentDepth
+import com.neaniesoft.vermilion.postdetails.domain.entities.CommentId
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentKind
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub
 import com.neaniesoft.vermilion.posts.domain.LinkRouter
@@ -98,5 +99,9 @@ class CommentsViewModel @Inject constructor(
                 networkActivityIdentifier = networkActivityIdentifier
             )
         }
+    }
+
+    suspend fun onCommentId(commentId: CommentId, postId: PostId) {
+
     }
 }

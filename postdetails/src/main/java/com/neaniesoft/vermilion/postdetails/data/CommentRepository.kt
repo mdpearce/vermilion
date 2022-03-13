@@ -58,6 +58,17 @@ interface CommentRepository {
         postId: PostId
     ): Flow<List<CommentKind>>
 
+    suspend fun getCommentThread(
+        postId: PostId,
+        commentId: CommentId
+    ): Flow<List<CommentKind>>
+
+    suspend fun refreshThread(
+        postId: PostId,
+        threadId: CommentId,
+        networkActivityIdentifier: String
+    )
+
     suspend fun fetchAndInsertMoreCommentsFor(stub: CommentStub): List<CommentKind>
     suspend fun cachedCommentsForPost(postId: PostId): Int
     suspend fun deleteByPost(postId: PostId)
@@ -99,6 +110,52 @@ class CommentRepositoryImpl @Inject constructor(
         return dao.flowOfCommentsForPost(postId.value).map { record ->
             record.map { it.toCommentKind() }
         }
+    }
+
+    override suspend fun getCommentThread(
+        postId: PostId,
+        commentId: CommentId
+    ): Flow<List<CommentKind>> {
+        return dao.flowOfCommentThread(postId.value, commentId.value).map { record ->
+            record.map { it.toCommentKind() }
+        }
+    }
+
+    override suspend fun refreshThread(
+        postId: PostId,
+        threadId: CommentId,
+        networkActivityIdentifier: String
+    ) {
+        _networkActivityUpdates.emit(NetworkActivityUpdate(networkActivityIdentifier, true))
+
+        val apiResponse = apiService.commentsForArticleFocusedOn(threadId.value, postId.value)
+        val post = (apiResponse[0].data.children.firstOrNull()?.data as? Link)?.toPost(
+            markdownParser
+        )
+        if (post != null) {
+            postRepository.update(postId, post)
+        }
+
+        val newCommentRecords: List<CommentRecord> =
+            apiResponse[1].getCommentRecords(postId, threadId)
+
+        database.withTransaction {
+            dao.deleteAllForThread(postId.value, threadId.value)
+
+            newCommentRecords.forEach { record ->
+                dao.insertAll(record)
+                val parentId = record.parentId
+                val parentPath = if (parentId != null) {
+                    dao.getPathForComment(parentId) + "/"
+                } else {
+                    ""
+                }
+                val updatedRecord = record.copy(path = "$parentPath${record.id}")
+                dao.update(updatedRecord)
+            }
+        }
+
+        _networkActivityUpdates.emit(NetworkActivityUpdate(networkActivityIdentifier, false))
     }
 
     override suspend fun refreshIfRequired(
@@ -283,7 +340,10 @@ class CommentRepositoryImpl @Inject constructor(
             .toSet()
     }
 
-    private fun CommentResponse.getCommentRecords(postId: PostId): List<CommentRecord> {
+    private fun CommentResponse.getCommentRecords(
+        postId: PostId,
+        threadId: CommentId? = null
+    ): List<CommentRecord> {
         val comments = this.data.children.mapNotNull {
             when (it) {
                 is CommentThing -> CommentOrStubData.Comment(it.data)
@@ -299,14 +359,17 @@ class CommentRepositoryImpl @Inject constructor(
                     listOf(it.moreComments)
                 }
             }
-        }.map { it.buildCommentRecord(postId) }
+        }.map { it.buildCommentRecord(postId, threadId) }
         return comments
     }
 
-    private fun ThingData.buildCommentRecord(postId: PostId): CommentRecord {
+    private fun ThingData.buildCommentRecord(
+        postId: PostId,
+        threadId: CommentId? = null
+    ): CommentRecord {
         return when (this) {
-            is CommentData -> this.toCommentRecord()
-            is MoreCommentsData -> this.toCommentRecord(postId)
+            is CommentData -> this.toCommentRecord(threadId = threadId)
+            is MoreCommentsData -> this.toCommentRecord(postId, threadId)
             else -> {
                 throw IllegalStateException("Trying to build a comment record from a Thing which isn't a comment")
             }
@@ -335,7 +398,10 @@ class CommentRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun MoreCommentsData.toCommentRecord(postId: PostId): CommentRecord {
+    private fun MoreCommentsData.toCommentRecord(
+        postId: PostId,
+        threadId: CommentId? = null
+    ): CommentRecord {
         val flags = listOf(CommentFlags.MORE_COMMENTS_STUB)
         val now = clock.millis()
 
@@ -358,11 +424,12 @@ class CommentRepositoryImpl @Inject constructor(
             upVotes = 0,
             flairText = null,
             flairBackgroundColor = 0,
-            flairTextColor = CommentFlairTextColor.DARK.name
+            flairTextColor = CommentFlairTextColor.DARK.name,
+            threadIdentifier = threadId?.value
         )
     }
 
-    private fun CommentData.toCommentRecord(): CommentRecord {
+    private fun CommentData.toCommentRecord(threadId: CommentId? = null): CommentRecord {
         val flags = listOfNotNull(
             if (saved) {
                 CommentFlags.SAVED
@@ -420,7 +487,8 @@ class CommentRepositoryImpl @Inject constructor(
             upVotes = ups,
             flairText = authorFlairText,
             flairBackgroundColor = flairBackgroundColor(),
-            flairTextColor = flairTextColor()
+            flairTextColor = flairTextColor(),
+            threadIdentifier = threadId?.value
         )
     }
 

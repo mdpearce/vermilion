@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 19,
-    "identityHash": "524c8a4f3494b052bee7d29f15641b08",
+    "identityHash": "d5f90f61b0187436b26d078f0edd6eb1",
     "entities": [
       {
         "tableName": "user_accounts",
@@ -288,7 +288,7 @@
       },
       {
         "tableName": "comments",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `commentId` TEXT NOT NULL, `postId` TEXT NOT NULL, `parentId` TEXT, `path` TEXT, `body` TEXT NOT NULL, `flags` TEXT NOT NULL, `author` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `editedAt` INTEGER NOT NULL, `insertedAt` INTEGER NOT NULL, `score` INTEGER NOT NULL, `link` TEXT NOT NULL, `controversialIndex` INTEGER NOT NULL, `depth` INTEGER NOT NULL, `upVotes` INTEGER NOT NULL, `flairText` TEXT, `flairBackgroundColor` INTEGER NOT NULL, `flairTextColor` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `commentId` TEXT NOT NULL, `postId` TEXT NOT NULL, `parentId` TEXT, `path` TEXT, `body` TEXT NOT NULL, `flags` TEXT NOT NULL, `author` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `editedAt` INTEGER NOT NULL, `insertedAt` INTEGER NOT NULL, `score` INTEGER NOT NULL, `link` TEXT NOT NULL, `controversialIndex` INTEGER NOT NULL, `depth` INTEGER NOT NULL, `upVotes` INTEGER NOT NULL, `flairText` TEXT, `flairBackgroundColor` INTEGER NOT NULL, `flairTextColor` TEXT NOT NULL, `threadIdentifier` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
@@ -403,6 +403,12 @@
             "columnName": "flairTextColor",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "threadIdentifier",
+            "columnName": "threadIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -556,7 +562,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '524c8a4f3494b052bee7d29f15641b08')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd5f90f61b0187436b26d078f0edd6eb1')"
     ]
   }
 }

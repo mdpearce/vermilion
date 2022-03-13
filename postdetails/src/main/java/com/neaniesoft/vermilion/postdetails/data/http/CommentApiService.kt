@@ -18,6 +18,12 @@ interface CommentApiService {
     @GET("/comments/{articleId}")
     suspend fun commentsForArticle(@Path("articleId") articleId: String): Array<CommentResponse>
 
+    @GET("/comments/{articleId}")
+    suspend fun commentsForArticleFocusedOn(
+        @Query("comment") commentId: String,
+        articleId: String
+    ): Array<CommentResponse>
+
     @GET("/api/morechildren")
     suspend fun moreChildren(
         @Query("api_type") apiType: String,
