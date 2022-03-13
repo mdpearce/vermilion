@@ -46,6 +46,7 @@ import com.neaniesoft.vermilion.postdetails.domain.entities.CommentId
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub
 import com.neaniesoft.vermilion.postdetails.domain.entities.ControversialIndex
 import com.neaniesoft.vermilion.postdetails.domain.entities.DurationString
+import com.neaniesoft.vermilion.postdetails.domain.entities.ThreadStub
 import com.neaniesoft.vermilion.postdetails.domain.entities.UpVotesCount
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
@@ -243,6 +244,29 @@ fun MoreCommentsStubRow(
         DepthIndicators(depth = stub.depth.value)
         Text(
             text = stringResource(id = R.string.more_comments, stub.count.value),
+            style = MaterialTheme.typography.caption,
+            color = MaterialTheme.colors.primary,
+            modifier = Modifier
+                .alignByBaseline()
+                .padding(8.dp)
+        )
+    }
+}
+
+@Composable
+fun ThreadStubRow(
+    stub: ThreadStub,
+    modifier: Modifier = Modifier,
+    onClick: (ThreadStub) -> Unit
+) {
+    Row(
+        modifier
+            .height(intrinsicSize = IntrinsicSize.Min)
+            .clickable { onClick(stub) }
+    ) {
+        DepthIndicators(depth = stub.depth.value)
+        Text(
+            text = stringResource(id = R.string.continue_thread),
             style = MaterialTheme.typography.caption,
             color = MaterialTheme.colors.primary,
             modifier = Modifier

@@ -28,6 +28,7 @@ import com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub
 import com.neaniesoft.vermilion.postdetails.domain.entities.ControversialIndex
 import com.neaniesoft.vermilion.postdetails.domain.entities.DurationString
 import com.neaniesoft.vermilion.postdetails.domain.entities.MoreCommentsCount
+import com.neaniesoft.vermilion.postdetails.domain.entities.ThreadStub
 import com.neaniesoft.vermilion.postdetails.domain.entities.UpVotesCount
 import com.neaniesoft.vermilion.posts.data.PostRepository
 import com.neaniesoft.vermilion.posts.data.toPost
@@ -267,7 +268,11 @@ class CommentRepositoryImpl @Inject constructor(
 
     private fun CommentRecord.toCommentKind(): CommentKind {
         return if (flags == CommentFlags.MORE_COMMENTS_STUB.name) {
-            CommentKind.Stub(this.toCommentStub())
+            if (score == 0) {
+                CommentKind.Thread(this.toThreadStub())
+            } else {
+                CommentKind.Stub(this.toCommentStub())
+            }
         } else {
             CommentKind.Full(this.toComment())
         }
@@ -281,6 +286,14 @@ class CommentRepositoryImpl @Inject constructor(
             parentId = parentId?.let { CommentId(it) },
             depth = CommentDepth(depth),
             children = body.split(",").map { CommentId((it)) }
+        )
+    }
+
+    private fun CommentRecord.toThreadStub(): ThreadStub {
+        return ThreadStub(
+            postId = PostId(postId),
+            parentId = CommentId(requireNotNull(parentId).replace("t1_", "")),
+            depth = CommentDepth(depth)
         )
     }
 

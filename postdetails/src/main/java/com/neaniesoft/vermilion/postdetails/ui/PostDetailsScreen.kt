@@ -34,6 +34,7 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.neaniesoft.vermilion.postdetails.R
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentKind
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub
+import com.neaniesoft.vermilion.postdetails.domain.entities.ThreadStub
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.ui.DUMMY_TEXT_POST
@@ -72,13 +73,7 @@ fun PostDetailsScreen(
     }
 
     LaunchedEffect(Unit) {
-        postViewModel.routeEvents.collect {
-            onRoute(it)
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        commentsViewModel.routeEvents.collect {
+        postDetailsViewModel.routeEvents.collect {
             onRoute(it)
         }
     }
@@ -133,6 +128,7 @@ fun PostDetailsScreen(
         onUpVoteClicked = { postViewModel.onUpVoteClicked(it) },
         onDownVoteClicked = { postViewModel.onDownVoteClicked(it) },
         onMoreCommentsClicked = { commentsViewModel.onMoreCommentsClicked(it) },
+        onThreadClicked = { postDetailsViewModel.onThreadClicked(it) },
         onCommentNavDownClicked = { commentsViewModel.onCommentNavDownClicked(it) }
     )
 }
@@ -148,6 +144,7 @@ fun PostDetailsScreenContent(
     onUpVoteClicked: (Post) -> Unit,
     onDownVoteClicked: (Post) -> Unit,
     onMoreCommentsClicked: (CommentStub) -> Unit,
+    onThreadClicked: (ThreadStub) -> Unit,
     onCommentNavDownClicked: (Int) -> Unit
 ) {
     Surface(
@@ -181,6 +178,11 @@ fun PostDetailsScreenContent(
                             stub = item.stub,
                             Modifier.fillMaxWidth(),
                             onClick = { onMoreCommentsClicked(it) }
+                        )
+                        is CommentKind.Thread -> ThreadStubRow(
+                            stub = item.stub,
+                            Modifier.fillMaxWidth(),
+                            onClick = { onThreadClicked(it) }
                         )
                     }
                 }
@@ -268,7 +270,8 @@ fun PostDetailsScreenDark() {
             onMoreCommentsClicked = {},
             onCommentNavDownClicked = {},
             onUpVoteClicked = {},
-            onDownVoteClicked = {}
+            onDownVoteClicked = {},
+            onThreadClicked = {}
         )
     }
 }

@@ -35,13 +35,7 @@ fun CommentThreadScreen(
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isRefreshing)
 
     LaunchedEffect(Unit) {
-        postViewModel.routeEvents.collect {
-            onRoute(it)
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        commentsViewModel.routeEvents.collect {
+        postDetailsViewModel.routeEvents.collect {
             onRoute(it)
         }
     }
@@ -68,6 +62,7 @@ fun CommentThreadScreen(
         onUpVoteClicked = { postViewModel.onUpVoteClicked(it) },
         onDownVoteClicked = { postViewModel.onDownVoteClicked(it) },
         onMoreCommentsClicked = { commentsViewModel.onMoreCommentsClicked(it) },
-        onCommentNavDownClicked = { commentsViewModel.onCommentNavDownClicked(it) }
+        onCommentNavDownClicked = { commentsViewModel.onCommentNavDownClicked(it) },
+        onThreadClicked = { postDetailsViewModel.onThreadClicked(it) }
     )
 }

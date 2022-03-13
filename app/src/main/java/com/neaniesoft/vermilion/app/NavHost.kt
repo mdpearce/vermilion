@@ -91,12 +91,12 @@ fun VermilionNavHost(
 
         // Post with comments
         composable(
-            "${VermilionScreen.PostDetails.name}/{id}",
+            "${VermilionScreen.PostDetails.name}/{postId}",
             arguments = listOf(
-                navArgument("id") { type = NavType.StringType }
+                navArgument("postId") { type = NavType.StringType }
             )
         ) {
-            val postId = PostId(requireNotNull(it.arguments?.getString("id")))
+            val postId = PostId(requireNotNull(it.arguments?.getString("postId")))
             PostDetailsScreen(postId = postId, appState = appState, onRoute = { route ->
                 navController.navigate(route)
             })

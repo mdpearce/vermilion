@@ -1,6 +1,5 @@
 package com.neaniesoft.vermilion.postdetails.ui
 
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.neaniesoft.vermilion.postdetails.data.CommentRepository
@@ -8,7 +7,6 @@ import com.neaniesoft.vermilion.postdetails.domain.entities.CommentDepth
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentId
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentKind
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub
-import com.neaniesoft.vermilion.posts.domain.LinkRouter
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.utils.CoroutinesModule
 import com.neaniesoft.vermilion.utils.logger
@@ -29,7 +27,6 @@ import javax.inject.Named
 @HiltViewModel
 class CommentsViewModel @Inject constructor(
     private val commentRepository: CommentRepository,
-    private val linkRouter: LinkRouter,
     @Named(CoroutinesModule.IO_DISPATCHER) private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
     private val logger by logger()
@@ -45,9 +42,6 @@ class CommentsViewModel @Inject constructor(
 
     private val _scrollToEvents = MutableSharedFlow<Int>()
     val scrollToEvents = _scrollToEvents.asSharedFlow()
-
-    private val _routeEvents: MutableSharedFlow<String> = MutableSharedFlow()
-    val routeEvents = _routeEvents.asSharedFlow()
 
     suspend fun onPostId(postId: PostId) {
         viewModelScope.launch {
@@ -85,12 +79,6 @@ class CommentsViewModel @Inject constructor(
         }
     }
 
-    fun onOpenUri(uri: Uri) {
-        val route = linkRouter.routeForLink(uri)
-
-        viewModelScope.launch { _routeEvents.emit(route) }
-    }
-
     fun onRefresh(postId: PostId) {
         viewModelScope.launch {
             commentRepository.refreshIfRequired(
@@ -102,6 +90,5 @@ class CommentsViewModel @Inject constructor(
     }
 
     suspend fun onCommentId(commentId: CommentId, postId: PostId) {
-
     }
 }
