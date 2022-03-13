@@ -118,7 +118,8 @@ fun VermilionNavHost(
                 appState = appState,
                 onRoute = { route ->
                     navController.navigate(route)
-                })
+                }
+            )
         }
 
         // Account/Settings
