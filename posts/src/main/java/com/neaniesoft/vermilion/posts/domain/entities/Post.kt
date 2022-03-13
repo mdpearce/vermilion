@@ -34,3 +34,5 @@ data class Post(
 fun Post.isNsfw(): Boolean = flags.contains(PostFlags.NSFW)
 
 fun Post.isUpVoted(): Boolean = flags.contains(PostFlags.UP_VOTED)
+
+fun Post.isDownVoted(): Boolean = flags.contains(PostFlags.DOWN_VOTED)

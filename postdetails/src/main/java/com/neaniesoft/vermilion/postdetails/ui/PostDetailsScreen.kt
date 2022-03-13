@@ -116,7 +116,8 @@ fun PostDetailsScreen(
         onUriClicked = { viewModel.onOpenUri(it) },
         onMoreCommentsClicked = { viewModel.onMoreCommentsClicked(it) },
         onCommentNavDownClicked = { viewModel.onCommentNavDownClicked(columnState.firstVisibleItemIndex) },
-        onUpVoteClicked = { viewModel.onUpVoteClicked(it) }
+        onUpVoteClicked = { viewModel.onUpVoteClicked(it) },
+        onDownVoteClicked = { viewModel.onDownVoteClicked(it) }
     )
 }
 
@@ -131,7 +132,8 @@ fun PostDetailsScreenContent(
     onUriClicked: (Uri) -> Unit,
     onMoreCommentsClicked: (CommentStub) -> Unit,
     onCommentNavDownClicked: () -> Unit,
-    onUpVoteClicked: (Post) -> Unit
+    onUpVoteClicked: (Post) -> Unit,
+    onDownVoteClicked: (Post) -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -156,7 +158,8 @@ fun PostDetailsScreenContent(
                                     onSummaryClicked = {},
                                     onCommunityClicked = {},
                                     onUriClicked = onUriClicked,
-                                    onUpVoteClicked = onUpVoteClicked
+                                    onUpVoteClicked = onUpVoteClicked,
+                                    onDownVoteClicked = onDownVoteClicked
                                 )
                             }
                         }
@@ -238,7 +241,8 @@ fun PostDetailsScreenDark() {
             onUriClicked = {},
             onMoreCommentsClicked = {},
             onCommentNavDownClicked = {},
-            onUpVoteClicked = {}
+            onUpVoteClicked = {},
+            onDownVoteClicked = {}
         )
     }
 }

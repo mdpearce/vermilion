@@ -142,6 +142,12 @@ class PostDetailsViewModel @Inject constructor(
             postVotingService.toggleUpVote(post)
         }
     }
+
+    fun onDownVoteClicked(post: Post) {
+        viewModelScope.launch {
+            postVotingService.toggleDownVote(post)
+        }
+    }
 }
 
 sealed class PostDetailsState

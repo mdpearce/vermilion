@@ -37,8 +37,3 @@ interface PostDao {
     @Query("UPDATE posts SET flags = :flags WHERE postId == :postId")
     suspend fun updateFlags(postId: String, flags: String): Int
 }
-
-data class PostRecordWithUpdatedFlags(
-    val id: Int,
-    val flags: String
-)

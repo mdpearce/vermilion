@@ -74,6 +74,7 @@ fun PostCard(
     onCommunityClicked: (Community) -> Unit,
     onUriClicked: (Uri) -> Unit,
     onUpVoteClicked: (Post) -> Unit,
+    onDownVoteClicked: (Post) -> Unit,
     modifier: Modifier = Modifier,
     shouldHideNsfw: Boolean = false
 ) {
@@ -87,7 +88,8 @@ fun PostCard(
             onSummaryClicked = onClick,
             onCommunityClicked = onCommunityClicked,
             onUriClicked = onUriClicked,
-            onUpVoteClicked = onUpVoteClicked
+            onUpVoteClicked = onUpVoteClicked,
+            onDownVoteClicked = onDownVoteClicked
         )
     }
 }
@@ -102,7 +104,8 @@ fun PostContent(
     onSummaryClicked: (Post) -> Unit,
     onCommunityClicked: (Community) -> Unit,
     onUriClicked: (Uri) -> Unit,
-    onUpVoteClicked: (Post) -> Unit
+    onUpVoteClicked: (Post) -> Unit,
+    onDownVoteClicked: (Post) -> Unit
 ) {
     Column(modifier = modifier.padding(0.dp)) {
 
@@ -196,7 +199,7 @@ fun PostContent(
                     .padding(bottom = 8.dp),
                 onCommunityClicked = onCommunityClicked,
                 onUpVoteClicked = onUpVoteClicked,
-                onDownVoteClicked = {},
+                onDownVoteClicked = onDownVoteClicked,
                 onSaveClicked = {}
             )
         }
@@ -340,7 +343,7 @@ fun PostCardPlaceholder() {
 @Composable
 fun PostCardPreview() {
     VermilionTheme {
-        PostCard(post = DUMMY_TEXT_POST, {}, {}, {}, {}, {})
+        PostCard(post = DUMMY_TEXT_POST, {}, {}, {}, {}, {}, {})
     }
 }
 
@@ -348,7 +351,7 @@ fun PostCardPreview() {
 @Composable
 fun PostCardPreviewDark() {
     VermilionTheme(darkTheme = true) {
-        PostCard(post = DUMMY_TEXT_POST, {}, {}, {}, {}, {})
+        PostCard(post = DUMMY_TEXT_POST, {}, {}, {}, {}, {}, {})
     }
 }
 
@@ -367,7 +370,7 @@ fun TextPostSummaryPreview() {
 @Composable
 fun ThumbnailPostPreview() {
     VermilionTheme(darkTheme = true) {
-        PostCard(post = DUMMY_LINK_POST, onClick = {}, onMediaClicked = {}, {}, {}, {})
+        PostCard(post = DUMMY_LINK_POST, onClick = {}, onMediaClicked = {}, {}, {}, {}, {})
     }
 }
 
