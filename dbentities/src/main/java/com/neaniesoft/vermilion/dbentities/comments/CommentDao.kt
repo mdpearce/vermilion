@@ -4,11 +4,18 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CommentDao {
     @Query("SELECT * from comments WHERE postId == :postId")
     suspend fun getAllForPost(postId: String): List<CommentRecord>
+
+    @Query("SELECT * from comments WHERE postId == :postId")
+    fun flowOfCommentsForPost(postId: String): Flow<List<CommentRecord>>
+
+    @Query("SELECT * from comments WHERE postId == :postId AND threadIdentifier == :commentId")
+    fun flowOfCommentThread(postId: String, commentId: String): Flow<List<CommentRecord>>
 
     @Query("SELECT * from comments WHERE postId == :postId AND parentId == null")
     suspend fun getAllTopLevelRecordsForPost(postId: String): List<CommentRecord>
@@ -33,6 +40,9 @@ interface CommentDao {
 
     @Query("DELETE FROM comments WHERE postId == :postId")
     suspend fun deleteAllForPost(postId: String): Int
+
+    @Query("DELETE FROM comments WHERE postId == :postId AND threadIdentifier == :threadId")
+    suspend fun deleteAllForThread(postId: String, threadId: String): Int
 
     @Query("DELETE FROM comments WHERE id >= :id")
     suspend fun deleteAllFromId(id: Int)
