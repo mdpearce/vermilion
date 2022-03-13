@@ -54,11 +54,6 @@ import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
 interface CommentRepository {
-    // suspend fun getFlattenedCommentTreeForPost(
-    //     postId: PostId,
-    //     forceRefresh: Boolean
-    // ): Flow<CommentRepositoryResponse>
-
     suspend fun getCommentsForPost(
         postId: PostId
     ): Flow<List<CommentKind>>

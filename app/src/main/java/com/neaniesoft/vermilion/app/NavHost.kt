@@ -1,7 +1,6 @@
 package com.neaniesoft.vermilion.app
 
 import VermilionAppState
-import android.os.Bundle
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -27,12 +26,9 @@ import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.ui.PostsScreen
 import com.neaniesoft.vermilion.ui.images.ImageDialog
 import com.neaniesoft.vermilion.ui.videos.custom.youtube.YouTubeDialog
-import com.neaniesoft.vermilion.ui.videos.direct.VideoDescriptor
 import com.neaniesoft.vermilion.ui.videos.direct.VideoDialog
 import com.neaniesoft.vermilion.ui.videos.external.ExternalVideoDialog
 import kotlinx.coroutines.FlowPreview
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 import java.net.URLDecoder
 
 @ExperimentalMaterialApi
@@ -179,19 +175,5 @@ fun VermilionNavHost(
                 navController.popBackStack(backStackEntry.destination.id, true)
             })
         }
-    }
-}
-
-object VideoDescriptorParamType : NavType<VideoDescriptor>(isNullableAllowed = false) {
-    override fun get(bundle: Bundle, key: String): VideoDescriptor? {
-        return bundle.getParcelable(key)
-    }
-
-    override fun parseValue(value: String): VideoDescriptor {
-        return Json.decodeFromString(value)
-    }
-
-    override fun put(bundle: Bundle, key: String, value: VideoDescriptor) {
-        bundle.putParcelable(key, value)
     }
 }

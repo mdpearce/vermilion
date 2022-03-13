@@ -28,41 +28,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.neaniesoft.vermilion.postdetails.R
-import com.neaniesoft.vermilion.postdetails.data.CommentRepository
-import com.neaniesoft.vermilion.postdetails.domain.entities.CommentDepth
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentKind
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub
-import com.neaniesoft.vermilion.posts.data.PostRepository
-import com.neaniesoft.vermilion.posts.domain.LinkRouter
-import com.neaniesoft.vermilion.posts.domain.PostVotingService
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.ui.DUMMY_TEXT_POST
 import com.neaniesoft.vermilion.posts.ui.PostContent
 import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
-import com.neaniesoft.vermilion.utils.CoroutinesModule
-import com.neaniesoft.vermilion.utils.logger
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.UUID
-import javax.inject.Inject
-import javax.inject.Named
 
 @FlowPreview
 @Composable
@@ -157,57 +135,6 @@ fun PostDetailsScreen(
         onMoreCommentsClicked = { commentsViewModel.onMoreCommentsClicked(it) },
         onCommentNavDownClicked = { commentsViewModel.onCommentNavDownClicked(it) }
     )
-
-    // Surface(
-    //     modifier = Modifier.fillMaxWidth(),
-    //     color = MaterialTheme.colors.surface,
-    //     elevation = 0.dp
-    // ) {
-    //     SwipeRefresh(
-    //         state = swipeRefreshState,
-    //         onRefresh = { commentsViewModel.onRefresh(postId) },
-    //         modifier = Modifier.fillMaxSize()
-    //     ) {
-    //         LazyColumn(state = columnState) {
-    //             item {
-    //                 PostDetails(
-    //                     viewModel = postViewModel
-    //                 )
-    //             }
-    //
-    //             items(comments) { item ->
-    //                 when (item) {
-    //                     is CommentKind.Full -> CommentRow(
-    //                         comment = item.comment,
-    //                         Modifier.fillMaxWidth(),
-    //                         onUriClicked = { commentsViewModel.onOpenUri(it.toUri()) }
-    //                     )
-    //                     is CommentKind.Stub -> MoreCommentsStubRow(
-    //                         stub = item.stub,
-    //                         Modifier.fillMaxWidth(),
-    //                         onClick = { commentsViewModel.onMoreCommentsClicked(it) }
-    //                     )
-    //                 }
-    //             }
-    //
-    //         }
-    //     }
-    //     Box(
-    //         Modifier
-    //             .fillMaxSize()
-    //             .padding(bottom = 8.dp, end = 8.dp),
-    //         contentAlignment = Alignment.BottomEnd
-    //     ) {
-    //         FloatingActionButton(
-    //             onClick = { commentsViewModel.onCommentNavDownClicked(columnState.firstVisibleItemIndex) }
-    //         ) {
-    //             Icon(
-    //                 painter = painterResource(id = R.drawable.ic_baseline_keyboard_arrow_down_24),
-    //                 contentDescription = "Next top level comment"
-    //             )
-    //         }
-    //     }
-    // }
 }
 
 @Composable
@@ -319,131 +246,6 @@ fun PostDetails(
     }
 }
 
-sealed class PostState {
-    object Empty : PostState()
-    object Error : PostState()
-    data class Post(val post: com.neaniesoft.vermilion.posts.domain.entities.Post) : PostState()
-}
-
-@HiltViewModel
-class PostViewModel @Inject constructor(
-    private val postRepository: PostRepository,
-    private val linkRouter: LinkRouter,
-    private val postVotingService: PostVotingService,
-    @Named(CoroutinesModule.IO_DISPATCHER) private val dispatcher: CoroutineDispatcher
-) : ViewModel() {
-    private val _routeEvents: MutableSharedFlow<String> = MutableSharedFlow()
-    val routeEvents = _routeEvents.asSharedFlow()
-
-    private val _post: MutableStateFlow<PostState> = MutableStateFlow(PostState.Empty)
-    val post = _post.asStateFlow()
-
-    fun onPostId(postId: PostId) {
-        viewModelScope.launch {
-            withContext(dispatcher) {
-                postRepository.postFlow(postId).collect {
-                    _post.emit(PostState.Post(it))
-                }
-            }
-        }
-    }
-
-    fun onOpenUri(uri: Uri) {
-        val route = linkRouter.routeForLink(uri)
-
-        viewModelScope.launch { _routeEvents.emit(route) }
-    }
-
-    fun onUpVoteClicked(post: Post) {
-        viewModelScope.launch {
-            postVotingService.toggleUpVote(post)
-        }
-    }
-
-    fun onDownVoteClicked(post: Post) {
-        viewModelScope.launch {
-            postVotingService.toggleDownVote(post)
-        }
-    }
-}
-
-@HiltViewModel
-class CommentsViewModel @Inject constructor(
-    private val commentRepository: CommentRepository,
-    private val linkRouter: LinkRouter,
-    @Named(CoroutinesModule.IO_DISPATCHER) private val dispatcher: CoroutineDispatcher
-) : ViewModel() {
-    private val logger by logger()
-
-    private val _comments: MutableStateFlow<List<CommentKind>> = MutableStateFlow(emptyList())
-    val comments = _comments.asStateFlow()
-
-    private val networkActivityIdentifier = UUID.randomUUID().toString()
-
-    val networkIsActive = commentRepository.networkActivityUpdates.filter {
-        it.identifier == networkActivityIdentifier
-    }.map { it.isActive }
-
-    private val _scrollToEvents = MutableSharedFlow<Int>()
-    val scrollToEvents = _scrollToEvents.asSharedFlow()
-
-    private val _routeEvents: MutableSharedFlow<String> = MutableSharedFlow()
-    val routeEvents = _routeEvents.asSharedFlow()
-
-    suspend fun onPostId(postId: PostId) {
-        viewModelScope.launch {
-            withContext(dispatcher) {
-                commentRepository.getCommentsForPost(postId).collect { comments ->
-                    _comments.emit(comments)
-                }
-            }
-        }
-        commentRepository.refreshIfRequired(
-            postId,
-            forceRefresh = false,
-            networkActivityIdentifier = networkActivityIdentifier
-        )
-    }
-
-    fun onMoreCommentsClicked(stub: CommentStub) {
-        viewModelScope.launch {
-            val comments: List<CommentKind> = commentRepository.fetchAndInsertMoreCommentsFor(stub)
-
-            _comments.emit(comments)
-        }
-    }
-
-    fun onCommentNavDownClicked(firstVisibleItemIndex: Int) {
-        viewModelScope.launch {
-            val foundIndex = comments.value.let { list ->
-                list.subList(firstVisibleItemIndex, list.size)
-                    .indexOfFirst { (it as? CommentKind.Full)?.comment?.depth == CommentDepth(0) }
-            }
-            if (foundIndex != -1) {
-                val positionInCommentList = firstVisibleItemIndex + foundIndex + 1
-                _scrollToEvents.emit(positionInCommentList)
-            }
-        }
-    }
-
-    fun onOpenUri(uri: Uri) {
-        val route = linkRouter.routeForLink(uri)
-
-        viewModelScope.launch { _routeEvents.emit(route) }
-    }
-
-    fun onRefresh(postId: PostId) {
-        viewModelScope.launch {
-            commentRepository.refreshIfRequired(
-                postId,
-                forceRefresh = true,
-                networkActivityIdentifier = networkActivityIdentifier
-            )
-        }
-    }
-}
-
-//
 @Preview
 @Composable
 fun PostDetailsScreenDark() {
