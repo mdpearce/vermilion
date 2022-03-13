@@ -184,7 +184,6 @@ fun PostDetailsScreenContent(
                         )
                     }
                 }
-
             }
         }
         Box(
