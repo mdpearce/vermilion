@@ -52,7 +52,7 @@ object Deps {
     const val COMMONMARK_EXT_AUTOLINK = "org.commonmark:commonmark-ext-autolink:0.18.2"
     const val SEMVER = "net.thauvin.erik.gradle:semver:1.0.4"
     const val GOOGLE_SERVICES_PLUGIN = "com.google.gms:google-services:4.3.10"
-    const val FIREBASE_BOM = "com.google.firebase:firebase-bom:29.1.0"
+    const val FIREBASE_BOM = "com.google.firebase:firebase-bom:29.2.0"
     const val FIREBASE_CRASHLYTICS = "com.google.firebase:firebase-crashlytics-ktx"
     const val FIREBASE_ANALYTICS = "com.google.firebase:firebase-analytics-ktx"
     const val FIREBASE_CRASHLYTICS_GRADLE_PLUGIN =
