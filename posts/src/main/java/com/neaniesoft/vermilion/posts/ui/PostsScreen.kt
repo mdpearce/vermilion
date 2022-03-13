@@ -111,7 +111,8 @@ fun PostsScreen(
             },
             onCommunityClicked = { community -> viewModel.onOpenCommunity(community) },
             onUriClicked = { viewModel.onUriClicked(it) },
-            onUpVoteClicked = { viewModel.onUpVoteClicked(it) }
+            onUpVoteClicked = { viewModel.onUpVoteClicked(it) },
+            onDownVoteClicked = { viewModel.onDownVoteClicked(it) }
         )
     }
 }
@@ -125,7 +126,8 @@ fun PostsList(
     onMediaClicked: (Post) -> Unit,
     onCommunityClicked: (Community) -> Unit,
     onUriClicked: (Uri) -> Unit,
-    onUpVoteClicked: (Post) -> Unit
+    onUpVoteClicked: (Post) -> Unit,
+    onDownVoteClicked: (Post) -> Unit
 ) {
     val isRefreshing = posts.loadState.refresh is LoadState.Loading
     val refreshState = rememberSwipeRefreshState(isRefreshing = isRefreshing)
@@ -141,7 +143,8 @@ fun PostsList(
                             onCommunityClicked = onCommunityClicked,
                             shouldHideNsfw = shouldHideNsfw,
                             onUriClicked = onUriClicked,
-                            onUpVoteClicked = onUpVoteClicked
+                            onUpVoteClicked = onUpVoteClicked,
+                            onDownVoteClicked = onDownVoteClicked
                         )
                     } else {
                         PostCardPlaceholder()

@@ -31,6 +31,7 @@ import com.neaniesoft.vermilion.coreentities.Community
 import com.neaniesoft.vermilion.coreentities.NamedCommunity
 import com.neaniesoft.vermilion.posts.R
 import com.neaniesoft.vermilion.posts.domain.entities.Post
+import com.neaniesoft.vermilion.posts.domain.entities.isDownVoted
 import com.neaniesoft.vermilion.posts.domain.entities.isUpVoted
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import org.ocpsoft.prettytime.PrettyTime
@@ -115,6 +116,7 @@ fun PostDetails(
         )
         VoteSaveBlock(
             isUpVoted = post.isUpVoted(),
+            isDownVoted = post.isDownVoted(),
             onUpVoteClicked = { onUpVoteClicked(post) },
             onDownVoteClicked = { onDownVoteClicked(post) },
             onSaveClicked = { onSaveClicked(post) }
@@ -125,6 +127,7 @@ fun PostDetails(
 @Composable
 fun VoteSaveBlock(
     isUpVoted: Boolean,
+    isDownVoted: Boolean,
     onUpVoteClicked: () -> Unit,
     onDownVoteClicked: () -> Unit,
     onSaveClicked: () -> Unit
@@ -160,10 +163,15 @@ fun VoteSaveBlock(
             IconButton(
                 onClick = onDownVoteClicked
             ) {
+                val tint = if (isDownVoted) {
+                    MaterialTheme.colors.secondary
+                } else {
+                    LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                }
                 Icon(
                     painter = painterResource(id = R.drawable.ic_baseline_arrow_downward_24),
                     contentDescription = "Down vote",
-                    tint = MaterialTheme.colors.secondary
+                    tint = tint
                 )
             }
         }
