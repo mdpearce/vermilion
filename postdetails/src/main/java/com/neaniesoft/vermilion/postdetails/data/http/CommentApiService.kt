@@ -19,9 +19,9 @@ interface CommentApiService {
     suspend fun commentsForArticle(@Path("articleId") articleId: String): Array<CommentResponse>
 
     @GET("/comments/{articleId}")
-    suspend fun commentsForArticleFocusedOn(
-        @Query("comment") commentId: String,
-        articleId: String
+    suspend fun commentThread(
+        @Path("articleId") articleId: String,
+        @Query("comment") commentId: String
     ): Array<CommentResponse>
 
     @GET("/api/morechildren")

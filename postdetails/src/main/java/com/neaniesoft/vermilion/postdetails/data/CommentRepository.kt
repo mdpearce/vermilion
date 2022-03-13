@@ -108,8 +108,8 @@ class CommentRepositoryImpl @Inject constructor(
     override val networkActivityUpdates = _networkActivityUpdates.asSharedFlow()
 
     override suspend fun getCommentsForPost(postId: PostId): Flow<List<CommentKind>> {
-        return dao.flowOfCommentsForPost(postId.value).map { record ->
-            record.map { it.toCommentKind() }
+        return dao.flowOfCommentsForPost(postId.value).map { records ->
+            records.map { it.toCommentKind() }
         }
     }
 
@@ -117,8 +117,8 @@ class CommentRepositoryImpl @Inject constructor(
         postId: PostId,
         commentId: CommentId
     ): Flow<List<CommentKind>> {
-        return dao.flowOfCommentThread(postId.value, commentId.value).map { record ->
-            record.map { it.toCommentKind() }
+        return dao.flowOfCommentThread(postId.value, commentId.value).map { records ->
+            records.map { it.toCommentKind() }
         }
     }
 
@@ -129,7 +129,7 @@ class CommentRepositoryImpl @Inject constructor(
     ) {
         _networkActivityUpdates.emit(NetworkActivityUpdate(networkActivityIdentifier, true))
 
-        val apiResponse = apiService.commentsForArticleFocusedOn(threadId.value, postId.value)
+        val apiResponse = apiService.commentThread(postId.value, threadId.value)
         val post = (apiResponse[0].data.children.firstOrNull()?.data as? Link)?.toPost(
             markdownParser
         )

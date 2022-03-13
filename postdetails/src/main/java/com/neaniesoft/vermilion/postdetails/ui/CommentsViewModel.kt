@@ -51,11 +51,13 @@ class CommentsViewModel @Inject constructor(
                 }
             }
         }
-        commentRepository.refreshIfRequired(
-            postId,
-            forceRefresh = false,
-            networkActivityIdentifier = networkActivityIdentifier
-        )
+        withContext(dispatcher) {
+            commentRepository.refreshIfRequired(
+                postId,
+                forceRefresh = false,
+                networkActivityIdentifier = networkActivityIdentifier
+            )
+        }
     }
 
     fun onMoreCommentsClicked(stub: CommentStub) {
@@ -90,5 +92,19 @@ class CommentsViewModel @Inject constructor(
     }
 
     suspend fun onCommentId(commentId: CommentId, postId: PostId) {
+        viewModelScope.launch {
+            withContext(dispatcher) {
+                commentRepository.getCommentThread(postId, commentId).collect { comments ->
+                    _comments.emit(comments)
+                }
+            }
+        }
+        withContext(dispatcher) {
+            commentRepository.refreshThread(
+                postId = postId,
+                threadId = commentId,
+                networkActivityIdentifier
+            )
+        }
     }
 }
