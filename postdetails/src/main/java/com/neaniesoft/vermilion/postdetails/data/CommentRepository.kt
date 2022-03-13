@@ -29,9 +29,9 @@ import com.neaniesoft.vermilion.postdetails.domain.entities.ControversialIndex
 import com.neaniesoft.vermilion.postdetails.domain.entities.DurationString
 import com.neaniesoft.vermilion.postdetails.domain.entities.MoreCommentsCount
 import com.neaniesoft.vermilion.postdetails.domain.entities.UpVotesCount
+import com.neaniesoft.vermilion.posts.data.PostRepository
 import com.neaniesoft.vermilion.posts.data.toPost
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
-import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.utils.formatCompact
@@ -39,10 +39,12 @@ import com.neaniesoft.vermilion.utils.logger
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.map
 import org.apache.commons.text.StringEscapeUtils
 import org.commonmark.parser.Parser
-import org.ocpsoft.prettytime.PrettyTime
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
@@ -52,20 +54,31 @@ import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
 interface CommentRepository {
-    suspend fun getFlattenedCommentTreeForPost(
-        postId: PostId,
-        forceRefresh: Boolean
-    ): Flow<CommentRepositoryResponse>
+    // suspend fun getFlattenedCommentTreeForPost(
+    //     postId: PostId,
+    //     forceRefresh: Boolean
+    // ): Flow<CommentRepositoryResponse>
+
+    suspend fun getCommentsForPost(
+        postId: PostId
+    ): Flow<List<CommentKind>>
 
     suspend fun fetchAndInsertMoreCommentsFor(stub: CommentStub): List<CommentKind>
     suspend fun cachedCommentsForPost(postId: PostId): Int
     suspend fun deleteByPost(postId: PostId)
+    suspend fun refreshIfRequired(
+        postId: PostId,
+        forceRefresh: Boolean,
+        networkActivityIdentifier: String
+    )
+
+    val networkActivityUpdates: SharedFlow<NetworkActivityUpdate>
 }
 
-sealed class CommentRepositoryResponse {
-    data class ListOfComments(val comments: List<CommentKind>) : CommentRepositoryResponse()
-    data class UpdatedPost(val post: Post) : CommentRepositoryResponse()
-}
+data class NetworkActivityUpdate(
+    val identifier: String,
+    val isActive: Boolean
+)
 
 @Singleton
 class CommentRepositoryImpl @Inject constructor(
@@ -73,80 +86,75 @@ class CommentRepositoryImpl @Inject constructor(
     private val database: VermilionDatabase,
     private val dao: CommentDao,
     private val clock: Clock,
-    private val prettyTime: PrettyTime,
-    private val markdownParser: Parser // TODO replace with a wrapper interface
+    private val markdownParser: Parser,
+    private val postRepository: PostRepository
 ) : CommentRepository {
+
     companion object {
         private val CACHE_VALID_DURATION = Duration.ofMinutes(60)
     }
 
     private val logger by logger()
-    override suspend fun getFlattenedCommentTreeForPost(
-        postId: PostId,
-        forceRefresh: Boolean
-    ): Flow<CommentRepositoryResponse> =
-        flow {
-            val lastInsertedAtTime = database.withTransaction {
-                dao.getLastInsertedAtForPost(postId.value)
-            }
-            val commentCount = database.withTransaction {
-                dao.commentCountForPost(postId.value)
-            }
 
-            if (!forceRefresh && (commentCount > 0 && (lastInsertedAtTime != null && lastInsertedAtTime >= clock.millis() - CACHE_VALID_DURATION.toMillis()))) {
-                // Cache is valid, let's just return the database records
-                emit(
-                    CommentRepositoryResponse.ListOfComments(
-                        dao.getAllForPost(postId.value)
-                            .map { it.toCommentKind() }
-                    )
-                )
-            } else {
-                // Cache is invalid. First, let's return it so we have something to display
-                emit(
-                    CommentRepositoryResponse.ListOfComments(
-                        dao.getAllForPost(postId.value)
-                            .map { it.toCommentKind() }
-                    )
-                )
+    private val _networkActivityUpdates: MutableSharedFlow<NetworkActivityUpdate> =
+        MutableSharedFlow()
+    override val networkActivityUpdates = _networkActivityUpdates.asSharedFlow()
 
-                // Then, fetch new comments from the API
-                val apiResponse = apiService.commentsForArticle(postId.value)
-
-                // The response comes with an updated post, so we might as well return it so the caller can update the db if required
-                val post = (apiResponse[0].data.children.firstOrNull()?.data as? Link)?.toPost(
-                    markdownParser
-                )
-                if (post != null) {
-                    emit(CommentRepositoryResponse.UpdatedPost(post))
-                }
-
-                val newCommentRecords: List<CommentRecord> =
-                    apiResponse[1].getCommentRecords(postId)
-
-                // Finally, delete the old entries and insert the new ones and then return the new ones from the DAO
-                val newComments = database.withTransaction {
-                    dao.deleteAllForPost(postId.value)
-
-                    newCommentRecords.forEach { record ->
-                        dao.insertAll(record)
-                        val parentId = record.parentId
-                        val parentPath = if (parentId != null) {
-                            dao.getPathForComment(parentId) + "/"
-                        } else {
-                            ""
-                        }
-                        val updatedRecord = record.copy(path = "$parentPath${record.id}")
-                        dao.update(updatedRecord)
-                    }
-
-                    dao.getAllForPost(postId.value)
-                }
-
-                // Now, emit the new comments
-                emit(CommentRepositoryResponse.ListOfComments(newComments.map { it.toCommentKind() }))
-            }
+    override suspend fun getCommentsForPost(postId: PostId): Flow<List<CommentKind>> {
+        return dao.flowOfCommentsForPost(postId.value).map { record ->
+            record.map { it.toCommentKind() }
         }
+    }
+
+    override suspend fun refreshIfRequired(
+        postId: PostId,
+        forceRefresh: Boolean,
+        networkActivityIdentifier: String
+    ) {
+        val lastInsertedAtTime = database.withTransaction {
+            dao.getLastInsertedAtForPost(postId.value)
+        } ?: 0
+        val commentCount = database.withTransaction {
+            dao.commentCountForPost(postId.value)
+        }
+        val cacheIsValid = lastInsertedAtTime >= clock.millis() - CACHE_VALID_DURATION.toMillis()
+        if (forceRefresh || commentCount == 0 || !cacheIsValid) {
+            logger.debugIfEnabled { "Refreshing comments for ${postId.value} (forceRefresh == $forceRefresh)" }
+            _networkActivityUpdates.emit(NetworkActivityUpdate(networkActivityIdentifier, true))
+            // Fetch new comments
+            val apiResponse = apiService.commentsForArticle(postId.value)
+
+            // The response comes with an updated post, so we might as well update it in the db
+            val post = (apiResponse[0].data.children.firstOrNull()?.data as? Link)?.toPost(
+                markdownParser
+            )
+            if (post != null) {
+                postRepository.update(postId, post)
+            }
+            val newCommentRecords: List<CommentRecord> =
+                apiResponse[1].getCommentRecords(postId)
+
+            // Finally, delete the old entries and insert the new ones and then return the new ones from the DAO
+            database.withTransaction {
+                dao.deleteAllForPost(postId.value)
+
+                newCommentRecords.forEach { record ->
+                    dao.insertAll(record)
+                    val parentId = record.parentId
+                    val parentPath = if (parentId != null) {
+                        dao.getPathForComment(parentId) + "/"
+                    } else {
+                        ""
+                    }
+                    val updatedRecord = record.copy(path = "$parentPath${record.id}")
+                    dao.update(updatedRecord)
+                }
+            }
+            _networkActivityUpdates.emit(NetworkActivityUpdate(networkActivityIdentifier, false))
+        } else {
+            logger.debugIfEnabled { "Cache up to date, not refreshing." }
+        }
+    }
 
     override suspend fun fetchAndInsertMoreCommentsFor(stub: CommentStub): List<CommentKind> =
         coroutineScope {

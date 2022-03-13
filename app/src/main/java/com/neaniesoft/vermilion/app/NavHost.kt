@@ -23,6 +23,7 @@ import com.neaniesoft.vermilion.coreentities.CommunityId
 import com.neaniesoft.vermilion.coreentities.CommunityName
 import com.neaniesoft.vermilion.coreentities.NamedCommunity
 import com.neaniesoft.vermilion.postdetails.ui.PostDetailsScreen
+import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.ui.PostsScreen
 import com.neaniesoft.vermilion.ui.images.ImageDialog
 import com.neaniesoft.vermilion.ui.videos.custom.youtube.YouTubeDialog
@@ -97,9 +98,10 @@ fun VermilionNavHost(
                 navArgument("id") { type = NavType.StringType }
             )
         ) {
-            PostDetailsScreen(appState = appState) { route ->
+            val postId = PostId(requireNotNull(it.arguments?.getString("id")))
+            PostDetailsScreen(postId = postId, appState = appState, onRoute = { route ->
                 navController.navigate(route)
-            }
+            })
         }
 
         // Account/Settings

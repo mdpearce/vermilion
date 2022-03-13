@@ -5,6 +5,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -36,4 +37,10 @@ interface PostDao {
 
     @Query("UPDATE posts SET flags = :flags WHERE postId == :postId")
     suspend fun updateFlags(postId: String, flags: String): Int
+
+    @Update()
+    suspend fun update(post: PostRecord)
+
+    @Query("SELECT id FROM posts WHERE postId == :postId")
+    suspend fun dbIdForPostId(postId: String): String?
 }
