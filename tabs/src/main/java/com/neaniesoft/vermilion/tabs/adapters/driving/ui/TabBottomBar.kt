@@ -1,39 +1,42 @@
 package com.neaniesoft.vermilion.tabs.adapters.driving.ui
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.BottomAppBar
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.LeadingIconTab
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ScrollableTabRow
 import androidx.compose.material.Surface
+import androidx.compose.material.Tab
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import com.neaniesoft.vermilion.tabs.R
 import com.neaniesoft.vermilion.tabs.domain.TabSupervisor
-import com.neaniesoft.vermilion.tabs.domain.entities.ActiveTab
 import com.neaniesoft.vermilion.tabs.domain.entities.DisplayName
 import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
 import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
@@ -43,40 +46,73 @@ import com.neaniesoft.vermilion.tabs.domain.entities.TabState
 import com.neaniesoft.vermilion.tabs.domain.entities.TabType
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import java.time.Instant
 import javax.inject.Inject
 
 @Composable
 fun TabBottomBar(
+    onRoute: (String) -> Unit,
+    viewModel: TabBottomBarViewModel = hiltViewModel()
+) {
+
+    LaunchedEffect(Unit) {
+        viewModel.routeEvents.collect {
+            onRoute(it)
+        }
+    }
+
+    BottomAppBar(elevation = 16.dp) {
+        val tabs by viewModel.tabs.collectAsState(initial = emptyList())
+        val activeTab by viewModel.activeTab.collectAsState()
+
+        TabBottomBarContent(
+            tabs = tabs,
+            activeTab = activeTab,
+            onHomeButtonClicked = { viewModel.onHomeClicked() },
+            onTabClicked = { viewModel.onTabClicked() },
+            onTabCloseClicked = { viewModel.onTabCloseClicked() }
+        )
+    }
+}
+
+@Composable
+fun TabBottomBarContent(
     tabs: List<TabState>,
-    activeTab: ActiveTab,
+    activeTab: Int,
     onHomeButtonClicked: () -> Unit,
     onTabClicked: (TabState) -> Unit,
-    onTabCloseClicked: (TabState) -> Unit
+    onTabCloseClicked: (TabState) -> Unit,
 ) {
-    BottomAppBar(elevation = 16.dp) {
-        LazyRow(
-            Modifier
-                .fillMaxWidth()
-        ) {
-            item {
-                HomeIcon(isActive = activeTab is ActiveTab.Home, onClick = onHomeButtonClicked)
+    ScrollableTabRow(selectedTabIndex = activeTab) {
+        LeadingIconTab(
+            selected = activeTab == 0,
+            onClick = onHomeButtonClicked,
+            text = { Text(text = stringResource(id = R.string.content_description_home_button)) },
+            icon = {
+                Icon(
+                    Icons.Default.Home,
+                    contentDescription = stringResource(id = R.string.content_description_home_button)
+                )
             }
-
-            items(tabs) { tab ->
-                if (tab.type != TabType.HOME) {
-                    val isActive = activeTab is ActiveTab.Tab && tab.id == activeTab.id
-
-                    Box(modifier = Modifier.height(IntrinsicSize.Min)) {
-                        TopLevelTab(
-                            isActive = isActive,
-                            tabState = tab,
-                            onTabClicked = onTabClicked,
-                            onCloseClicked = onTabCloseClicked
-                        )
-                    }
+        )
+        tabs.forEachIndexed { index, tabState ->
+            Tab(selected = activeTab == index + 1,
+                onClick = {
+                    onTabClicked(tabState)
+                },
+                text = {
+                    Text(text = tabState.displayName.value)
+                },
+                modifier = Modifier.pointerInput(Unit) {
+                    detectTapGestures(onLongPress = {
+                        onTabCloseClicked(tabState)
+                    })
                 }
-            }
+            )
         }
     }
 }
@@ -86,6 +122,21 @@ class TabBottomBarViewModel @Inject constructor(
     private val tabSupervisor: TabSupervisor
 ) : ViewModel() {
     val tabs = tabSupervisor.currentTabs
+
+    private val _activeTab: MutableStateFlow<Int> = MutableStateFlow(0)
+    val activeTab = _activeTab.asStateFlow()
+
+    private val _routeEvents: MutableSharedFlow<String> = MutableSharedFlow()
+    val routeEvents = _routeEvents.asSharedFlow()
+
+    fun onTabClicked() {
+    }
+
+    fun onHomeClicked() {
+    }
+
+    fun onTabCloseClicked() {
+    }
 }
 
 @Composable
@@ -167,9 +218,9 @@ fun HomeIcon(isActive: Boolean, onClick: () -> Unit) {
 @Composable
 fun TabBottomBarPreview() {
     VermilionTheme {
-        TabBottomBar(
+        TabBottomBarContent(
             tabs = listOf(DUMMY_TAB, DUMMY_TAB_2),
-            activeTab = ActiveTab.Tab(DUMMY_TAB.id),
+            activeTab = 1,
             onHomeButtonClicked = {},
             onTabClicked = {},
             onTabCloseClicked = {}
@@ -181,9 +232,9 @@ fun TabBottomBarPreview() {
 @Composable
 fun TabBottomBarPreviewDark() {
     VermilionTheme(darkTheme = true) {
-        TabBottomBar(
+        TabBottomBarContent(
             tabs = listOf(DUMMY_TAB, DUMMY_TAB_2),
-            activeTab = ActiveTab.Tab(DUMMY_TAB.id),
+            activeTab = 1,
             onHomeButtonClicked = {},
             onTabClicked = {},
             onTabCloseClicked = {}
@@ -195,9 +246,9 @@ fun TabBottomBarPreviewDark() {
 @Composable
 fun TabBottomBarHomeHighlighted() {
     VermilionTheme {
-        TabBottomBar(
+        TabBottomBarContent(
             tabs = listOf(DUMMY_TAB, DUMMY_TAB_2),
-            activeTab = ActiveTab.Home,
+            activeTab = 0,
             onHomeButtonClicked = {},
             onTabClicked = {},
             onTabCloseClicked = {}
@@ -209,9 +260,9 @@ fun TabBottomBarHomeHighlighted() {
 @Composable
 fun TabBottomBarHomeHighlightedDark() {
     VermilionTheme(darkTheme = true) {
-        TabBottomBar(
+        TabBottomBarContent(
             tabs = listOf(DUMMY_TAB, DUMMY_TAB_2),
-            activeTab = ActiveTab.Home,
+            activeTab = 0,
             onHomeButtonClicked = {},
             onTabClicked = {},
             onTabCloseClicked = {}
