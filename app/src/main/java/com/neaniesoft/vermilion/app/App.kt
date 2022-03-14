@@ -127,7 +127,7 @@ fun VermilionApp(
                     title = { Text(currentScreen.name) },
                     modifier = Modifier.clickable { scope.launch { appState.onAppBarClicked() } },
                     actions = {
-                        IconButton(onClick = { navController.navigate("${VermilionScreen.MyAccount}") }) {
+                        IconButton(onClick = { viewModel.onUserButtonClicked() }) {
                             Icon(
                                 Icons.Default.Person,
                                 contentDescription = stringResource(id = R.string.content_description_my_account_button)
@@ -142,9 +142,6 @@ fun VermilionApp(
                     activeTab = activeTab,
                     onHomeButtonClicked = {
                         viewModel.onHomeButtonClicked()
-                    },
-                    onUserButtonClicked = {
-                        viewModel.onUserButtonClicked()
                     },
                     onTabClicked = {
                         viewModel.onTabClicked(it)

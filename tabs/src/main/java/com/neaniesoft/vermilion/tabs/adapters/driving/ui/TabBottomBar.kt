@@ -21,7 +21,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
@@ -48,7 +47,6 @@ fun TabBottomBar(
     tabs: List<TabState>,
     activeTab: ActiveTab,
     onHomeButtonClicked: () -> Unit,
-    onUserButtonClicked: () -> Unit,
     onTabClicked: (TabState) -> Unit,
     onTabCloseClicked: (TabState) -> Unit
 ) {
@@ -59,15 +57,6 @@ fun TabBottomBar(
         ) {
             item {
                 HomeIcon(isActive = activeTab is ActiveTab.Home, onClick = onHomeButtonClicked)
-            }
-
-            item {
-                IconButton(onClick = onUserButtonClicked) {
-                    Icon(
-                        Icons.Default.Person,
-                        contentDescription = stringResource(id = R.string.content_description_my_account_button)
-                    )
-                }
             }
 
             items(tabs) { tab ->
@@ -170,7 +159,6 @@ fun TabBottomBarPreview() {
         TabBottomBar(
             tabs = listOf(DUMMY_TAB, DUMMY_TAB_2),
             activeTab = ActiveTab.Tab(DUMMY_TAB.id),
-            onUserButtonClicked = {},
             onHomeButtonClicked = {},
             onTabClicked = {},
             onTabCloseClicked = {}
@@ -185,7 +173,6 @@ fun TabBottomBarPreviewDark() {
         TabBottomBar(
             tabs = listOf(DUMMY_TAB, DUMMY_TAB_2),
             activeTab = ActiveTab.Tab(DUMMY_TAB.id),
-            onUserButtonClicked = {},
             onHomeButtonClicked = {},
             onTabClicked = {},
             onTabCloseClicked = {}
@@ -201,7 +188,6 @@ fun TabBottomBarHomeHighlighted() {
             tabs = listOf(DUMMY_TAB, DUMMY_TAB_2),
             activeTab = ActiveTab.Home,
             onHomeButtonClicked = {},
-            onUserButtonClicked = {},
             onTabClicked = {},
             onTabCloseClicked = {}
         )
@@ -216,7 +202,6 @@ fun TabBottomBarHomeHighlightedDark() {
             tabs = listOf(DUMMY_TAB, DUMMY_TAB_2),
             activeTab = ActiveTab.Home,
             onHomeButtonClicked = {},
-            onUserButtonClicked = {},
             onTabClicked = {},
             onTabCloseClicked = {}
         )
