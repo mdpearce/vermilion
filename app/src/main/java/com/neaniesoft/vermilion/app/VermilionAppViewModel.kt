@@ -50,7 +50,7 @@ class VermilionAppViewModel @Inject constructor(
             when {
                 route.startsWith(VermilionScreen.PostDetails.name) -> {
                     val id =
-                        requireNotNull(args?.getString("id")) { "Received a post details route with no id" }
+                        requireNotNull(args?.getString("postId")) { "Received a post details route with no id" }
                     viewModelScope.launch(Dispatchers.IO) {
                         val tab =
                             tabSupervisor.addNewTabIfNotExists(ParentId(id), TabType.POST_DETAILS)
