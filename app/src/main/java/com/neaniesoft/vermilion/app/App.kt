@@ -83,7 +83,6 @@ fun VermilionApp(
         val currentScreen = VermilionScreen.fromRoute(backStackEntry.value?.destination?.route)
 
         val scaffoldState = rememberScaffoldState()
-        val tabs by viewModel.tabs.collectAsState()
 
         LaunchedEffect(key1 = Unit, block = {
             viewModel.routeEvents.collect { route ->
@@ -138,18 +137,9 @@ fun VermilionApp(
             },
             bottomBar = {
                 TabBottomBar(
-                    tabs = tabs,
-                    activeTab = activeTab,
-                    onHomeButtonClicked = {
-                        viewModel.onHomeButtonClicked()
-                    },
-                    onTabClicked = {
-                        viewModel.onTabClicked(it)
-                    },
-                    onTabCloseClicked = {
-                        viewModel.onTabCloseClicked(it)
-                    }
-                )
+                    onRoute = { route ->
+                        navController.navigate(route)
+                    })
             },
             drawerContent = {
                 CommunityList(
