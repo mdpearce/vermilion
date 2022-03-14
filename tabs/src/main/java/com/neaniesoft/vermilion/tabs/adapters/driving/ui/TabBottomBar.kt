@@ -30,7 +30,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
 import com.neaniesoft.vermilion.tabs.R
+import com.neaniesoft.vermilion.tabs.domain.TabSupervisor
 import com.neaniesoft.vermilion.tabs.domain.entities.ActiveTab
 import com.neaniesoft.vermilion.tabs.domain.entities.DisplayName
 import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
@@ -40,7 +42,9 @@ import com.neaniesoft.vermilion.tabs.domain.entities.TabSortOrderIndex
 import com.neaniesoft.vermilion.tabs.domain.entities.TabState
 import com.neaniesoft.vermilion.tabs.domain.entities.TabType
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
+import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Instant
+import javax.inject.Inject
 
 @Composable
 fun TabBottomBar(
@@ -75,6 +79,13 @@ fun TabBottomBar(
             }
         }
     }
+}
+
+@HiltViewModel
+class TabBottomBarViewModel @Inject constructor(
+    private val tabSupervisor: TabSupervisor
+) : ViewModel() {
+    val tabs = tabSupervisor.currentTabs
 }
 
 @Composable
