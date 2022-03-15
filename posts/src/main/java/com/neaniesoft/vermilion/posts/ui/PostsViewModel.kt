@@ -102,6 +102,12 @@ class PostsViewModel @Inject constructor(
                 communityName.value,
                 scrollPosition
             )
+        } else {
+            uiStateProvider.updateScrollPositionForTab(
+                TabType.POSTS,
+                communityName.value,
+                scrollPosition
+            )
         }
     }
 
