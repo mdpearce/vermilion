@@ -1,11 +1,17 @@
 package com.neaniesoft.vermilion.tabs.adapters.driving.ui
 
 import android.util.Log
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -25,6 +31,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -105,17 +112,48 @@ fun TabBottomBarContent(
             }
         )
         tabs.forEachIndexed { index, tabState ->
+
             Tab(selected = activeTab == index + 1,
                 onClick = {
                     onTabClicked(tabState)
                 },
-                text = {
-                    Text(text = tabState.displayName.value)
-                },
-                modifier = Modifier.pointerInput(Unit) {
-                    detectTapGestures(onLongPress = {
-                        onTabCloseClicked(tabState)
-                    })
+                content = {
+
+                    val interactionSource = remember { MutableInteractionSource() }
+
+                    Row(
+                        Modifier
+                            .indication(interactionSource, LocalIndication.current)
+                            .padding(horizontal = 16.dp)
+                            .height(48.dp)
+                            .fillMaxWidth()
+                            .pointerInput(Unit) {
+                                detectTapGestures(
+                                    onPress = { offset ->
+                                        val press = PressInteraction.Press(offset)
+                                        interactionSource.emit(press)
+
+                                        tryAwaitRelease()
+
+                                        interactionSource.emit(PressInteraction.Release(press))
+                                    },
+
+                                    onTap = {
+                                        onTabClicked(tabState)
+                                    },
+
+                                    onLongPress = {
+                                        onTabCloseClicked(tabState)
+                                    })
+                            },
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = CenterVertically
+                    ) {
+                        Text(
+                            text = tabState.displayName.value,
+                            style = MaterialTheme.typography.button.copy(textAlign = TextAlign.Center)
+                        )
+                    }
                 }
             )
         }
