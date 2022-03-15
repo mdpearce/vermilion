@@ -1,5 +1,6 @@
 package com.neaniesoft.vermilion.tabs.adapters.driving.ui
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Row
@@ -47,9 +48,7 @@ import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import com.neaniesoft.vermilion.uistate.TabType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.Instant
 import javax.inject.Inject
@@ -68,11 +67,16 @@ fun TabBottomBar(
 
     BottomAppBar(elevation = 16.dp) {
         val tabs by viewModel.tabs.collectAsState(initial = emptyList())
-        val activeTab by viewModel.activeTab.collectAsState()
+        val activeTab by viewModel.activeTab.collectAsState(initial = null)
+        val activeTabIndex = tabs.indexOfFirst {
+            Log.d("TabBottomBar", "comparing ${it.id} to ${activeTab?.id}")
+            it.id == activeTab?.id
+        } + 1 // if none is found, we'll get -1, which will then map to 0 - Home.
+        Log.d("TabBottomBar", "activeTab: $activeTab, activeTabIndex: $activeTabIndex")
 
         TabBottomBarContent(
             tabs = tabs,
-            activeTab = activeTab,
+            activeTab = activeTabIndex,
             onHomeButtonClicked = { viewModel.onHomeClicked() },
             onTabClicked = { viewModel.onTabClicked(it) },
             onTabCloseClicked = { viewModel.onTabCloseClicked(it) }
@@ -124,14 +128,21 @@ class TabBottomBarViewModel @Inject constructor(
 ) : ViewModel() {
     val tabs = tabSupervisor.currentTabs
 
-    private val _activeTab: MutableStateFlow<Int> = MutableStateFlow(0)
-    val activeTab = _activeTab.asStateFlow()
+    val activeTab = tabSupervisor.activeTab
 
     private val _routeEvents: MutableSharedFlow<String> = MutableSharedFlow()
     val routeEvents = _routeEvents.asSharedFlow()
 
     fun onTabClicked(tabState: TabState) {
-        viewModelScope.launch { tabSupervisor.setActiveTab(tabState.type, tabState.parentId.value) }
+        viewModelScope.launch {
+            tabSupervisor.setActiveTab(tabState.type, tabState.parentId.value)
+            val route = when (tabState.type) {
+                TabType.HOME -> tabState.parentId.value
+                TabType.POSTS -> "Posts/${tabState.parentId.value}"
+                TabType.POST_DETAILS -> "PostDetails/${tabState.parentId.value}"
+            }
+            _routeEvents.emit(route)
+        }
     }
 
     fun onHomeClicked() {

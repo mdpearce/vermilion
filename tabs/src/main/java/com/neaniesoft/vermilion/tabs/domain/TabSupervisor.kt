@@ -34,6 +34,7 @@ class TabSupervisor @Inject constructor(
     private val clock: Clock,
 ) : UiStateProvider {
     val currentTabs = repository.currentTabs
+    val activeTab = repository.activeTab
 
     private val _removedTabs: MutableSharedFlow<TabState> = MutableSharedFlow()
     val removedTabs = _removedTabs.asSharedFlow()
