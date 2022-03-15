@@ -35,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.neaniesoft.vermilion.tabs.R
 import com.neaniesoft.vermilion.tabs.domain.TabSupervisor
 import com.neaniesoft.vermilion.tabs.domain.entities.DisplayName
@@ -42,13 +43,14 @@ import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
 import com.neaniesoft.vermilion.tabs.domain.entities.TabId
 import com.neaniesoft.vermilion.tabs.domain.entities.TabSortOrderIndex
 import com.neaniesoft.vermilion.tabs.domain.entities.TabState
-import com.neaniesoft.vermilion.uistate.TabType
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
+import com.neaniesoft.vermilion.uistate.TabType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import java.time.Instant
 import javax.inject.Inject
 
@@ -72,8 +74,8 @@ fun TabBottomBar(
             tabs = tabs,
             activeTab = activeTab,
             onHomeButtonClicked = { viewModel.onHomeClicked() },
-            onTabClicked = { viewModel.onTabClicked() },
-            onTabCloseClicked = { viewModel.onTabCloseClicked() }
+            onTabClicked = { viewModel.onTabClicked(it) },
+            onTabCloseClicked = { viewModel.onTabCloseClicked(it) }
         )
     }
 }
@@ -128,13 +130,16 @@ class TabBottomBarViewModel @Inject constructor(
     private val _routeEvents: MutableSharedFlow<String> = MutableSharedFlow()
     val routeEvents = _routeEvents.asSharedFlow()
 
-    fun onTabClicked() {
+    fun onTabClicked(tabState: TabState) {
+        viewModelScope.launch { tabSupervisor.setActiveTab(tabState.type, tabState.parentId.value) }
     }
 
     fun onHomeClicked() {
+        viewModelScope.launch { tabSupervisor.setActiveTab(TabType.HOME, "Home") }
     }
 
-    fun onTabCloseClicked() {
+    fun onTabCloseClicked(tabState: TabState) {
+        viewModelScope.launch { tabSupervisor.removeTab(tabState) }
     }
 }
 

@@ -40,11 +40,11 @@ class TabSupervisor @Inject constructor(
 
     private val logger by logger()
 
-    suspend fun setActiveTab(parentId: ParentId, type: TabType) {
+    override suspend fun setActiveTab(type: TabType, parentId: String) {
         logger.debugIfEnabled { "Setting active tab defined by parentId: $parentId, type: ${type.name}" }
-        addNewTabIfNotExists(parentId, type)
+        addNewTabIfNotExists(ParentId(parentId), type)
 
-        repository.setActiveTab(parentId, type)
+        repository.setActiveTab(ParentId(parentId), type)
     }
 
     private suspend fun addNewTabIfNotExists(parentId: ParentId, type: TabType): TabState {
@@ -105,10 +105,6 @@ class TabSupervisor @Inject constructor(
 
     override val activeTabClosedEvents: Flow<ActiveTabClosedEvent> =
         repository.activeTab.filter { it == null }.map { ActiveTabClosedEvent }
-
-    override suspend fun setActiveTab(tabType: TabType, parentId: String) {
-        repository.setActiveTab(ParentId(parentId), tabType)
-    }
 }
 
 @Module
