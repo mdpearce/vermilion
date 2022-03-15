@@ -31,6 +31,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.neaniesoft.vermilion.coreentities.ScrollPosition
 import com.neaniesoft.vermilion.postdetails.R
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentKind
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub
@@ -39,7 +40,6 @@ import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.ui.DUMMY_TEXT_POST
 import com.neaniesoft.vermilion.posts.ui.PostContent
-import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import kotlinx.coroutines.FlowPreview
 
@@ -64,9 +64,7 @@ fun PostDetailsScreen(
     val postState by postViewModel.post.collectAsState()
 
     val columnState = rememberLazyListState()
-    val initialScrollPosition = postDetailsViewModel.restoredScrollPosition.collectAsState(
-        initial = null
-    )
+
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isRefreshing)
     val isScrolling by remember {
         derivedStateOf { columnState.isScrollInProgress }
@@ -103,7 +101,7 @@ fun PostDetailsScreen(
 
     // Only launch this effect if we have items
     LaunchedEffect(commentsLoaded) {
-        val scrollToPosition = initialScrollPosition.value
+        val scrollToPosition = postDetailsViewModel.getSavedScrollPosition()
         if (commentsLoaded && scrollToPosition != null) {
             columnState.scrollToItem(
                 scrollToPosition.index,

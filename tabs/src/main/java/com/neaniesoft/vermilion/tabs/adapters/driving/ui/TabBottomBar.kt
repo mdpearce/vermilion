@@ -39,11 +39,10 @@ import com.neaniesoft.vermilion.tabs.R
 import com.neaniesoft.vermilion.tabs.domain.TabSupervisor
 import com.neaniesoft.vermilion.tabs.domain.entities.DisplayName
 import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
-import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
 import com.neaniesoft.vermilion.tabs.domain.entities.TabId
 import com.neaniesoft.vermilion.tabs.domain.entities.TabSortOrderIndex
 import com.neaniesoft.vermilion.tabs.domain.entities.TabState
-import com.neaniesoft.vermilion.tabs.domain.entities.TabType
+import com.neaniesoft.vermilion.uistate.TabType
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -277,7 +276,7 @@ private val DUMMY_TAB = TabState(
     DisplayName("AskScience"),
     createdAt = Instant.now(),
     TabSortOrderIndex(1),
-    ScrollPosition(0, 0)
+    com.neaniesoft.vermilion.coreentities.ScrollPosition(0, 0)
 )
 
 private val DUMMY_TAB_2 = DUMMY_TAB.copy(

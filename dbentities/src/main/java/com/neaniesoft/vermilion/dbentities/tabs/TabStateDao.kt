@@ -32,5 +32,19 @@ interface TabStateDao {
     suspend fun deleteAll()
 
     @Query("UPDATE tabs SET scrollPosition = :scrollPosition, scrollOffset = :scrollOffset WHERE parentId == :parentId AND type == :type")
-    suspend fun updateTabWithScrollState(parentId: String, type: String, scrollPosition: Int, scrollOffset: Int)
+    suspend fun updateTabWithScrollState(
+        parentId: String,
+        type: String,
+        scrollPosition: Int,
+        scrollOffset: Int
+    )
+
+    @Query("UPDATE tabs SET isActive = 'false'")
+    fun updateAllTabsToInactive()
+
+    @Query("UPDATE tabs SET isActive = 'true' WHERE parentId == :parentId AND type == :type")
+    fun setActiveTab(parentId: String, type: String)
+
+    @Query("SELECT * FROM tabs WHERE isActive == 'true'")
+    fun getActiveTab(): Flow<TabStateRecord?>
 }

@@ -36,7 +36,6 @@ import com.neaniesoft.vermilion.accounts.domain.UserAccountService
 import com.neaniesoft.vermilion.app.customtabs.CustomTabNavigator
 import com.neaniesoft.vermilion.communities.ui.CommunityList
 import com.neaniesoft.vermilion.tabs.adapters.driving.ui.TabBottomBar
-import com.neaniesoft.vermilion.tabs.domain.entities.ActiveTab
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
@@ -96,17 +95,11 @@ fun VermilionApp(
             }
         })
 
-        val activeTab by viewModel.activeTab.collectAsState()
-
-        LaunchedEffect(key1 = activeTab, block = {
-            viewModel.clearTabFromBackstackEvents.collect { clearTab ->
-                @Suppress("UnnecessaryVariable") // can't inline because it has a custom getter
-                val currentTab = activeTab
-                if (currentTab is ActiveTab.Tab && currentTab.id == clearTab.id) {
-                    navController.popBackStack(VermilionScreen.Home.name, false)
-                }
+        LaunchedEffect(Unit) {
+            viewModel.currentTabRemovedEvents.collect {
+                navController.popBackStack()
             }
-        })
+        }
 
         LaunchedEffect(key1 = currentUser) {
             viewModel.onUserChanged(currentUser)

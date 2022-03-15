@@ -22,8 +22,8 @@ dependencies {
     implementation(project(":auth"))
     implementation(project(":dbentities"))
     implementation(project(":db"))
-    implementation(project(":tabs"))
     implementation(project(":coreentities"))
+    implementation(project(":uistate"))
     debugImplementation(Deps.COMPOSE_UI_TOOLING)
     implementation(Deps.KOTLINX_SERIALIZATION_JSON)
 

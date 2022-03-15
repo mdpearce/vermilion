@@ -1,43 +1,53 @@
 package com.neaniesoft.vermilion.tabs.domain
 
+import com.neaniesoft.vermilion.coreentities.ScrollPosition
+import com.neaniesoft.vermilion.postdetails.data.CommentRepository
+import com.neaniesoft.vermilion.posts.data.PostRepository
+import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.tabs.domain.entities.NewTabState
 import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
-import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
 import com.neaniesoft.vermilion.tabs.domain.entities.TabState
-import com.neaniesoft.vermilion.tabs.domain.entities.TabType
 import com.neaniesoft.vermilion.tabs.domain.ports.TabRepository
-import com.neaniesoft.vermilion.utils.CoroutinesModule
+import com.neaniesoft.vermilion.uistate.ActiveTabClosedEvent
+import com.neaniesoft.vermilion.uistate.TabType
+import com.neaniesoft.vermilion.uistate.UiStateProvider
 import com.neaniesoft.vermilion.utils.logger
-import kotlinx.coroutines.CoroutineDispatcher
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 import java.time.Clock
 import java.time.Instant
 import javax.inject.Inject
-import javax.inject.Named
 import javax.inject.Singleton
 
 @Singleton
 class TabSupervisor @Inject constructor(
     private val repository: TabRepository,
+    private val postRepository: PostRepository,
+    private val commentRepository: CommentRepository,
     private val clock: Clock,
-    @Named(CoroutinesModule.IO_DISPATCHER) private val dispatcher: CoroutineDispatcher
-) {
-    // private val _currentTabs: MutableStateFlow<List<TabState>> = MutableStateFlow(emptyList())
-    // val currentTabs: StateFlow<List<TabState>> = _currentTabs.asStateFlow()
+) : UiStateProvider {
     val currentTabs = repository.currentTabs
+
+    private val _removedTabs: MutableSharedFlow<TabState> = MutableSharedFlow()
+    val removedTabs = _removedTabs.asSharedFlow()
 
     private val logger by logger()
 
-    // private val scope = CoroutineScope(dispatcher)
+    suspend fun setActiveTab(parentId: ParentId, type: TabType) {
+        logger.debugIfEnabled { "Setting active tab defined by parentId: $parentId, type: ${type.name}" }
+        addNewTabIfNotExists(parentId, type)
 
-    // init {
-    //     scope.launch {
-    //         repository.currentTabs.collect {
-    //             _currentTabs.emit(it)
-    //         }
-    //     }
-    // }
+        repository.setActiveTab(parentId, type)
+    }
 
-    suspend fun addNewTabIfNotExists(parentId: ParentId, type: TabType): TabState {
+    private suspend fun addNewTabIfNotExists(parentId: ParentId, type: TabType): TabState {
         val displayName = repository.displayName(parentId, type)
 
         val tab = NewTabState(
@@ -45,16 +55,23 @@ class TabSupervisor @Inject constructor(
             type,
             displayName,
             Instant.ofEpochMilli(clock.millis()),
-            ScrollPosition(0, 0)
+            ScrollPosition(0, 0),
+            isActive = false
         )
         return repository.addNewTabIfNotExists(tab)
     }
 
     suspend fun removeTab(tab: TabState) {
         repository.removeTab(tab)
+        when (tab.type) {
+            TabType.POSTS -> postRepository.deleteByQuery(tab.parentId.value)
+            TabType.POST_DETAILS -> commentRepository.deleteByPost(PostId(tab.parentId.value))
+            else -> {} // Not implemented
+        }
+        _removedTabs.emit(tab)
     }
 
-    suspend fun updateScrollState(
+    private suspend fun updateScrollState(
         parentId: ParentId,
         type: TabType,
         scrollPosition: ScrollPosition
@@ -67,10 +84,36 @@ class TabSupervisor @Inject constructor(
         )
     }
 
-    suspend fun scrollPositionForTab(parentId: ParentId, tabType: TabType): ScrollPosition? {
+    private suspend fun scrollPositionForTab(parentId: String, tabType: TabType): ScrollPosition? {
         return repository.findTab(
-            parentId,
+            ParentId(parentId),
             tabType
         )?.scrollPosition.also { logger.warnIfEnabled { "Tab not found, defaulting to null scroll position" } }
     }
+
+    override suspend fun scrollPositionTab(tabType: TabType, parentId: String): ScrollPosition? {
+        return scrollPositionForTab(parentId, tabType)
+    }
+
+    override suspend fun updateScrollPositionForTab(
+        tabType: TabType,
+        parentId: String,
+        scrollPosition: ScrollPosition
+    ) {
+        repository.updateScrollStateForTab(ParentId(parentId), tabType, scrollPosition)
+    }
+
+    override val activeTabClosedEvents: Flow<ActiveTabClosedEvent> =
+        repository.activeTab.filter { it == null }.map { ActiveTabClosedEvent }
+
+    override suspend fun setActiveTab(tabType: TabType, parentId: String) {
+        repository.setActiveTab(ParentId(parentId), tabType)
+    }
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class TabSupervisorModule {
+    @Binds
+    abstract fun tabSupervisorUiProvider(tabSupervisor: TabSupervisor): UiStateProvider
 }
