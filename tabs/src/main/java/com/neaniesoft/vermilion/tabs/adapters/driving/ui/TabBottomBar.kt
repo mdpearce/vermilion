@@ -146,7 +146,10 @@ class TabBottomBarViewModel @Inject constructor(
     }
 
     fun onHomeClicked() {
-        viewModelScope.launch { tabSupervisor.setActiveTab(TabType.HOME, "Home") }
+        viewModelScope.launch {
+            tabSupervisor.setActiveTab(TabType.HOME, "Home")
+            _routeEvents.emit("Home")
+        }
     }
 
     fun onTabCloseClicked(tabState: TabState) {
