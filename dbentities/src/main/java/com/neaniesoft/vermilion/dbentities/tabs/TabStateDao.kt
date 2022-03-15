@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TabStateDao {
-    @Query("SELECT * FROM tabs ORDER BY tabSortOrder ASC")
+    @Query("SELECT * FROM tabs WHERE type != 'HOME' ORDER BY tabSortOrder ASC")
     fun getAllCurrentTabs(): Flow<List<TabStateRecord>>
 
     @Insert
