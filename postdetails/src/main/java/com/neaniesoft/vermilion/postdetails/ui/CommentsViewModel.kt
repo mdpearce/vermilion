@@ -134,6 +134,5 @@ class CommentsViewModel @Inject constructor(
         viewModelScope.launch {
             commentRepository.toggleDownVote(comment)
         }
-
     }
 }

@@ -152,7 +152,8 @@ fun CommentActionsRow(
         Row(
             modifier = Modifier
                 .padding(8.dp)
-                .fillMaxWidth(), horizontalArrangement = Arrangement.End
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
         ) {
             IconButton(
                 modifier = Modifier.padding(end = 8.dp),
