@@ -27,7 +27,6 @@ class TabBottomBarViewModel @Inject constructor(
     fun onTabClicked(tabState: TabState) {
         logger.debugIfEnabled { "Tab clicked: $tabState" }
         viewModelScope.launch {
-            tabSupervisor.setActiveTab(tabState.type, tabState.parentId.value)
             val route = when (tabState.type) {
                 TabType.HOME -> tabState.parentId.value
                 TabType.POSTS -> "Posts/${tabState.parentId.value}"
@@ -39,7 +38,6 @@ class TabBottomBarViewModel @Inject constructor(
 
     fun onHomeClicked() {
         viewModelScope.launch {
-            tabSupervisor.setActiveTab(TabType.HOME, "Home")
             _routeEvents.emit("Home")
         }
     }
