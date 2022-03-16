@@ -2,6 +2,7 @@ package com.neaniesoft.vermilion.postdetails.ui
 
 import VermilionAppState
 import android.net.Uri
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -33,6 +34,7 @@ import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.neaniesoft.vermilion.coreentities.ScrollPosition
 import com.neaniesoft.vermilion.postdetails.R
+import com.neaniesoft.vermilion.postdetails.domain.entities.Comment
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentKind
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub
 import com.neaniesoft.vermilion.postdetails.domain.entities.ThreadStub
@@ -44,6 +46,7 @@ import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import com.neaniesoft.vermilion.utils.getLogger
 import kotlinx.coroutines.FlowPreview
 
+@ExperimentalFoundationApi
 @FlowPreview
 @Composable
 fun PostDetailsScreen(
@@ -128,10 +131,14 @@ fun PostDetailsScreen(
         onDownVoteClicked = { postViewModel.onDownVoteClicked(it) },
         onMoreCommentsClicked = { commentsViewModel.onMoreCommentsClicked(it) },
         onThreadClicked = { postDetailsViewModel.onThreadClicked(it) },
-        onCommentNavDownClicked = { commentsViewModel.onCommentNavDownClicked(it) }
+        onCommentNavDownClicked = { commentsViewModel.onCommentNavDownClicked(it) },
+        onCommentLongPressed = { commentsViewModel.onCommentLongPressed(it) },
+        onCommentUpVoteClicked = { commentsViewModel.onCommentUpVoteClicked(it) },
+        onCommentDownVoteClicked = { commentsViewModel.onCommentDownVoteClicked(it) }
     )
 }
 
+@ExperimentalFoundationApi
 @Composable
 fun PostDetailsScreenContent(
     swipeRefreshState: SwipeRefreshState,
@@ -144,7 +151,10 @@ fun PostDetailsScreenContent(
     onDownVoteClicked: (Post) -> Unit,
     onMoreCommentsClicked: (CommentStub) -> Unit,
     onThreadClicked: (ThreadStub) -> Unit,
-    onCommentNavDownClicked: (Int) -> Unit
+    onCommentNavDownClicked: (Int) -> Unit,
+    onCommentLongPressed: (Comment) -> Unit,
+    onCommentUpVoteClicked: (Comment) -> Unit,
+    onCommentDownVoteClicked: (Comment) -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -171,7 +181,10 @@ fun PostDetailsScreenContent(
                         is CommentKind.Full -> CommentRow(
                             comment = item.comment,
                             Modifier.fillMaxWidth(),
-                            onUriClicked = { onOpenUri(it.toUri()) }
+                            onUriClicked = { onOpenUri(it.toUri()) },
+                            onLongPress = onCommentLongPressed,
+                            onUpVoteClicked = onCommentUpVoteClicked,
+                            onDownVoteClicked = onCommentDownVoteClicked
                         )
                         is CommentKind.Stub -> MoreCommentsStubRow(
                             stub = item.stub,
@@ -246,6 +259,7 @@ fun PostDetails(
     }
 }
 
+@ExperimentalFoundationApi
 @Preview
 @Composable
 fun PostDetailsScreenDark() {
@@ -270,7 +284,10 @@ fun PostDetailsScreenDark() {
             onCommentNavDownClicked = {},
             onUpVoteClicked = {},
             onDownVoteClicked = {},
-            onThreadClicked = {}
+            onThreadClicked = {},
+            onCommentLongPressed = {},
+            onCommentUpVoteClicked = {},
+            onCommentDownVoteClicked = {}
         )
     }
 }

@@ -52,4 +52,7 @@ interface CommentDao {
 
     @Query("SELECT count(id) FROM comments WHERE postId == :postId")
     suspend fun commentCountForPost(postId: String): Int
+
+    @Query("UPDATE comments SET flags = :flags WHERE commentId == :commentId")
+    suspend fun updateFlags(commentId: String, flags: String): Int
 }

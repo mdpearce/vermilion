@@ -1,6 +1,7 @@
 package com.neaniesoft.vermilion.postdetails.ui
 
 import VermilionAppState
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -11,6 +12,7 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentId
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 
+@ExperimentalFoundationApi
 @Composable
 fun CommentThreadScreen(
     appState: VermilionAppState,
@@ -63,6 +65,9 @@ fun CommentThreadScreen(
         onDownVoteClicked = { postViewModel.onDownVoteClicked(it) },
         onMoreCommentsClicked = { commentsViewModel.onMoreCommentsClicked(it) },
         onCommentNavDownClicked = { commentsViewModel.onCommentNavDownClicked(it) },
-        onThreadClicked = { postDetailsViewModel.onThreadClicked(it) }
+        onThreadClicked = { postDetailsViewModel.onThreadClicked(it) },
+        onCommentLongPressed = { commentsViewModel.onCommentLongPressed(it) },
+        onCommentUpVoteClicked = { commentsViewModel.onCommentUpVoteClicked(it) },
+        onCommentDownVoteClicked = { commentsViewModel.onCommentDownVoteClicked(it) },
     )
 }
