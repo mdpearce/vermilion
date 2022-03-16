@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TabStateDao {
-    @Query("SELECT * FROM tabs ORDER BY tabSortOrder ASC")
+    @Query("SELECT * FROM tabs WHERE type != 'HOME' ORDER BY tabSortOrder ASC")
     fun getAllCurrentTabs(): Flow<List<TabStateRecord>>
 
     @Insert
@@ -32,5 +32,22 @@ interface TabStateDao {
     suspend fun deleteAll()
 
     @Query("UPDATE tabs SET scrollPosition = :scrollPosition, scrollOffset = :scrollOffset WHERE parentId == :parentId AND type == :type")
-    suspend fun updateTabWithScrollState(parentId: String, type: String, scrollPosition: Int, scrollOffset: Int)
+    suspend fun updateTabWithScrollState(
+        parentId: String,
+        type: String,
+        scrollPosition: Int,
+        scrollOffset: Int
+    )
+
+    @Query("UPDATE tabs SET isActive = 'false'")
+    fun updateAllTabsToInactive()
+
+    @Query("UPDATE tabs SET isActive = 'true' WHERE parentId == :parentId AND type == :type")
+    fun setActiveTab(parentId: String, type: String)
+
+    @Query("SELECT * FROM tabs WHERE isActive == 'true' LIMIT 1")
+    fun getActiveTab(): Flow<TabStateRecord?>
+
+    @Query("SELECT * FROM tabs WHERE isActive == 'true' LIMIT 1")
+    suspend fun getActiveTabOrNull(): TabStateRecord?
 }

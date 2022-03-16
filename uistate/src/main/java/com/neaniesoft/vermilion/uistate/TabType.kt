@@ -1,4 +1,4 @@
-package com.neaniesoft.vermilion.tabs.domain.entities
+package com.neaniesoft.vermilion.uistate
 
 enum class TabType {
     POSTS, POST_DETAILS, HOME

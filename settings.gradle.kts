@@ -13,6 +13,7 @@ include(":dbentities")
 include(":tabs")
 include(":communities")
 include(":coreentities")
+include(":uistate")
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)

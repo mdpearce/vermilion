@@ -2,7 +2,6 @@ package com.neaniesoft.vermilion.posts.ui
 
 import VermilionAppState
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -18,8 +17,8 @@ import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,10 +35,11 @@ import androidx.paging.compose.items
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.neaniesoft.vermilion.coreentities.Community
+import com.neaniesoft.vermilion.coreentities.ScrollPosition
 import com.neaniesoft.vermilion.posts.R
 import com.neaniesoft.vermilion.posts.domain.entities.Post
-import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
+import com.neaniesoft.vermilion.utils.getLogger
 import kotlinx.coroutines.FlowPreview
 
 @FlowPreview
@@ -52,18 +52,17 @@ fun PostsScreen(
     onRoute: (String) -> Unit,
     viewModel: PostsViewModel = hiltViewModel()
 ) {
+    val logger by remember { derivedStateOf { getLogger("PostsScreen") } }
     val pagingItems = viewModel.pagingData(community.routeName).collectAsLazyPagingItems()
     val listState = rememberLazyListState()
-    val initialScrollPosition = viewModel.restoredScrollPosition.collectAsState(
-        initial = null
-    )
-    LaunchedEffect(key1 = Unit) {
+
+    LaunchedEffect(Unit) {
         viewModel.routeEvents.collect {
             onRoute(it)
         }
     }
 
-    val isScrolling = remember {
+    val isScrolling by remember {
         derivedStateOf { listState.isScrollInProgress }
     }
 
@@ -73,8 +72,24 @@ fun PostsScreen(
         }
     }
 
-    if (!isScrolling.value) {
-        LaunchedEffect(key1 = scrollPosition) {
+    // Only launch this effect if we have items
+    val loadedPosts by derivedStateOf { pagingItems.itemCount > 0 }
+
+    LaunchedEffect(loadedPosts) {
+        val loadedPosts = loadedPosts
+        val scrollToPosition = viewModel.getSavedScrollPosition()
+        if (loadedPosts && scrollToPosition != null) {
+            logger.debugIfEnabled { "Posts are loaded, scroll position is not null: $scrollToPosition. Scrolling..." }
+            listState.scrollToItem(
+                scrollToPosition.index,
+                scrollToPosition.offset
+            )
+        }
+    }
+
+    LaunchedEffect(isScrolling) {
+        if (loadedPosts && !isScrolling) {
+            logger.debugIfEnabled { "Posts are loaded, scrolling stopped" }
             viewModel.onScrollStateUpdated(scrollPosition.value)
         }
     }
@@ -83,18 +98,6 @@ fun PostsScreen(
     LaunchedEffect(key1 = Unit) {
         appState.appBarClicks.collect {
             listState.animateScrollToItem(0, 0)
-        }
-    }
-
-    // Only launch this effect if we have items
-    LaunchedEffect(key1 = pagingItems.itemCount > 0) {
-        val scrollToPosition = initialScrollPosition.value
-        if (pagingItems.itemCount > 0 && scrollToPosition != null) {
-            Log.d("PostsScreen", "Scrolling to $scrollToPosition")
-            listState.scrollToItem(
-                scrollToPosition.index,
-                scrollToPosition.offset
-            )
         }
     }
 

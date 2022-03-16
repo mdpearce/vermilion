@@ -13,6 +13,7 @@ import androidx.paging.map
 import com.neaniesoft.vermilion.coreentities.Community
 import com.neaniesoft.vermilion.coreentities.CommunityName
 import com.neaniesoft.vermilion.coreentities.NamedCommunity
+import com.neaniesoft.vermilion.coreentities.ScrollPosition
 import com.neaniesoft.vermilion.db.VermilionDatabase
 import com.neaniesoft.vermilion.dbentities.posts.PostDao
 import com.neaniesoft.vermilion.dbentities.posts.PostRemoteKeyDao
@@ -23,18 +24,15 @@ import com.neaniesoft.vermilion.posts.domain.PostHistoryService
 import com.neaniesoft.vermilion.posts.domain.PostVotingService
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
-import com.neaniesoft.vermilion.tabs.domain.TabSupervisor
-import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
-import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
-import com.neaniesoft.vermilion.tabs.domain.entities.TabType
 import com.neaniesoft.vermilion.ui.videos.direct.VideoDescriptor
+import com.neaniesoft.vermilion.uistate.TabType
+import com.neaniesoft.vermilion.uistate.UiStateProvider
 import com.neaniesoft.vermilion.utils.logger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.commonmark.parser.Parser
@@ -51,7 +49,7 @@ class PostsViewModel @Inject constructor(
     private val database: VermilionDatabase,
     private val clock: Clock,
     private val markdownParser: Parser,
-    private val tabSupervisor: TabSupervisor,
+    private val uiStateProvider: UiStateProvider,
     private val linkRouter: LinkRouter,
     private val postVotingService: PostVotingService,
     savedStateHandle: SavedStateHandle
@@ -65,17 +63,6 @@ class PostsViewModel @Inject constructor(
 
     private val _routeEvents = MutableSharedFlow<String>()
     val routeEvents = _routeEvents.asSharedFlow()
-
-    private val tabType = if (communityName == CommunityName("Home")) {
-        TabType.HOME
-    } else {
-        TabType.POSTS
-    }
-
-    val restoredScrollPosition = flow {
-        val position = tabSupervisor.scrollPositionForTab(ParentId(communityName.value), tabType)
-        emit(position)
-    }
 
     @ExperimentalPagingApi
     fun pagingData(query: String): Flow<PagingData<Post>> {
@@ -100,12 +87,33 @@ class PostsViewModel @Inject constructor(
         }
     }
 
+    suspend fun getSavedScrollPosition(): ScrollPosition? {
+        val scrollPosition = if (communityName == CommunityName("Home")) {
+            uiStateProvider.scrollPositionTab(TabType.HOME, communityName.value)
+        } else {
+            uiStateProvider.scrollPositionTab(TabType.POSTS, communityName.value)
+        }
+
+        logger.debugIfEnabled { "Saved scroll position: $scrollPosition" }
+
+        return scrollPosition
+    }
+
     suspend fun onScrollStateUpdated(scrollPosition: ScrollPosition) {
-        tabSupervisor.updateScrollState(
-            parentId = ParentId(communityName.value),
-            type = tabType,
-            scrollPosition = scrollPosition
-        )
+        logger.debugIfEnabled { "onScrollStateUpdated: $scrollPosition" }
+        if (communityName == CommunityName("Home")) {
+            uiStateProvider.updateScrollPositionForTab(
+                TabType.HOME,
+                communityName.value,
+                scrollPosition
+            )
+        } else {
+            uiStateProvider.updateScrollPositionForTab(
+                TabType.POSTS,
+                communityName.value,
+                scrollPosition
+            )
+        }
     }
 
     fun onOpenPostDetails(postId: PostId) {

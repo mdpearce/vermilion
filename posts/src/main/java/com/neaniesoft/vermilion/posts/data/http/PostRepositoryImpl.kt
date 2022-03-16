@@ -103,4 +103,10 @@ class PostRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun deleteByQuery(query: String) {
+        database.withTransaction {
+            postDao.deleteByQuery(query)
+        }
+    }
 }

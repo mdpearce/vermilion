@@ -7,42 +7,29 @@ import androidx.navigation.NavDestination
 import com.neaniesoft.vermilion.accounts.domain.entities.UserAccount
 import com.neaniesoft.vermilion.communities.data.database.CommunityRepository
 import com.neaniesoft.vermilion.coreentities.Community
-import com.neaniesoft.vermilion.dbentities.posts.PostDao
-import com.neaniesoft.vermilion.postdetails.data.CommentRepository
-import com.neaniesoft.vermilion.posts.domain.entities.PostId
-import com.neaniesoft.vermilion.tabs.domain.TabSupervisor
-import com.neaniesoft.vermilion.tabs.domain.entities.ActiveTab
-import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
-import com.neaniesoft.vermilion.tabs.domain.entities.TabState
-import com.neaniesoft.vermilion.tabs.domain.entities.TabType
+import com.neaniesoft.vermilion.uistate.TabType
+import com.neaniesoft.vermilion.uistate.UiStateProvider
+import com.neaniesoft.vermilion.utils.logger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class VermilionAppViewModel @Inject constructor(
-    private val tabSupervisor: TabSupervisor,
     private val communityRepository: CommunityRepository,
-    private val postDao: PostDao,
-    private val commentRepository: CommentRepository
+    private val uiStateProvider: UiStateProvider
 ) : ViewModel() {
-    val tabs = tabSupervisor.currentTabs
+    private val logger by logger()
 
     private val _routeEvents = MutableSharedFlow<String>()
     val routeEvents: SharedFlow<String> = _routeEvents.asSharedFlow()
 
-    private val _clearTabFromBackstackEvents = MutableSharedFlow<TabState>()
-    val clearTabFromBackstackEvents = _clearTabFromBackstackEvents.asSharedFlow()
-
-    private val _activeTab = MutableStateFlow<ActiveTab>(ActiveTab.None)
-    val activeTab = _activeTab.asStateFlow()
+    val currentTabRemovedEvents = uiStateProvider.activeTabClosedEvents
 
     fun onNavigationEvent(destination: NavDestination, args: Bundle?) {
         val route = destination.route
@@ -52,70 +39,26 @@ class VermilionAppViewModel @Inject constructor(
                     val id =
                         requireNotNull(args?.getString("postId")) { "Received a post details route with no id" }
                     viewModelScope.launch(Dispatchers.IO) {
-                        val tab =
-                            tabSupervisor.addNewTabIfNotExists(ParentId(id), TabType.POST_DETAILS)
-                        _activeTab.emit(ActiveTab.Tab(tab.id))
+                        uiStateProvider.setActiveTab(TabType.POST_DETAILS, id)
                     }
                 }
                 route.startsWith(VermilionScreen.Posts.name) -> {
                     val communityName =
                         requireNotNull(args?.getString("communityName")) { "Received a posts route with no name " }
                     viewModelScope.launch(Dispatchers.IO) {
-                        val tab =
-                            tabSupervisor.addNewTabIfNotExists(
-                                ParentId(communityName),
-                                TabType.POSTS
-                            )
-                        _activeTab.emit(ActiveTab.Tab(tab.id))
+                        uiStateProvider.setActiveTab(TabType.POSTS, communityName)
                     }
                 }
                 route.startsWith(VermilionScreen.Home.name) -> {
                     viewModelScope.launch(Dispatchers.IO) {
-                        tabSupervisor.addNewTabIfNotExists(
-                            ParentId(VermilionScreen.Home.name),
-                            TabType.HOME
-                        )
-                        _activeTab.emit(ActiveTab.Home)
+                        uiStateProvider.setActiveTab(TabType.HOME, VermilionScreen.Home.name)
                     }
                 }
                 else -> {
-                    viewModelScope.launch { _activeTab.emit(ActiveTab.None) }
+                    logger.debugIfEnabled { "Received route was not a tab" }
                 }
             }
         }
-    }
-
-    fun onTabClicked(tab: TabState) {
-        emitRouteEvent(tab.type, tab.parentId)
-    }
-
-    private fun emitRouteEvent(type: TabType, parentId: ParentId) {
-        if (type == TabType.POST_DETAILS) {
-            val route =
-                "${VermilionScreen.PostDetails}/${parentId.value}"
-            viewModelScope.launch { _routeEvents.emit(route) }
-        } else if (type == TabType.POSTS) {
-            val route =
-                "${VermilionScreen.Posts}/${parentId.value}"
-            viewModelScope.launch { _routeEvents.emit(route) }
-        }
-    }
-
-    fun onTabCloseClicked(tab: TabState) {
-        // TODO This should be encapsulated somewhere else. Probably the tab supervisor itself.
-        viewModelScope.launch {
-            tabSupervisor.removeTab(tab)
-            when (tab.type) {
-                TabType.POSTS -> postDao.deleteByQuery(tab.parentId.value)
-                TabType.POST_DETAILS -> commentRepository.deleteByPost(PostId(tab.parentId.value))
-                else -> {} // Not implemented
-            }
-            _clearTabFromBackstackEvents.emit(tab)
-        }
-    }
-
-    fun onHomeButtonClicked() {
-        viewModelScope.launch { _routeEvents.emit(VermilionScreen.Home.name) }
     }
 
     fun onUserButtonClicked() {
