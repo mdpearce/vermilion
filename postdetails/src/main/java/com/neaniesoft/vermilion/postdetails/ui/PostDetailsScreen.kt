@@ -72,6 +72,32 @@ fun PostDetailsScreen(
     val isScrolling by remember {
         derivedStateOf { columnState.isScrollInProgress }
     }
+    val scrollPosition by remember {
+        derivedStateOf {
+            ScrollPosition(
+                columnState.firstVisibleItemIndex,
+                columnState.firstVisibleItemScrollOffset
+            )
+        }
+    }
+
+    // Only launch this effect if we have items
+    val commentsLoaded by derivedStateOf { comments.isNotEmpty() }
+    LaunchedEffect(commentsLoaded) {
+        val scrollToPosition = postDetailsViewModel.getSavedScrollPosition()
+        if (commentsLoaded && scrollToPosition != null) {
+            columnState.scrollToItem(
+                scrollToPosition.index,
+                scrollToPosition.offset
+            )
+        }
+    }
+
+    LaunchedEffect(isScrolling) {
+        if (commentsLoaded && !isScrolling) {
+            postDetailsViewModel.onScrollStateUpdated(scrollPosition)
+        }
+    }
 
     LaunchedEffect(Unit) {
         postDetailsViewModel.routeEvents.collect {
@@ -82,34 +108,6 @@ fun PostDetailsScreen(
     LaunchedEffect(key1 = Unit) {
         commentsViewModel.scrollToEvents.collect {
             columnState.animateScrollToItem(it, 0)
-        }
-    }
-
-    val scrollPosition by remember {
-        derivedStateOf {
-            ScrollPosition(
-                columnState.firstVisibleItemIndex,
-                columnState.firstVisibleItemScrollOffset
-            )
-        }
-    }
-
-    val commentsLoaded by derivedStateOf { comments.isNotEmpty() }
-
-    LaunchedEffect(isScrolling) {
-        if (commentsLoaded && isScrolling) {
-            postDetailsViewModel.onScrollStateUpdated(scrollPosition)
-        }
-    }
-
-    // Only launch this effect if we have items
-    LaunchedEffect(commentsLoaded) {
-        val scrollToPosition = postDetailsViewModel.getSavedScrollPosition()
-        if (commentsLoaded && scrollToPosition != null) {
-            columnState.scrollToItem(
-                scrollToPosition.index,
-                scrollToPosition.offset
-            )
         }
     }
 
