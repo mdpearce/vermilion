@@ -115,7 +115,7 @@ class CommentsViewModel @Inject constructor(
             val index = comments.indexOf(CommentKind.Full(comment))
             if (index != -1) {
                 val updatedList =
-                    comments.take(index + 1) + CommentKind.Full(comment.copy(isExpanded = !comment.isExpanded)) + comments.subList(
+                    comments.take(index) + CommentKind.Full(comment.copy(isExpanded = !comment.isExpanded)) + comments.subList(
                         index + 1,
                         comments.size
                     )

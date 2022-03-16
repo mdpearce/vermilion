@@ -1,6 +1,7 @@
 package com.neaniesoft.vermilion.postdetails.ui
 
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -110,6 +111,13 @@ fun CommentRow(
                         document = comment.contentMarkdown as Document,
                         onUriClicked = onUriClicked
                     )
+                }
+            }
+        }
+        AnimatedVisibility(visible = comment.isExpanded) {
+            Surface(elevation = 0.dp, color = MaterialTheme.colors.background) {
+                Row(Modifier.fillMaxWidth()) {
+                    Text(text = "Hello!")
                 }
             }
         }
