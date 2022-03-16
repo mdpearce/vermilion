@@ -143,9 +143,12 @@ fun CommentActionsRow(
     Surface(
         elevation = 0.dp,
         color = MaterialTheme.colors.background,
-        modifier = Modifier.padding(8.dp)
     ) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+        Row(
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth(), horizontalArrangement = Arrangement.End
+        ) {
             IconButton(
                 modifier = Modifier.padding(end = 8.dp),
                 onClick = onDownVoteClicked
