@@ -27,7 +27,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -120,7 +122,7 @@ fun ContentTab(
         onClick = {},
         content = {
             val interactionSource = remember(tabState) { MutableInteractionSource() }
-
+            val haptic = LocalHapticFeedback.current
             Row(
                 Modifier
                     .indication(interactionSource, LocalIndication.current)
@@ -143,6 +145,7 @@ fun ContentTab(
                             },
 
                             onLongPress = {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                 onLongPress(tabState)
                             })
                     },
