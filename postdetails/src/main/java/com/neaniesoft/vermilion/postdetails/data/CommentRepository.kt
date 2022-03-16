@@ -525,6 +525,17 @@ class CommentRepositoryImpl @Inject constructor(
                 CommentFlags.LOCKED
             } else {
                 null
+            },
+            when (likes) {
+                true -> {
+                    CommentFlags.UP_VOTED
+                }
+                false -> {
+                    (CommentFlags.DOWN_VOTED)
+                }
+                else -> {
+                    null
+                }
             }
         ).joinToString(",") { it.name }
 
