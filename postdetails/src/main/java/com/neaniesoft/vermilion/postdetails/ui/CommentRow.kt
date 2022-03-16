@@ -31,6 +31,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -91,10 +93,13 @@ fun CommentRow(
 
             DepthIndicators(depth = comment.depth.value)
 
+            val haptic = LocalHapticFeedback.current
+
             Column(
                 Modifier
                     .padding(top = 8.dp, bottom = 8.dp, end = 8.dp)
                     .combinedClickable(onLongClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         onLongPress(comment)
                     }, onClick = {})
             ) {
