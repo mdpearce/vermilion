@@ -73,7 +73,9 @@ fun CommentRow(
     comment: Comment,
     modifier: Modifier = Modifier,
     onUriClicked: (String) -> Unit = {},
-    onLongPress: (Comment) -> Unit = {}
+    onLongPress: (Comment) -> Unit = {},
+    onUpVoteClicked: (Comment) -> Unit = {},
+    onDownVoteClicked: (Comment) -> Unit = {}
 ) {
     Column {
         if (comment.depth == CommentDepth(0)) {
@@ -118,8 +120,8 @@ fun CommentRow(
         }
         AnimatedVisibility(visible = comment.isExpanded) {
             CommentActionsRow(
-                onUpVoteClicked = {},
-                onDownVoteClicked = {}
+                onUpVoteClicked = { onUpVoteClicked(comment) },
+                onDownVoteClicked = { onDownVoteClicked(comment) }
             )
         }
     }

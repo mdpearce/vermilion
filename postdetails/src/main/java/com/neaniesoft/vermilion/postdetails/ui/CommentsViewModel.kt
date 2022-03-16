@@ -123,4 +123,13 @@ class CommentsViewModel @Inject constructor(
             }
         }
     }
+
+    fun onCommentUpVoteClicked(comment: Comment) {
+
+    }
+
+    fun onCommentDownVoteClicked(comment: Comment) {
+
+
+    }
 }

@@ -132,7 +132,9 @@ fun PostDetailsScreen(
         onMoreCommentsClicked = { commentsViewModel.onMoreCommentsClicked(it) },
         onThreadClicked = { postDetailsViewModel.onThreadClicked(it) },
         onCommentNavDownClicked = { commentsViewModel.onCommentNavDownClicked(it) },
-        onCommentLongPressed = { commentsViewModel.onCommentLongPressed(it) }
+        onCommentLongPressed = { commentsViewModel.onCommentLongPressed(it) },
+        onCommentUpVoteClicked = { commentsViewModel.onCommentUpVoteClicked(it) },
+        onCommentDownVoteClicked = { commentsViewModel.onCommentDownVoteClicked(it) }
     )
 }
 
@@ -150,7 +152,9 @@ fun PostDetailsScreenContent(
     onMoreCommentsClicked: (CommentStub) -> Unit,
     onThreadClicked: (ThreadStub) -> Unit,
     onCommentNavDownClicked: (Int) -> Unit,
-    onCommentLongPressed: (Comment) -> Unit
+    onCommentLongPressed: (Comment) -> Unit,
+    onCommentUpVoteClicked: (Comment) -> Unit,
+    onCommentDownVoteClicked: (Comment) -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -178,7 +182,9 @@ fun PostDetailsScreenContent(
                             comment = item.comment,
                             Modifier.fillMaxWidth(),
                             onUriClicked = { onOpenUri(it.toUri()) },
-                            onLongPress = onCommentLongPressed
+                            onLongPress = onCommentLongPressed,
+                            onUpVoteClicked = onCommentUpVoteClicked,
+                            onDownVoteClicked = onCommentDownVoteClicked
                         )
                         is CommentKind.Stub -> MoreCommentsStubRow(
                             stub = item.stub,
@@ -279,7 +285,9 @@ fun PostDetailsScreenDark() {
             onUpVoteClicked = {},
             onDownVoteClicked = {},
             onThreadClicked = {},
-            onCommentLongPressed = {}
+            onCommentLongPressed = {},
+            onCommentUpVoteClicked = {},
+            onCommentDownVoteClicked = {}
         )
     }
 }
