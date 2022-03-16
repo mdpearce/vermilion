@@ -41,6 +41,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.ui.DUMMY_TEXT_POST
 import com.neaniesoft.vermilion.posts.ui.PostContent
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
+import com.neaniesoft.vermilion.utils.getLogger
 import kotlinx.coroutines.FlowPreview
 
 @FlowPreview
@@ -53,6 +54,8 @@ fun PostDetailsScreen(
     postViewModel: PostViewModel = hiltViewModel(),
     commentsViewModel: CommentsViewModel = hiltViewModel()
 ) {
+    val logger by remember { derivedStateOf { getLogger("PostDetailsScreen") } }
+
     val isRefreshing by commentsViewModel.networkIsActive.collectAsState(initial = false)
 
     LaunchedEffect(postId) {
@@ -91,13 +94,13 @@ fun PostDetailsScreen(
         }
     }
 
-    if (!isScrolling) {
-        LaunchedEffect(key1 = scrollPosition) {
+    val commentsLoaded by derivedStateOf { comments.isNotEmpty() }
+
+    LaunchedEffect(isScrolling) {
+        if (commentsLoaded && isScrolling) {
             postDetailsViewModel.onScrollStateUpdated(scrollPosition)
         }
     }
-
-    val commentsLoaded by derivedStateOf { comments.isNotEmpty() }
 
     // Only launch this effect if we have items
     LaunchedEffect(commentsLoaded) {
