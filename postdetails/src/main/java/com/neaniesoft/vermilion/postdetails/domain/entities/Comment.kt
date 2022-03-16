@@ -24,5 +24,6 @@ data class Comment(
     val depth: CommentDepth,
     val upVotes: UpVotesCount,
     val parentId: CommentId?,
-    val commentFlair: CommentFlair
+    val commentFlair: CommentFlair,
+    val isExpanded: Boolean = false
 )

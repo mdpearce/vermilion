@@ -34,6 +34,7 @@ import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.neaniesoft.vermilion.coreentities.ScrollPosition
 import com.neaniesoft.vermilion.postdetails.R
+import com.neaniesoft.vermilion.postdetails.domain.entities.Comment
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentKind
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub
 import com.neaniesoft.vermilion.postdetails.domain.entities.ThreadStub
@@ -130,7 +131,8 @@ fun PostDetailsScreen(
         onDownVoteClicked = { postViewModel.onDownVoteClicked(it) },
         onMoreCommentsClicked = { commentsViewModel.onMoreCommentsClicked(it) },
         onThreadClicked = { postDetailsViewModel.onThreadClicked(it) },
-        onCommentNavDownClicked = { commentsViewModel.onCommentNavDownClicked(it) }
+        onCommentNavDownClicked = { commentsViewModel.onCommentNavDownClicked(it) },
+        onCommentLongPressed = { commentsViewModel.onCommentLongPressed(it) }
     )
 }
 
@@ -147,7 +149,8 @@ fun PostDetailsScreenContent(
     onDownVoteClicked: (Post) -> Unit,
     onMoreCommentsClicked: (CommentStub) -> Unit,
     onThreadClicked: (ThreadStub) -> Unit,
-    onCommentNavDownClicked: (Int) -> Unit
+    onCommentNavDownClicked: (Int) -> Unit,
+    onCommentLongPressed: (Comment) -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -174,7 +177,8 @@ fun PostDetailsScreenContent(
                         is CommentKind.Full -> CommentRow(
                             comment = item.comment,
                             Modifier.fillMaxWidth(),
-                            onUriClicked = { onOpenUri(it.toUri()) }
+                            onUriClicked = { onOpenUri(it.toUri()) },
+                            onLongPress = onCommentLongPressed
                         )
                         is CommentKind.Stub -> MoreCommentsStubRow(
                             stub = item.stub,
@@ -274,7 +278,8 @@ fun PostDetailsScreenDark() {
             onCommentNavDownClicked = {},
             onUpVoteClicked = {},
             onDownVoteClicked = {},
-            onThreadClicked = {}
+            onThreadClicked = {},
+            onCommentLongPressed = {}
         )
     }
 }

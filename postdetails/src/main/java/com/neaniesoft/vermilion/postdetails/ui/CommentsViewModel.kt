@@ -3,6 +3,7 @@ package com.neaniesoft.vermilion.postdetails.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.neaniesoft.vermilion.postdetails.data.CommentRepository
+import com.neaniesoft.vermilion.postdetails.domain.entities.Comment
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentDepth
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentId
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentKind
@@ -105,6 +106,21 @@ class CommentsViewModel @Inject constructor(
                 threadId = commentId,
                 networkActivityIdentifier
             )
+        }
+    }
+
+    fun onCommentLongPressed(comment: Comment) {
+        viewModelScope.launch {
+            val comments = comments.value
+            val index = comments.indexOf(CommentKind.Full(comment))
+            if (index != -1) {
+                val updatedList =
+                    comments.take(index + 1) + CommentKind.Full(comment.copy(isExpanded = !comment.isExpanded)) + comments.subList(
+                        index + 1,
+                        comments.size
+                    )
+                _comments.emit(updatedList)
+            }
         }
     }
 }
