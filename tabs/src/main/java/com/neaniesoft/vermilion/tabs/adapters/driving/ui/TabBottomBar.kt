@@ -95,52 +95,67 @@ fun TabBottomBarContent(
             }
         )
         tabs.forEachIndexed { index, tabState ->
-
-            Tab(selected = activeTab == index + 1,
+            Log.d("TabBottomBarContent", "Drawing tab index $index ${tabState.displayName}")
+            ContentTab(
+                tabState = tabState,
+                isSelected = activeTab == index + 1,
                 onClick = {
-                    onTabClicked(tabState)
+                    Log.d("TabBottomBar", "Clicked index $index - ${tabs[index]}")
+                    onTabClicked(tabs[index])
                 },
-                content = {
-
-                    val interactionSource = remember { MutableInteractionSource() }
-
-                    Row(
-                        Modifier
-                            .indication(interactionSource, LocalIndication.current)
-                            .padding(horizontal = 16.dp)
-                            .height(48.dp)
-                            .fillMaxWidth()
-                            .pointerInput(Unit) {
-                                detectTapGestures(
-                                    onPress = { offset ->
-                                        val press = PressInteraction.Press(offset)
-                                        interactionSource.emit(press)
-
-                                        tryAwaitRelease()
-
-                                        interactionSource.emit(PressInteraction.Release(press))
-                                    },
-
-                                    onTap = {
-                                        onTabClicked(tabState)
-                                    },
-
-                                    onLongPress = {
-                                        onTabCloseClicked(tabState)
-                                    })
-                            },
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = CenterVertically
-                    ) {
-                        Text(
-                            text = tabState.displayName.value,
-                            style = MaterialTheme.typography.button.copy(textAlign = TextAlign.Center)
-                        )
-                    }
-                }
+                onLongPress = onTabCloseClicked
             )
         }
     }
+}
+
+@Composable
+fun ContentTab(
+    tabState: TabState,
+    isSelected: Boolean,
+    onClick: (TabState) -> Unit,
+    onLongPress: (TabState) -> Unit
+) {
+    Tab(selected = isSelected,
+        onClick = {},
+        content = {
+            val interactionSource = remember(tabState) { MutableInteractionSource() }
+
+            Row(
+                Modifier
+                    .indication(interactionSource, LocalIndication.current)
+                    .padding(horizontal = 16.dp)
+                    .height(48.dp)
+                    .fillMaxWidth()
+                    .pointerInput(tabState) {
+                        detectTapGestures(
+                            onPress = { offset ->
+                                val press = PressInteraction.Press(offset)
+                                interactionSource.emit(press)
+
+                                tryAwaitRelease()
+
+                                interactionSource.emit(PressInteraction.Release(press))
+                            },
+
+                            onTap = {
+                                onClick(tabState)
+                            },
+
+                            onLongPress = {
+                                onLongPress(tabState)
+                            })
+                    },
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = CenterVertically
+            ) {
+                Text(
+                    text = tabState.displayName.value,
+                    style = MaterialTheme.typography.button.copy(textAlign = TextAlign.Center)
+                )
+            }
+        }
+    )
 }
 
 @Preview(name = "Tab Bottom Bar")

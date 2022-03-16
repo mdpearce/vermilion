@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.neaniesoft.vermilion.tabs.domain.TabSupervisor
 import com.neaniesoft.vermilion.tabs.domain.entities.TabState
 import com.neaniesoft.vermilion.uistate.TabType
+import com.neaniesoft.vermilion.utils.logger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -15,6 +16,7 @@ import javax.inject.Inject
 class TabBottomBarViewModel @Inject constructor(
     private val tabSupervisor: TabSupervisor
 ) : ViewModel() {
+    private val logger by logger()
     val tabs = tabSupervisor.currentTabs
 
     val activeTab = tabSupervisor.activeTab
@@ -23,6 +25,7 @@ class TabBottomBarViewModel @Inject constructor(
     val routeEvents = _routeEvents.asSharedFlow()
 
     fun onTabClicked(tabState: TabState) {
+        logger.debugIfEnabled { "Tab clicked: $tabState" }
         viewModelScope.launch {
             tabSupervisor.setActiveTab(tabState.type, tabState.parentId.value)
             val route = when (tabState.type) {
