@@ -290,12 +290,15 @@ class CommentRepositoryImpl @Inject constructor(
 
                 logger.debugIfEnabled { "Inserting remaining comments" }
                 // Finally, insert all the comments after the stub to recreate the complete list.
-                dao.insertAll(
-                    allComments.subList(
-                        allComments.indexOfFirst { it.commentId == stub.id.value } + 1,
-                        allComments.size - 1
-                    ).map { it.copy(id = 0) }
-                )
+                val indexOfStub = allComments.indexOfFirst { it.commentId == stub.id.value }
+                if (indexOfStub < allComments.lastIndex) {
+                    dao.insertAll(
+                        allComments.subList(
+                            indexOfStub + 1,
+                            allComments.size - 1
+                        ).map { it.copy(id = 0) }
+                    )
+                }
 
                 dao.getAllForPost(stub.postId.value)
             }.map { it.toCommentKind() }
