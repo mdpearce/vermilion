@@ -1,6 +1,7 @@
 package com.neaniesoft.vermilion.ui.markdown
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -87,7 +88,11 @@ fun MarkdownBlockChildren(
                 onUriClicked = onUriClicked,
                 onTextClick = onTextClick
             )
-            is Paragraph -> MarkdownParagraph(paragraph = child, onClick = onTextClick, onUriClicked = onUriClicked)
+            is Paragraph -> MarkdownParagraph(
+                paragraph = child,
+                onClick = onTextClick,
+                onUriClicked = onUriClicked
+            )
             is FencedCodeBlock -> MarkdownFencedCodeBlock(fencedCodeBlock = child)
             is IndentedCodeBlock -> MarkdownIndentedCodeBlock(indentedCodeBlock = child)
             is Image -> MarkdownImage(image = child)
@@ -163,26 +168,44 @@ fun MarkdownText(
     onClick: (() -> Unit)? = null
 ) {
     val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
-
-    Text(
-        text = text,
-        modifier = modifier.pointerInput(text) {
-            detectTapGestures { pos ->
-                layoutResult.value?.let { layoutResult ->
-                    val position = layoutResult.getOffsetForPosition(pos)
-                    val annotation = text.getStringAnnotations(position, position)
-                        .firstOrNull()
-                    if (annotation != null) {
-                        if (annotation.tag == TAG_URL) {
-                            onUriClicked(annotation.item)
-                        }
-                    } else {
-                        if (onClick != null) {
-                            onClick()
+    val links = text.getStringAnnotations(TAG_URL, 0, text.length)
+    val clickableModifier = remember(text) {
+        when {
+            links.isNotEmpty() -> {
+                Modifier.pointerInput(text) {
+                    detectTapGestures { pos ->
+                        layoutResult.value?.let { layoutResult ->
+                            val position = layoutResult.getOffsetForPosition(pos)
+                            val annotation = text.getStringAnnotations(position, position)
+                                .firstOrNull()
+                            if (annotation != null) {
+                                if (annotation.tag == TAG_URL) {
+                                    onUriClicked(annotation.item)
+                                }
+                            } else {
+                                if (onClick != null) {
+                                    onClick()
+                                }
+                            }
                         }
                     }
                 }
             }
+            onClick != null -> {
+                Modifier.clickable { onClick() }
+            }
+            else -> {
+                null
+            }
+        }
+    }
+
+    Text(
+        text = text,
+        modifier = if (clickableModifier != null) {
+            modifier.then(clickableModifier)
+        } else {
+            modifier
         },
         style = style,
         inlineContent = mapOf(
