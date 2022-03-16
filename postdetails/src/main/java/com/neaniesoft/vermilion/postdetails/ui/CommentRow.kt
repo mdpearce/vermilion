@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -53,6 +55,8 @@ import com.neaniesoft.vermilion.postdetails.domain.entities.ControversialIndex
 import com.neaniesoft.vermilion.postdetails.domain.entities.DurationString
 import com.neaniesoft.vermilion.postdetails.domain.entities.ThreadStub
 import com.neaniesoft.vermilion.postdetails.domain.entities.UpVotesCount
+import com.neaniesoft.vermilion.postdetails.domain.entities.isDownVoted
+import com.neaniesoft.vermilion.postdetails.domain.entities.isUpVoted
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.Score
@@ -121,7 +125,9 @@ fun CommentRow(
         AnimatedVisibility(visible = comment.isExpanded) {
             CommentActionsRow(
                 onUpVoteClicked = { onUpVoteClicked(comment) },
-                onDownVoteClicked = { onDownVoteClicked(comment) }
+                onDownVoteClicked = { onDownVoteClicked(comment) },
+                isUpVoted = comment.isUpVoted(),
+                isDownVoted = comment.isDownVoted()
             )
         }
     }
@@ -130,7 +136,9 @@ fun CommentRow(
 @Composable
 fun CommentActionsRow(
     onUpVoteClicked: () -> Unit,
-    onDownVoteClicked: () -> Unit
+    onDownVoteClicked: () -> Unit,
+    isUpVoted: Boolean,
+    isDownVoted: Boolean
 ) {
     Surface(
         elevation = 0.dp,
@@ -144,13 +152,23 @@ fun CommentActionsRow(
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_baseline_arrow_downward_24),
-                    contentDescription = "Down vote"
+                    contentDescription = "Down vote",
+                    tint = if (isDownVoted) {
+                        MaterialTheme.colors.secondary
+                    } else {
+                        LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                    }
                 )
             }
             IconButton(onClick = onUpVoteClicked) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_baseline_arrow_upward_24),
-                    contentDescription = "Up vote"
+                    contentDescription = "Up vote",
+                    tint = if (isUpVoted) {
+                        MaterialTheme.colors.primary
+                    } else {
+                        LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                    }
                 )
             }
         }
@@ -211,7 +229,18 @@ fun CommentScore(comment: Comment, modifier: Modifier = Modifier) {
         text = score,
         style = MaterialTheme.typography.caption,
         fontWeight = FontWeight.Bold,
-        modifier = modifier
+        modifier = modifier,
+        color = when {
+            comment.isUpVoted() -> {
+                MaterialTheme.colors.primary
+            }
+            comment.isDownVoted() -> {
+                MaterialTheme.colors.secondary
+            }
+            else -> {
+                Color.Unspecified
+            }
+        }
     )
 }
 
