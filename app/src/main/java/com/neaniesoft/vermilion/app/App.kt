@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -25,6 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.plusAssign
@@ -73,9 +75,23 @@ fun VermilionApp(
         }
         navController.navigatorProvider += bottomSheetNavigator
         navController.navigatorProvider += customTabNavigator
+        val destinationChangedListener: NavController.OnDestinationChangedListener =
+            NavController.OnDestinationChangedListener { _, destination, arguments ->
+                viewModel.onNavigationEvent(
+                    destination,
+                    arguments
+                )
+            }
 
-        navController.addOnDestinationChangedListener { _, destination, arguments ->
-            viewModel.onNavigationEvent(destination, arguments)
+        LaunchedEffect(Unit) {
+            navController.addOnDestinationChangedListener(destinationChangedListener)
+        }
+
+        DisposableEffect(Unit) {
+            onDispose {
+                Log.d("VermilionApp", "removing listener")
+                navController.removeOnDestinationChangedListener(destinationChangedListener)
+            }
         }
 
         val backStackEntry = navController.currentBackStackEntryAsState()

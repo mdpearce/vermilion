@@ -45,6 +45,9 @@ interface TabStateDao {
     @Query("UPDATE tabs SET isActive = 'true' WHERE parentId == :parentId AND type == :type")
     fun setActiveTab(parentId: String, type: String)
 
-    @Query("SELECT * FROM tabs WHERE isActive == 'true'")
+    @Query("SELECT * FROM tabs WHERE isActive == 'true' LIMIT 1")
     fun getActiveTab(): Flow<TabStateRecord?>
+
+    @Query("SELECT * FROM tabs WHERE isActive == 'true' LIMIT 1")
+    suspend fun getActiveTabOrNull(): TabStateRecord?
 }

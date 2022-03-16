@@ -1,6 +1,5 @@
 package com.neaniesoft.vermilion.tabs.adapters.driving.ui
 
-import android.util.Log
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.indication
@@ -61,10 +60,8 @@ fun TabBottomBar(
         val tabs by viewModel.tabs.collectAsState(initial = emptyList())
         val activeTab by viewModel.activeTab.collectAsState(initial = null)
         val activeTabIndex = tabs.indexOfFirst {
-            Log.d("TabBottomBar", "comparing ${it.id} to ${activeTab?.id}")
             it.id == activeTab?.id
         } + 1 // if none is found, we'll get -1, which will then map to 0 - Home.
-        Log.d("TabBottomBar", "activeTab: $activeTab, activeTabIndex: $activeTabIndex")
 
         TabBottomBarContent(
             tabs = tabs,
@@ -97,12 +94,10 @@ fun TabBottomBarContent(
             }
         )
         tabs.forEachIndexed { index, tabState ->
-            Log.d("TabBottomBarContent", "Drawing tab index $index ${tabState.displayName}")
             ContentTab(
                 tabState = tabState,
                 isSelected = activeTab == index + 1,
                 onClick = {
-                    Log.d("TabBottomBar", "Clicked index $index - ${tabs[index]}")
                     onTabClicked(tabs[index])
                 },
                 onLongPress = onTabCloseClicked

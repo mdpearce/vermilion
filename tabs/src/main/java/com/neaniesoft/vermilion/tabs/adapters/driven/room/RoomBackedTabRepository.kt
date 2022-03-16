@@ -98,8 +98,11 @@ class RoomBackedTabRepository @Inject constructor(
 
     override suspend fun setActiveTab(parentId: ParentId, type: TabType) {
         database.withTransaction {
-            tabStateDao.updateAllTabsToInactive()
-            tabStateDao.setActiveTab(parentId.value, type.name)
+            val activeTab = tabStateDao.getActiveTabOrNull()
+            if (!(activeTab?.type == type.name && activeTab.parentId == parentId.value)) {
+                tabStateDao.updateAllTabsToInactive()
+                tabStateDao.setActiveTab(parentId.value, type.name)
+            }
         }
     }
 
