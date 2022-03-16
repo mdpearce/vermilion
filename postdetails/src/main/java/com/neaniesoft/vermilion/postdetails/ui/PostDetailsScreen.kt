@@ -31,6 +31,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.neaniesoft.vermilion.coreentities.ScrollPosition
 import com.neaniesoft.vermilion.postdetails.R
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentKind
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub
@@ -39,8 +40,8 @@ import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.ui.DUMMY_TEXT_POST
 import com.neaniesoft.vermilion.posts.ui.PostContent
-import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
+import com.neaniesoft.vermilion.utils.getLogger
 import kotlinx.coroutines.FlowPreview
 
 @FlowPreview
@@ -53,6 +54,8 @@ fun PostDetailsScreen(
     postViewModel: PostViewModel = hiltViewModel(),
     commentsViewModel: CommentsViewModel = hiltViewModel()
 ) {
+    val logger by remember { derivedStateOf { getLogger("PostDetailsScreen") } }
+
     val isRefreshing by commentsViewModel.networkIsActive.collectAsState(initial = false)
 
     LaunchedEffect(postId) {
@@ -64,12 +67,36 @@ fun PostDetailsScreen(
     val postState by postViewModel.post.collectAsState()
 
     val columnState = rememberLazyListState()
-    val initialScrollPosition = postDetailsViewModel.restoredScrollPosition.collectAsState(
-        initial = null
-    )
+
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isRefreshing)
     val isScrolling by remember {
         derivedStateOf { columnState.isScrollInProgress }
+    }
+    val scrollPosition by remember {
+        derivedStateOf {
+            ScrollPosition(
+                columnState.firstVisibleItemIndex,
+                columnState.firstVisibleItemScrollOffset
+            )
+        }
+    }
+
+    // Only launch this effect if we have items
+    val commentsLoaded by derivedStateOf { comments.isNotEmpty() }
+    LaunchedEffect(commentsLoaded) {
+        val scrollToPosition = postDetailsViewModel.getSavedScrollPosition()
+        if (commentsLoaded && scrollToPosition != null) {
+            columnState.scrollToItem(
+                scrollToPosition.index,
+                scrollToPosition.offset
+            )
+        }
+    }
+
+    LaunchedEffect(isScrolling) {
+        if (commentsLoaded && !isScrolling) {
+            postDetailsViewModel.onScrollStateUpdated(scrollPosition)
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -81,34 +108,6 @@ fun PostDetailsScreen(
     LaunchedEffect(key1 = Unit) {
         commentsViewModel.scrollToEvents.collect {
             columnState.animateScrollToItem(it, 0)
-        }
-    }
-
-    val scrollPosition by remember {
-        derivedStateOf {
-            ScrollPosition(
-                columnState.firstVisibleItemIndex,
-                columnState.firstVisibleItemScrollOffset
-            )
-        }
-    }
-
-    if (!isScrolling) {
-        LaunchedEffect(key1 = scrollPosition) {
-            postDetailsViewModel.onScrollStateUpdated(scrollPosition)
-        }
-    }
-
-    val commentsLoaded by derivedStateOf { comments.isNotEmpty() }
-
-    // Only launch this effect if we have items
-    LaunchedEffect(commentsLoaded) {
-        val scrollToPosition = initialScrollPosition.value
-        if (commentsLoaded && scrollToPosition != null) {
-            columnState.scrollToItem(
-                scrollToPosition.index,
-                scrollToPosition.offset
-            )
         }
     }
 

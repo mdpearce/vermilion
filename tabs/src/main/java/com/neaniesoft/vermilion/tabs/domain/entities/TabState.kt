@@ -1,5 +1,7 @@
 package com.neaniesoft.vermilion.tabs.domain.entities
 
+import com.neaniesoft.vermilion.coreentities.ScrollPosition
+import com.neaniesoft.vermilion.uistate.TabType
 import java.time.Instant
 
 data class TabState(

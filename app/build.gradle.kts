@@ -148,6 +148,7 @@ dependencies {
     implementation(project(":posts"))
     implementation(project(":postdetails"))
     implementation(project(":ui"))
+    implementation(project(":uistate"))
     implementation(project(":accounts"))
     implementation(project(":utils"))
     implementation(project(":tabs"))

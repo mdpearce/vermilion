@@ -18,4 +18,5 @@ interface PostRepository {
 
     fun postFlow(postId: PostId): Flow<Post>
     suspend fun update(postId: PostId, post: Post)
+    suspend fun deleteByQuery(query: String)
 }

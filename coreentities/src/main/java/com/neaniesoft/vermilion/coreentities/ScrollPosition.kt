@@ -1,4 +1,4 @@
-package com.neaniesoft.vermilion.tabs.domain.entities
+package com.neaniesoft.vermilion.coreentities
 
 // @JvmInline
 // value class ScrollPosition(val value: Int)

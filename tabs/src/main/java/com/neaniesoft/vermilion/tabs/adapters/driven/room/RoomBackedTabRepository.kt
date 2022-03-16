@@ -9,12 +9,11 @@ import com.neaniesoft.vermilion.dbentities.tabs.TabStateRecord
 import com.neaniesoft.vermilion.tabs.domain.entities.DisplayName
 import com.neaniesoft.vermilion.tabs.domain.entities.NewTabState
 import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
-import com.neaniesoft.vermilion.tabs.domain.entities.ScrollPosition
 import com.neaniesoft.vermilion.tabs.domain.entities.TabId
 import com.neaniesoft.vermilion.tabs.domain.entities.TabSortOrderIndex
 import com.neaniesoft.vermilion.tabs.domain.entities.TabState
-import com.neaniesoft.vermilion.tabs.domain.entities.TabType
 import com.neaniesoft.vermilion.tabs.domain.ports.TabRepository
+import com.neaniesoft.vermilion.uistate.TabType
 import com.neaniesoft.vermilion.utils.logger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -39,6 +38,11 @@ class RoomBackedTabRepository @Inject constructor(
             }
         }
 
+    override val activeTab: Flow<TabState?> =
+        tabStateDao.getActiveTab().distinctUntilChanged().map {
+            it?.toTabState()
+        }
+
     override suspend fun addNewTabIfNotExists(tab: NewTabState): TabState {
         return database.withTransaction {
             val existingTab = tabStateDao.findByParentAndType(tab.parentId.value, tab.type.name)
@@ -59,8 +63,9 @@ class RoomBackedTabRepository @Inject constructor(
     override suspend fun updateScrollStateForTab(
         parentId: ParentId,
         type: TabType,
-        scrollPosition: ScrollPosition
+        scrollPosition: com.neaniesoft.vermilion.coreentities.ScrollPosition
     ) {
+        logger.debugIfEnabled { "Updating record for $parentId to $scrollPosition" }
         database.withTransaction {
             tabStateDao.updateTabWithScrollState(
                 parentId.value,
@@ -68,7 +73,6 @@ class RoomBackedTabRepository @Inject constructor(
                 scrollPosition.index,
                 scrollPosition.offset
             )
-            tabStateDao.findByParentAndType(parentId.value, TabType.POST_DETAILS.name)
         }
     }
 
@@ -87,8 +91,19 @@ class RoomBackedTabRepository @Inject constructor(
             createdAt.toEpochMilli(),
             leftMostIndex - 1,
             scrollPosition.index,
-            scrollPosition.offset
+            scrollPosition.offset,
+            isActive
         )
+    }
+
+    override suspend fun setActiveTab(parentId: ParentId, type: TabType) {
+        database.withTransaction {
+            val activeTab = tabStateDao.getActiveTabOrNull()
+            if (!(activeTab?.type == type.name && activeTab.parentId == parentId.value)) {
+                tabStateDao.updateAllTabsToInactive()
+                tabStateDao.setActiveTab(parentId.value, type.name)
+            }
+        }
     }
 
     private suspend fun displayNameForPostDetails(parentId: ParentId): DisplayName {
@@ -126,7 +141,7 @@ class RoomBackedTabRepository @Inject constructor(
             DisplayName(displayName),
             Instant.ofEpochMilli(createdAt),
             TabSortOrderIndex(tabSortOrder),
-            ScrollPosition(scrollPosition, scrollOffset)
+            com.neaniesoft.vermilion.coreentities.ScrollPosition(scrollPosition, scrollOffset)
         )
     }
 }
