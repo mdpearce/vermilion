@@ -6,6 +6,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -115,10 +117,39 @@ fun CommentRow(
             }
         }
         AnimatedVisibility(visible = comment.isExpanded) {
-            Surface(elevation = 0.dp, color = MaterialTheme.colors.background) {
-                Row(Modifier.fillMaxWidth()) {
-                    Text(text = "Hello!")
-                }
+            CommentActionsRow(
+                onUpVoteClicked = {},
+                onDownVoteClicked = {}
+            )
+        }
+    }
+}
+
+@Composable
+fun CommentActionsRow(
+    onUpVoteClicked: () -> Unit,
+    onDownVoteClicked: () -> Unit
+) {
+    Surface(
+        elevation = 0.dp,
+        color = MaterialTheme.colors.background,
+        modifier = Modifier.padding(8.dp)
+    ) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+            IconButton(
+                modifier = Modifier.padding(end = 8.dp),
+                onClick = onDownVoteClicked
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_baseline_arrow_downward_24),
+                    contentDescription = "Down vote"
+                )
+            }
+            IconButton(onClick = onUpVoteClicked) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_baseline_arrow_upward_24),
+                    contentDescription = "Up vote"
+                )
             }
         }
     }
