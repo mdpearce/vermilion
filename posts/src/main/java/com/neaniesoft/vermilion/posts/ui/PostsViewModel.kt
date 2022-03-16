@@ -88,14 +88,19 @@ class PostsViewModel @Inject constructor(
     }
 
     suspend fun getSavedScrollPosition(): ScrollPosition? {
-        return if (communityName == CommunityName("Home")) {
+        val scrollPosition = if (communityName == CommunityName("Home")) {
             uiStateProvider.scrollPositionTab(TabType.HOME, communityName.value)
         } else {
             uiStateProvider.scrollPositionTab(TabType.POSTS, communityName.value)
         }
+
+        logger.debugIfEnabled { "Saved scroll position: $scrollPosition" }
+
+        return scrollPosition
     }
 
     suspend fun onScrollStateUpdated(scrollPosition: ScrollPosition) {
+        logger.debugIfEnabled { "onScrollStateUpdated: $scrollPosition" }
         if (communityName == CommunityName("Home")) {
             uiStateProvider.updateScrollPositionForTab(
                 TabType.HOME,

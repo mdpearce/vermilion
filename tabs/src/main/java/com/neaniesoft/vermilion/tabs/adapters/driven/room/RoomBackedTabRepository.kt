@@ -65,6 +65,7 @@ class RoomBackedTabRepository @Inject constructor(
         type: TabType,
         scrollPosition: com.neaniesoft.vermilion.coreentities.ScrollPosition
     ) {
+        logger.debugIfEnabled { "Updating record for $parentId to $scrollPosition" }
         database.withTransaction {
             tabStateDao.updateTabWithScrollState(
                 parentId.value,
@@ -72,7 +73,6 @@ class RoomBackedTabRepository @Inject constructor(
                 scrollPosition.index,
                 scrollPosition.offset
             )
-            tabStateDao.findByParentAndType(parentId.value, TabType.POST_DETAILS.name)
         }
     }
 

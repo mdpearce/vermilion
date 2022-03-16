@@ -47,3 +47,5 @@ class AnonymousLoggerDelegate(private val level: Logger.Level, private val tag: 
 fun logger(level: Logger.Level = Logger.Level.DEBUG) = LoggerDelegate(level)
 fun anonymousLogger(tag: String, level: Logger.Level = Logger.Level.DEBUG) =
     AnonymousLoggerDelegate(level, tag)
+
+fun getLogger(tag: String, level: Logger.Level = Logger.Level.DEBUG): Logger = AndroidLogger(tag, level)
