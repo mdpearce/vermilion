@@ -89,7 +89,6 @@ fun VermilionApp(
 
         DisposableEffect(Unit) {
             onDispose {
-                Log.d("VermilionApp", "removing listener")
                 navController.removeOnDestinationChangedListener(destinationChangedListener)
             }
         }
