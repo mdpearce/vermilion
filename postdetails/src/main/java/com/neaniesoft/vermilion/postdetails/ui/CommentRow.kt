@@ -1,8 +1,10 @@
 package com.neaniesoft.vermilion.postdetails.ui
 
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -62,11 +64,13 @@ import org.commonmark.parser.Parser
 import java.text.NumberFormat
 import java.time.Instant
 
+@ExperimentalFoundationApi
 @Composable
 fun CommentRow(
     comment: Comment,
     modifier: Modifier = Modifier,
-    onUriClicked: (String) -> Unit = {}
+    onUriClicked: (String) -> Unit = {},
+    onLongPress: (Comment) -> Unit = {}
 ) {
     Column {
         if (comment.depth == CommentDepth(0)) {
@@ -78,7 +82,13 @@ fun CommentRow(
 
             DepthIndicators(depth = comment.depth.value)
 
-            Column(Modifier.padding(top = 8.dp, bottom = 8.dp, end = 8.dp)) {
+            Column(
+                Modifier
+                    .padding(top = 8.dp, bottom = 8.dp, end = 8.dp)
+                    .combinedClickable(onLongClick = {
+                        onLongPress(comment)
+                    }, onClick = {})
+            ) {
                 Row(
                     Modifier
                         .fillMaxWidth()
@@ -310,6 +320,7 @@ fun CommentFlair(flair: CommentFlair, modifier: Modifier = Modifier) {
     }
 }
 
+@ExperimentalFoundationApi
 @Preview
 @Composable
 fun CommentRowPreview() {
@@ -320,6 +331,7 @@ fun CommentRowPreview() {
     }
 }
 
+@ExperimentalFoundationApi
 @Preview
 @Composable
 fun DeepCommentRowPreview() {
@@ -330,6 +342,7 @@ fun DeepCommentRowPreview() {
     }
 }
 
+@ExperimentalFoundationApi
 @Preview
 @Composable
 fun StickiedCommentRowPreview() {
@@ -340,6 +353,7 @@ fun StickiedCommentRowPreview() {
     }
 }
 
+@ExperimentalFoundationApi
 @Preview
 @Composable
 fun StickiedModCommentRowPreview() {
@@ -350,6 +364,7 @@ fun StickiedModCommentRowPreview() {
     }
 }
 
+@ExperimentalFoundationApi
 @Preview
 @Composable
 fun AdminCommentRowPreview() {
@@ -360,6 +375,7 @@ fun AdminCommentRowPreview() {
     }
 }
 
+@ExperimentalFoundationApi
 @Preview
 @Composable
 fun OpCommentRowPreview() {
@@ -370,6 +386,7 @@ fun OpCommentRowPreview() {
     }
 }
 
+@ExperimentalFoundationApi
 @Preview
 @Composable
 fun EditedCOmmentRowPreview() {

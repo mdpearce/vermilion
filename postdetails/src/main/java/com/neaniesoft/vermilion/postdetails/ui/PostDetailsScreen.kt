@@ -2,6 +2,7 @@ package com.neaniesoft.vermilion.postdetails.ui
 
 import VermilionAppState
 import android.net.Uri
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -44,6 +45,7 @@ import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import com.neaniesoft.vermilion.utils.getLogger
 import kotlinx.coroutines.FlowPreview
 
+@ExperimentalFoundationApi
 @FlowPreview
 @Composable
 fun PostDetailsScreen(
@@ -132,6 +134,7 @@ fun PostDetailsScreen(
     )
 }
 
+@ExperimentalFoundationApi
 @Composable
 fun PostDetailsScreenContent(
     swipeRefreshState: SwipeRefreshState,
@@ -246,6 +249,7 @@ fun PostDetails(
     }
 }
 
+@ExperimentalFoundationApi
 @Preview
 @Composable
 fun PostDetailsScreenDark() {
