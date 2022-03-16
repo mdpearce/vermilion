@@ -66,6 +66,8 @@ fun CommentThreadScreen(
         onMoreCommentsClicked = { commentsViewModel.onMoreCommentsClicked(it) },
         onCommentNavDownClicked = { commentsViewModel.onCommentNavDownClicked(it) },
         onThreadClicked = { postDetailsViewModel.onThreadClicked(it) },
-        onCommentLongPressed = { commentsViewModel.onCommentLongPressed(it) }
+        onCommentLongPressed = { commentsViewModel.onCommentLongPressed(it) },
+        onCommentUpVoteClicked = { commentsViewModel.onCommentUpVoteClicked(it) },
+        onCommentDownVoteClicked = { commentsViewModel.onCommentDownVoteClicked(it) },
     )
 }
