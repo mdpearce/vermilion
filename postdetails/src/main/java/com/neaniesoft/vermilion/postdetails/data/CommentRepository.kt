@@ -30,13 +30,18 @@ import com.neaniesoft.vermilion.postdetails.domain.entities.DurationString
 import com.neaniesoft.vermilion.postdetails.domain.entities.MoreCommentsCount
 import com.neaniesoft.vermilion.postdetails.domain.entities.ThreadStub
 import com.neaniesoft.vermilion.postdetails.domain.entities.UpVotesCount
+import com.neaniesoft.vermilion.postdetails.domain.entities.fullName
+import com.neaniesoft.vermilion.postdetails.domain.entities.isDownVoted
+import com.neaniesoft.vermilion.postdetails.domain.entities.isUpVoted
 import com.neaniesoft.vermilion.posts.data.PostRepository
 import com.neaniesoft.vermilion.posts.data.toPost
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.Score
+import com.neaniesoft.vermilion.utils.CoroutinesModule
 import com.neaniesoft.vermilion.utils.formatCompact
 import com.neaniesoft.vermilion.utils.logger
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -44,12 +49,15 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import org.apache.commons.text.StringEscapeUtils
 import org.commonmark.parser.Parser
+import retrofit2.HttpException
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
 import javax.inject.Inject
+import javax.inject.Named
 import javax.inject.Singleton
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
@@ -80,6 +88,9 @@ interface CommentRepository {
     )
 
     val networkActivityUpdates: SharedFlow<NetworkActivityUpdate>
+
+    suspend fun toggleUpVote(comment: Comment)
+    suspend fun toggleDownVote(comment: Comment)
 }
 
 data class NetworkActivityUpdate(
@@ -94,7 +105,8 @@ class CommentRepositoryImpl @Inject constructor(
     private val dao: CommentDao,
     private val clock: Clock,
     private val markdownParser: Parser,
-    private val postRepository: PostRepository
+    private val postRepository: PostRepository,
+    @Named(CoroutinesModule.IO_DISPATCHER) private val dispatcher: CoroutineDispatcher
 ) : CommentRepository {
 
     companion object {
@@ -106,6 +118,41 @@ class CommentRepositoryImpl @Inject constructor(
     private val _networkActivityUpdates: MutableSharedFlow<NetworkActivityUpdate> =
         MutableSharedFlow()
     override val networkActivityUpdates = _networkActivityUpdates.asSharedFlow()
+
+    override suspend fun toggleUpVote(comment: Comment) {
+        if (comment.isUpVoted()) {
+            vote(0, comment)
+        } else {
+            vote(1, comment)
+        }
+    }
+
+    private suspend fun vote(direction: Int, comment: Comment) {
+        val flags = when (direction) {
+            -1 -> comment.flags + CommentFlags.DOWN_VOTED - CommentFlags.UP_VOTED
+            0 -> comment.flags - CommentFlags.UP_VOTED - CommentFlags.DOWN_VOTED
+            1 -> comment.flags + CommentFlags.UP_VOTED - CommentFlags.DOWN_VOTED
+            else -> throw IllegalArgumentException("Unexpected vote direction $direction")
+        }
+        withContext(dispatcher) {
+            database.withTransaction {
+                dao.updateFlags(comment.id.value, flags.joinToString(",") { it.name })
+            }
+            try {
+                apiService.vote(direction, comment.id.fullName())
+            } catch (httpException: HttpException) {
+                logger.errorIfEnabled(httpException) { "HTTP Exception while processing vote" }
+            }
+        }
+    }
+
+    override suspend fun toggleDownVote(comment: Comment) {
+        if (comment.isDownVoted()) {
+            vote(0, comment)
+        } else {
+            vote(-1, comment)
+        }
+    }
 
     override suspend fun getCommentsForPost(postId: PostId): Flow<List<CommentKind>> {
         return dao.flowOfCommentsForPost(postId.value).map { records ->

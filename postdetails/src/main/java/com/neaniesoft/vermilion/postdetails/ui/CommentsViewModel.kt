@@ -125,11 +125,15 @@ class CommentsViewModel @Inject constructor(
     }
 
     fun onCommentUpVoteClicked(comment: Comment) {
-
+        viewModelScope.launch {
+            commentRepository.toggleUpVote(comment)
+        }
     }
 
     fun onCommentDownVoteClicked(comment: Comment) {
-
+        viewModelScope.launch {
+            commentRepository.toggleDownVote(comment)
+        }
 
     }
 }

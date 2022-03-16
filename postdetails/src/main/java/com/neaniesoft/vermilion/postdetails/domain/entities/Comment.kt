@@ -27,3 +27,7 @@ data class Comment(
     val commentFlair: CommentFlair,
     val isExpanded: Boolean = false
 )
+
+fun Comment.isUpVoted(): Boolean = flags.contains(CommentFlags.UP_VOTED)
+
+fun Comment.isDownVoted(): Boolean = flags.contains(CommentFlags.DOWN_VOTED)
