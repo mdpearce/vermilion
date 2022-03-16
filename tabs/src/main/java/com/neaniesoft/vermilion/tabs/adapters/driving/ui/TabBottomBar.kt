@@ -114,7 +114,8 @@ fun ContentTab(
     onClick: (TabState) -> Unit,
     onLongPress: (TabState) -> Unit
 ) {
-    Tab(selected = isSelected,
+    Tab(
+        selected = isSelected,
         onClick = {},
         content = {
             val interactionSource = remember(tabState) { MutableInteractionSource() }
@@ -143,7 +144,8 @@ fun ContentTab(
                             onLongPress = {
                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                 onLongPress(tabState)
-                            })
+                            }
+                        )
                     },
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = CenterVertically

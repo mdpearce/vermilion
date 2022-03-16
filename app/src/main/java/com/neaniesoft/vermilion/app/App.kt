@@ -147,7 +147,8 @@ fun VermilionApp(
                 TabBottomBar(
                     onRoute = { route ->
                         navController.navigate(route)
-                    })
+                    }
+                )
             },
             drawerContent = {
                 CommunityList(
