@@ -9,7 +9,10 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.create
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 import javax.inject.Named
@@ -32,6 +35,13 @@ interface CommentApiService {
         @Query("link_id") linkId: String,
         @Query("sort") sort: String
     ): MoreCommentsResponse
+
+    @FormUrlEncoded
+    @POST("api/vote")
+    suspend fun vote(
+        @Field("dir") direction: Int,
+        @Field("id") fullNameId: String
+    )
 }
 
 @Module

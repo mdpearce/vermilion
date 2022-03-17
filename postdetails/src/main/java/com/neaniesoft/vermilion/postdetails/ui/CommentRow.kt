@@ -1,8 +1,12 @@
 package com.neaniesoft.vermilion.postdetails.ui
 
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -16,6 +20,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -24,6 +31,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -48,6 +57,8 @@ import com.neaniesoft.vermilion.postdetails.domain.entities.ControversialIndex
 import com.neaniesoft.vermilion.postdetails.domain.entities.DurationString
 import com.neaniesoft.vermilion.postdetails.domain.entities.ThreadStub
 import com.neaniesoft.vermilion.postdetails.domain.entities.UpVotesCount
+import com.neaniesoft.vermilion.postdetails.domain.entities.isDownVoted
+import com.neaniesoft.vermilion.postdetails.domain.entities.isUpVoted
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.Score
@@ -62,11 +73,15 @@ import org.commonmark.parser.Parser
 import java.text.NumberFormat
 import java.time.Instant
 
+@ExperimentalFoundationApi
 @Composable
 fun CommentRow(
     comment: Comment,
     modifier: Modifier = Modifier,
-    onUriClicked: (String) -> Unit = {}
+    onUriClicked: (String) -> Unit = {},
+    onLongPress: (Comment) -> Unit = {},
+    onUpVoteClicked: (Comment) -> Unit = {},
+    onDownVoteClicked: (Comment) -> Unit = {}
 ) {
     Column {
         if (comment.depth == CommentDepth(0)) {
@@ -78,7 +93,16 @@ fun CommentRow(
 
             DepthIndicators(depth = comment.depth.value)
 
-            Column(Modifier.padding(top = 8.dp, bottom = 8.dp, end = 8.dp)) {
+            val haptic = LocalHapticFeedback.current
+
+            Column(
+                Modifier
+                    .padding(top = 8.dp, bottom = 8.dp, end = 8.dp)
+                    .combinedClickable(onLongClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onLongPress(comment)
+                    }, onClick = {})
+            ) {
                 Row(
                     Modifier
                         .fillMaxWidth()
@@ -101,6 +125,60 @@ fun CommentRow(
                         onUriClicked = onUriClicked
                     )
                 }
+            }
+        }
+        AnimatedVisibility(visible = comment.isExpanded) {
+            CommentActionsRow(
+                onUpVoteClicked = { onUpVoteClicked(comment) },
+                onDownVoteClicked = { onDownVoteClicked(comment) },
+                isUpVoted = comment.isUpVoted(),
+                isDownVoted = comment.isDownVoted()
+            )
+        }
+    }
+}
+
+@Composable
+fun CommentActionsRow(
+    onUpVoteClicked: () -> Unit,
+    onDownVoteClicked: () -> Unit,
+    isUpVoted: Boolean,
+    isDownVoted: Boolean
+) {
+    Surface(
+        elevation = 0.dp,
+        color = MaterialTheme.colors.background,
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            IconButton(
+                modifier = Modifier.padding(end = 8.dp),
+                onClick = onDownVoteClicked
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_baseline_arrow_downward_24),
+                    contentDescription = "Down vote",
+                    tint = if (isDownVoted) {
+                        MaterialTheme.colors.secondary
+                    } else {
+                        LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                    }
+                )
+            }
+            IconButton(onClick = onUpVoteClicked) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_baseline_arrow_upward_24),
+                    contentDescription = "Up vote",
+                    tint = if (isUpVoted) {
+                        MaterialTheme.colors.primary
+                    } else {
+                        LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                    }
+                )
             }
         }
     }
@@ -160,7 +238,18 @@ fun CommentScore(comment: Comment, modifier: Modifier = Modifier) {
         text = score,
         style = MaterialTheme.typography.caption,
         fontWeight = FontWeight.Bold,
-        modifier = modifier
+        modifier = modifier,
+        color = when {
+            comment.isUpVoted() -> {
+                MaterialTheme.colors.primary
+            }
+            comment.isDownVoted() -> {
+                MaterialTheme.colors.secondary
+            }
+            else -> {
+                Color.Unspecified
+            }
+        }
     )
 }
 
@@ -310,6 +399,7 @@ fun CommentFlair(flair: CommentFlair, modifier: Modifier = Modifier) {
     }
 }
 
+@ExperimentalFoundationApi
 @Preview
 @Composable
 fun CommentRowPreview() {
@@ -320,6 +410,7 @@ fun CommentRowPreview() {
     }
 }
 
+@ExperimentalFoundationApi
 @Preview
 @Composable
 fun DeepCommentRowPreview() {
@@ -330,6 +421,7 @@ fun DeepCommentRowPreview() {
     }
 }
 
+@ExperimentalFoundationApi
 @Preview
 @Composable
 fun StickiedCommentRowPreview() {
@@ -340,6 +432,7 @@ fun StickiedCommentRowPreview() {
     }
 }
 
+@ExperimentalFoundationApi
 @Preview
 @Composable
 fun StickiedModCommentRowPreview() {
@@ -350,6 +443,7 @@ fun StickiedModCommentRowPreview() {
     }
 }
 
+@ExperimentalFoundationApi
 @Preview
 @Composable
 fun AdminCommentRowPreview() {
@@ -360,6 +454,7 @@ fun AdminCommentRowPreview() {
     }
 }
 
+@ExperimentalFoundationApi
 @Preview
 @Composable
 fun OpCommentRowPreview() {
@@ -370,6 +465,7 @@ fun OpCommentRowPreview() {
     }
 }
 
+@ExperimentalFoundationApi
 @Preview
 @Composable
 fun EditedCOmmentRowPreview() {

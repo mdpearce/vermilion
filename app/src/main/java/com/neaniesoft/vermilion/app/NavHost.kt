@@ -1,6 +1,7 @@
 package com.neaniesoft.vermilion.app
 
 import VermilionAppState
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -33,6 +34,7 @@ import com.neaniesoft.vermilion.ui.videos.external.ExternalVideoDialog
 import kotlinx.coroutines.FlowPreview
 import java.net.URLDecoder
 
+@ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @ExperimentalComposeUiApi
 @FlowPreview
