@@ -131,7 +131,7 @@ fun CommentRow(
                 }
             }
         }
-        AnimatedVisibility(visible = comment.isExpanded) {
+        AnimatedVisibility(visible = comment.showActionsRow) {
             CommentActionsRow(
                 onUpVoteClicked = { onUpVoteClicked(comment) },
                 onDownVoteClicked = { onDownVoteClicked(comment) },

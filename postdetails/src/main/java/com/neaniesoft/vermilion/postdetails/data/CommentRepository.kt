@@ -332,6 +332,7 @@ class CommentRepositoryImpl @Inject constructor(
         return CommentStub(
             postId = PostId(postId),
             id = CommentId(commentId),
+            path = path ?: "",
             count = MoreCommentsCount(score), // TODO stop using score as a proxy field for child count
             parentId = parentId?.let { CommentId(it) },
             depth = CommentDepth(depth),
@@ -342,6 +343,7 @@ class CommentRepositoryImpl @Inject constructor(
     private fun CommentRecord.toThreadStub(): ThreadStub {
         return ThreadStub(
             postId = PostId(postId),
+            path = path ?: "",
             parentId = CommentId(requireNotNull(parentId).replace("t1_", "")),
             depth = CommentDepth(depth)
         )
@@ -350,6 +352,7 @@ class CommentRepositoryImpl @Inject constructor(
     private fun CommentRecord.toComment(): Comment {
         return Comment(
             id = CommentId(commentId),
+            path = path ?: "",
             content = CommentContent(body),
             contentMarkdown = markdownParser.parse(body),
             flags = getFlags(),

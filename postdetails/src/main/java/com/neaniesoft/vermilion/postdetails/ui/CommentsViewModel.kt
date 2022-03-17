@@ -8,6 +8,7 @@ import com.neaniesoft.vermilion.postdetails.domain.entities.CommentDepth
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentId
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentKind
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub
+import com.neaniesoft.vermilion.postdetails.domain.entities.HasPath
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.utils.CoroutinesModule
 import com.neaniesoft.vermilion.utils.logger
@@ -115,7 +116,7 @@ class CommentsViewModel @Inject constructor(
             val index = comments.indexOf(CommentKind.Full(comment))
             if (index != -1) {
                 val updatedList =
-                    comments.take(index) + CommentKind.Full(comment.copy(isExpanded = !comment.isExpanded)) + comments.subList(
+                    comments.take(index) + CommentKind.Full(comment.copy(showActionsRow = !comment.showActionsRow)) + comments.subList(
                         index + 1,
                         comments.size
                     )
@@ -133,6 +134,35 @@ class CommentsViewModel @Inject constructor(
     fun onCommentDownVoteClicked(comment: Comment) {
         viewModelScope.launch {
             commentRepository.toggleDownVote(comment)
+        }
+    }
+
+    fun onCommentClicked(comment: Comment) {
+        viewModelScope.launch {
+            val comments = comments.value
+            val path = comment.path
+            val isCollapsed = !comment.isCollapsed
+
+            val updatedList =
+                comments.map {
+                    when {
+                        (it as? HasPath)?.path?.startsWith("$path/") == true -> {
+                            when (it) {
+                                is CommentKind.Full -> CommentKind.Full(it.comment.copy(isHidden = isCollapsed))
+                                is CommentKind.Stub -> CommentKind.Stub(it.stub.copy(isHidden = isCollapsed))
+                                is CommentKind.Thread -> CommentKind.Thread(it.stub.copy(isHidden = isCollapsed))
+                            }
+                        }
+                        (it as? CommentKind.Full)?.comment?.id == comment.id -> {
+                            CommentKind.Full(it.comment.copy(isCollapsed = isCollapsed))
+                        }
+                        else -> {
+                            it
+                        }
+                    }
+                }
+
+            _comments.emit(updatedList)
         }
     }
 }
