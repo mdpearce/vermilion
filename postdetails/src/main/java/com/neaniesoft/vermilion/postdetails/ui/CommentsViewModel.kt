@@ -139,30 +139,34 @@ class CommentsViewModel @Inject constructor(
 
     fun onCommentClicked(comment: Comment) {
         viewModelScope.launch {
-            val comments = comments.value
-            val path = comment.path
-            val isCollapsed = !comment.isCollapsed
+            toggleCollapsedState(comment)
+        }
+    }
 
-            val updatedList =
-                comments.map {
-                    when {
-                        (it as? HasPath)?.path?.startsWith("$path/") == true -> {
-                            when (it) {
-                                is CommentKind.Full -> CommentKind.Full(it.comment.copy(isHidden = isCollapsed))
-                                is CommentKind.Stub -> CommentKind.Stub(it.stub.copy(isHidden = isCollapsed))
-                                is CommentKind.Thread -> CommentKind.Thread(it.stub.copy(isHidden = isCollapsed))
-                            }
-                        }
-                        (it as? CommentKind.Full)?.comment?.id == comment.id -> {
-                            CommentKind.Full(it.comment.copy(isCollapsed = isCollapsed))
-                        }
-                        else -> {
-                            it
+    private suspend fun toggleCollapsedState(comment: Comment) {
+        val comments = comments.value
+        val path = comment.path
+        val isCollapsed = !comment.isCollapsed
+
+        val updatedList =
+            comments.map {
+                when {
+                    (it as? HasPath)?.path?.startsWith("$path/") == true -> {
+                        when (it) {
+                            is CommentKind.Full -> CommentKind.Full(it.comment.copy(isHidden = isCollapsed))
+                            is CommentKind.Stub -> CommentKind.Stub(it.stub.copy(isHidden = isCollapsed))
+                            is CommentKind.Thread -> CommentKind.Thread(it.stub.copy(isHidden = isCollapsed))
                         }
                     }
+                    (it as? CommentKind.Full)?.comment?.id == comment.id -> {
+                        CommentKind.Full(it.comment.copy(isCollapsed = isCollapsed))
+                    }
+                    else -> {
+                        it
+                    }
                 }
+            }
 
-            _comments.emit(updatedList)
-        }
+        _comments.emit(updatedList)
     }
 }
