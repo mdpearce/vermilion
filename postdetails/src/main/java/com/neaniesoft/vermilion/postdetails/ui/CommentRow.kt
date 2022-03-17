@@ -4,7 +4,6 @@ import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -334,7 +333,8 @@ fun MoreCommentsStubRow(
         DepthIndicators(depth = stub.depth.value)
         TextButton(onClick = { onClick(stub) }, modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = stringResource(id = R.string.more_comments, stub.count.value)
+                text = stringResource(id = R.string.more_comments, stub.count.value),
+                modifier = Modifier.fillMaxWidth()
             )
         }
 
@@ -347,20 +347,15 @@ fun ThreadStubRow(
     modifier: Modifier = Modifier,
     onClick: (ThreadStub) -> Unit
 ) {
-    Row(
-        modifier
-            .height(intrinsicSize = IntrinsicSize.Min)
-            .clickable { onClick(stub) }
-    ) {
+    Row(modifier.height(intrinsicSize = IntrinsicSize.Min)) {
         DepthIndicators(depth = stub.depth.value)
-        Text(
-            text = stringResource(id = R.string.continue_thread),
-            style = MaterialTheme.typography.caption,
-            color = MaterialTheme.colors.primary,
-            modifier = Modifier
-                .alignByBaseline()
-                .padding(8.dp)
-        )
+        TextButton(onClick = { onClick(stub) }, modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = stringResource(id = R.string.continue_thread),
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
     }
 }
 
