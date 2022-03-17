@@ -80,11 +80,20 @@ fun CommentRow(
     comment: Comment,
     modifier: Modifier = Modifier,
     onUriClicked: (String) -> Unit = {},
+    onClick: (Comment) -> Unit = {},
     onLongPress: (Comment) -> Unit = {},
     onUpVoteClicked: (Comment) -> Unit = {},
     onDownVoteClicked: (Comment) -> Unit = {}
 ) {
-    Column {
+    val haptic = LocalHapticFeedback.current
+    Column(
+        Modifier.combinedClickable(
+            onLongClick = {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                onLongPress(comment)
+            },
+            onClick = { onClick(comment) })
+    ) {
         if (comment.depth == CommentDepth(0)) {
             Divider()
         }
@@ -94,15 +103,9 @@ fun CommentRow(
 
             DepthIndicators(depth = comment.depth.value)
 
-            val haptic = LocalHapticFeedback.current
-
             Column(
                 Modifier
                     .padding(top = 8.dp, bottom = 8.dp, end = 8.dp)
-                    .combinedClickable(onLongClick = {
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        onLongPress(comment)
-                    }, onClick = {})
             ) {
                 Row(
                     Modifier
