@@ -94,6 +94,61 @@ fun CommentRow(
             },
             onClick = { onClick(comment) })
     ) {
+        AnimatedVisibility(visible = !comment.isCollapsed) {
+            CommentRowContent(comment = comment, modifier = modifier, onUriClicked = onUriClicked)
+        }
+
+        AnimatedVisibility(visible = comment.isCollapsed) {
+            CommentRowCollapsed(comment = comment, modifier = modifier)
+        }
+
+        AnimatedVisibility(visible = comment.showActionsRow) {
+            CommentActionsRow(
+                onUpVoteClicked = { onUpVoteClicked(comment) },
+                onDownVoteClicked = { onDownVoteClicked(comment) },
+                isUpVoted = comment.isUpVoted(),
+                isDownVoted = comment.isDownVoted()
+            )
+        }
+    }
+}
+
+@Composable
+fun CommentRowCollapsed(comment: Comment, modifier: Modifier) {
+    Column {
+        Divider()
+        Row(
+            modifier.height(intrinsicSize = IntrinsicSize.Min),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            DepthIndicators(depth = comment.depth.value)
+            CommentAuthor(
+                comment = comment,
+                Modifier.padding(start = 8.dp, end = 8.dp),
+                isDim = true
+            )
+            CommentScore(comment = comment, Modifier.padding(end = 8.dp))
+            CommentTime(comment = comment, Modifier.padding(end = 8.dp))
+            Spacer(modifier = Modifier.weight(1.0f))
+            Icon(
+                painter = painterResource(id = R.drawable.ic_baseline_keyboard_arrow_down_24),
+                contentDescription = "Expand",
+                modifier = Modifier
+                    .padding(top = 12.dp, bottom = 12.dp, end = 16.dp)
+                    .size(24.dp)
+            )
+        }
+        Divider()
+    }
+}
+
+@Composable
+private fun CommentRowContent(
+    comment: Comment,
+    modifier: Modifier,
+    onUriClicked: (String) -> Unit
+) {
+    Column {
         if (comment.depth == CommentDepth(0)) {
             Divider()
         }
@@ -102,11 +157,11 @@ fun CommentRow(
         ) {
 
             DepthIndicators(depth = comment.depth.value)
-
             Column(
                 Modifier
                     .padding(top = 8.dp, bottom = 8.dp, end = 8.dp)
             ) {
+
                 Row(
                     Modifier
                         .fillMaxWidth()
@@ -130,14 +185,6 @@ fun CommentRow(
                     )
                 }
             }
-        }
-        AnimatedVisibility(visible = comment.showActionsRow) {
-            CommentActionsRow(
-                onUpVoteClicked = { onUpVoteClicked(comment) },
-                onDownVoteClicked = { onDownVoteClicked(comment) },
-                isUpVoted = comment.isUpVoted(),
-                isDownVoted = comment.isDownVoted()
-            )
         }
     }
 }
@@ -207,12 +254,16 @@ fun CommentTime(comment: Comment, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun CommentAuthor(comment: Comment, modifier: Modifier = Modifier) {
+fun CommentAuthor(comment: Comment, modifier: Modifier = Modifier, isDim: Boolean = false) {
     if (comment.flags.contains(CommentFlags.IS_OP)) {
         Text(
             text = comment.authorName.value,
             style = MaterialTheme.typography.caption,
-            color = MaterialTheme.colors.primary,
+            color = if (isDim) {
+                Color.Unspecified
+            } else {
+                MaterialTheme.colors.primary
+            },
             fontWeight = FontWeight.SemiBold,
             modifier = modifier
         )
@@ -220,7 +271,11 @@ fun CommentAuthor(comment: Comment, modifier: Modifier = Modifier) {
         Text(
             text = comment.authorName.value,
             style = MaterialTheme.typography.caption,
-            color = MaterialTheme.colors.secondary,
+            color = if (isDim) {
+                Color.Unspecified
+            } else {
+                MaterialTheme.colors.secondary
+            },
             modifier = modifier
         )
     }
@@ -478,7 +533,7 @@ fun StubRowPreview() {
         Surface {
             MoreCommentsStubRow(
                 stub = CommentStub(
-                    PostId(""), CommentId(""), MoreCommentsCount(6), CommentId(""),
+                    PostId(""), CommentId(""), "", MoreCommentsCount(6), CommentId(""),
                     CommentDepth(3),
                     emptyList()
                 ),
@@ -490,6 +545,7 @@ fun StubRowPreview() {
 
 val DUMMY_COMMENT = Comment(
     CommentId("id"),
+    "",
     CommentContent("This is a pretty long comment that might split over several lines. It's got several sentences and goes on for some time. Still going here."),
     Parser.builder().build()
         .parse("This is a pretty long comment that might split over several lines. It's got several sentences and goes on for some time. Still going here."),
