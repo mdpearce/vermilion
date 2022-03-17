@@ -337,7 +337,6 @@ fun MoreCommentsStubRow(
                 modifier = Modifier.fillMaxWidth()
             )
         }
-
     }
 }
 
@@ -355,7 +354,6 @@ fun ThreadStubRow(
                 modifier = Modifier.fillMaxWidth()
             )
         }
-
     }
 }
 
@@ -480,7 +478,8 @@ fun StubRowPreview() {
                     PostId(""), CommentId(""), MoreCommentsCount(6), CommentId(""),
                     CommentDepth(3),
                     emptyList()
-                ), onClick = {}
+                ),
+                onClick = {}
             )
         }
     }
