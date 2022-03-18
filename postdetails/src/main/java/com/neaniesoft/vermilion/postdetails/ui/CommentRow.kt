@@ -80,9 +80,82 @@ fun CommentRow(
     comment: Comment,
     modifier: Modifier = Modifier,
     onUriClicked: (String) -> Unit = {},
+    onClick: (Comment) -> Unit = {},
     onLongPress: (Comment) -> Unit = {},
     onUpVoteClicked: (Comment) -> Unit = {},
     onDownVoteClicked: (Comment) -> Unit = {}
+) {
+    val haptic = LocalHapticFeedback.current
+    Column(
+        Modifier.combinedClickable(
+            onLongClick = {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                onLongPress(comment)
+            },
+            onClick = { onClick(comment) }
+        )
+    ) {
+        AnimatedVisibility(visible = !comment.isHidden) {
+            Column {
+                AnimatedVisibility(visible = !comment.isCollapsed) {
+                    CommentRowContent(
+                        comment = comment,
+                        modifier = modifier,
+                        onUriClicked = onUriClicked
+                    )
+                }
+
+                AnimatedVisibility(visible = comment.isCollapsed) {
+                    CommentRowCollapsed(comment = comment, modifier = modifier)
+                }
+
+                AnimatedVisibility(visible = comment.showActionsRow) {
+                    CommentActionsRow(
+                        onUpVoteClicked = { onUpVoteClicked(comment) },
+                        onDownVoteClicked = { onDownVoteClicked(comment) },
+                        isUpVoted = comment.isUpVoted(),
+                        isDownVoted = comment.isDownVoted()
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CommentRowCollapsed(comment: Comment, modifier: Modifier) {
+    Column {
+        Divider()
+        Row(
+            modifier.height(intrinsicSize = IntrinsicSize.Min),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            DepthIndicators(depth = comment.depth.value)
+            CommentAuthor(
+                comment = comment,
+                Modifier.padding(start = 8.dp, end = 8.dp),
+                isDim = true
+            )
+            CommentScore(comment = comment, Modifier.padding(end = 8.dp))
+            CommentTime(comment = comment, Modifier.padding(end = 8.dp))
+            Spacer(modifier = Modifier.weight(1.0f))
+            Icon(
+                painter = painterResource(id = R.drawable.ic_baseline_keyboard_arrow_down_24),
+                contentDescription = "Expand",
+                modifier = Modifier
+                    .padding(top = 12.dp, bottom = 12.dp, end = 16.dp)
+                    .size(24.dp)
+            )
+        }
+        Divider()
+    }
+}
+
+@Composable
+private fun CommentRowContent(
+    comment: Comment,
+    modifier: Modifier,
+    onUriClicked: (String) -> Unit
 ) {
     Column {
         if (comment.depth == CommentDepth(0)) {
@@ -93,17 +166,11 @@ fun CommentRow(
         ) {
 
             DepthIndicators(depth = comment.depth.value)
-
-            val haptic = LocalHapticFeedback.current
-
             Column(
                 Modifier
                     .padding(top = 8.dp, bottom = 8.dp, end = 8.dp)
-                    .combinedClickable(onLongClick = {
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        onLongPress(comment)
-                    }, onClick = {})
             ) {
+
                 Row(
                     Modifier
                         .fillMaxWidth()
@@ -127,14 +194,6 @@ fun CommentRow(
                     )
                 }
             }
-        }
-        AnimatedVisibility(visible = comment.isExpanded) {
-            CommentActionsRow(
-                onUpVoteClicked = { onUpVoteClicked(comment) },
-                onDownVoteClicked = { onDownVoteClicked(comment) },
-                isUpVoted = comment.isUpVoted(),
-                isDownVoted = comment.isDownVoted()
-            )
         }
     }
 }
@@ -204,12 +263,16 @@ fun CommentTime(comment: Comment, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun CommentAuthor(comment: Comment, modifier: Modifier = Modifier) {
+fun CommentAuthor(comment: Comment, modifier: Modifier = Modifier, isDim: Boolean = false) {
     if (comment.flags.contains(CommentFlags.IS_OP)) {
         Text(
             text = comment.authorName.value,
             style = MaterialTheme.typography.caption,
-            color = MaterialTheme.colors.primary,
+            color = if (isDim) {
+                Color.Unspecified
+            } else {
+                MaterialTheme.colors.primary
+            },
             fontWeight = FontWeight.SemiBold,
             modifier = modifier
         )
@@ -217,7 +280,11 @@ fun CommentAuthor(comment: Comment, modifier: Modifier = Modifier) {
         Text(
             text = comment.authorName.value,
             style = MaterialTheme.typography.caption,
-            color = MaterialTheme.colors.secondary,
+            color = if (isDim) {
+                Color.Unspecified
+            } else {
+                MaterialTheme.colors.secondary
+            },
             modifier = modifier
         )
     }
@@ -326,16 +393,20 @@ fun MoreCommentsStubRow(
     modifier: Modifier = Modifier,
     onClick: (CommentStub) -> Unit
 ) {
-    Row(
-        modifier
-            .height(intrinsicSize = IntrinsicSize.Min)
-    ) {
-        DepthIndicators(depth = stub.depth.value)
-        TextButton(onClick = { onClick(stub) }, modifier = Modifier.fillMaxWidth()) {
-            Text(
-                text = stringResource(id = R.string.more_comments, stub.count.value),
-                modifier = Modifier.fillMaxWidth()
-            )
+    Column {
+        AnimatedVisibility(visible = !stub.isHidden) {
+            Row(
+                modifier
+                    .height(intrinsicSize = IntrinsicSize.Min)
+            ) {
+                DepthIndicators(depth = stub.depth.value)
+                TextButton(onClick = { onClick(stub) }, modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = stringResource(id = R.string.more_comments, stub.count.value),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
         }
     }
 }
@@ -346,13 +417,17 @@ fun ThreadStubRow(
     modifier: Modifier = Modifier,
     onClick: (ThreadStub) -> Unit
 ) {
-    Row(modifier.height(intrinsicSize = IntrinsicSize.Min)) {
-        DepthIndicators(depth = stub.depth.value)
-        TextButton(onClick = { onClick(stub) }, modifier = Modifier.fillMaxWidth()) {
-            Text(
-                text = stringResource(id = R.string.continue_thread),
-                modifier = Modifier.fillMaxWidth()
-            )
+    Column {
+        AnimatedVisibility(visible = !stub.isHidden) {
+            Row(modifier.height(intrinsicSize = IntrinsicSize.Min)) {
+                DepthIndicators(depth = stub.depth.value)
+                TextButton(onClick = { onClick(stub) }, modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = stringResource(id = R.string.continue_thread),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
         }
     }
 }

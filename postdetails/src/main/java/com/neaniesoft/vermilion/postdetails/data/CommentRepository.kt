@@ -189,18 +189,19 @@ class CommentRepositoryImpl @Inject constructor(
 
         database.withTransaction {
             dao.deleteAllForThread(postId.value, threadId.value)
-
-            newCommentRecords.forEach { record ->
-                dao.insertAll(record)
-                val parentId = record.parentId
-                val parentPath = if (parentId != null) {
-                    dao.getPathForComment(parentId) + "/"
-                } else {
-                    ""
-                }
-                val updatedRecord = record.copy(path = "$parentPath${record.id}")
-                dao.update(updatedRecord)
-            }
+            dao.insertAll(newCommentRecords)
+            // newCommentRecords.forEach { record ->
+            //     dao.insertAll(record)
+            //     val parentId = record.parentId
+            //     val parentPath = if (parentId != null) {
+            //         dao.getPathForComment(parentId) + "/"
+            //     } else {
+            //         ""
+            //     }
+            //     logger.debugIfEnabled { "updating path: $parentPath${record.commentId}" }
+            //     val updatedRecord = record.copy(path = "$parentPath${record.commentId}")
+            //     dao.update(updatedRecord)
+            // } // TODO: Get the path construction working
         }
 
         _networkActivityUpdates.emit(NetworkActivityUpdate(networkActivityIdentifier, false))
@@ -237,18 +238,19 @@ class CommentRepositoryImpl @Inject constructor(
             // Finally, delete the old entries and insert the new ones and then return the new ones from the DAO
             database.withTransaction {
                 dao.deleteAllForPost(postId.value)
-
-                newCommentRecords.forEach { record ->
-                    dao.insertAll(record)
-                    val parentId = record.parentId
-                    val parentPath = if (parentId != null) {
-                        dao.getPathForComment(parentId) + "/"
-                    } else {
-                        ""
-                    }
-                    val updatedRecord = record.copy(path = "$parentPath${record.id}")
-                    dao.update(updatedRecord)
-                }
+                dao.insertAll(newCommentRecords)
+                // newCommentRecords.forEach { record ->
+                //     dao.insertAll(record)
+                //     val parentId = record.parentId
+                //     val parentPath = if (parentId != null) {
+                //         dao.getPathForComment(parentId) + "/"
+                //     } else {
+                //         ""
+                //     }
+                //     logger.debugIfEnabled { "updating path: $parentPath${record.commentId}" }
+                //     val updatedRecord = record.copy(path = "$parentPath${record.commentId}")
+                //     dao.update(updatedRecord)
+                // } // TODO: Get the path construction working
             }
             _networkActivityUpdates.emit(NetworkActivityUpdate(networkActivityIdentifier, false))
         } else {

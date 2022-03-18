@@ -8,5 +8,6 @@ data class CommentStub(
     val count: MoreCommentsCount,
     val parentId: CommentId?,
     val depth: CommentDepth,
-    val children: List<CommentId>
+    val children: List<CommentId>,
+    val isHidden: Boolean = false
 )

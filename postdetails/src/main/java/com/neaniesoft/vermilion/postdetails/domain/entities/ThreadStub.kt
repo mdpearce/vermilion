@@ -5,5 +5,6 @@ import com.neaniesoft.vermilion.posts.domain.entities.PostId
 data class ThreadStub(
     val postId: PostId,
     val parentId: CommentId,
-    val depth: CommentDepth
+    val depth: CommentDepth,
+    val isHidden: Boolean = false
 )
