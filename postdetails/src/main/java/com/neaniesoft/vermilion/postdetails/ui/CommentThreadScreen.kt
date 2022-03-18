@@ -30,7 +30,7 @@ fun CommentThreadScreen(
         commentsViewModel.onCommentId(commentId, postId)
     }
 
-    val comments by commentsViewModel.comments.collectAsState()
+    val comments by commentsViewModel.comments.collectAsState(emptyList())
     val postState by postViewModel.post.collectAsState()
 
     val columnState = rememberLazyListState()

@@ -33,7 +33,8 @@ class CommentsViewModel @Inject constructor(
     private val logger by logger()
 
     private val _comments: MutableStateFlow<List<CommentKind>> = MutableStateFlow(emptyList())
-    val comments = _comments.asStateFlow()
+    private val allComments = _comments.asStateFlow()
+    val comments = allComments.map { it.filterNot { comment -> comment.isHidden } }
 
     private val networkActivityIdentifier = UUID.randomUUID().toString()
 
@@ -71,7 +72,7 @@ class CommentsViewModel @Inject constructor(
 
     fun onCommentNavDownClicked(firstVisibleItemIndex: Int) {
         viewModelScope.launch {
-            val foundIndex = comments.value.let { list ->
+            val foundIndex = allComments.value.let { list ->
                 list.subList(firstVisibleItemIndex, list.size)
                     .indexOfFirst { (it as? CommentKind.Full)?.comment?.depth == CommentDepth(0) }
             }
@@ -111,7 +112,7 @@ class CommentsViewModel @Inject constructor(
 
     fun onCommentLongPressed(comment: Comment) {
         viewModelScope.launch {
-            val comments = comments.value
+            val comments = allComments.value
             val index = comments.indexOf(CommentKind.Full(comment))
             if (index != -1) {
                 val updatedList =
@@ -143,7 +144,7 @@ class CommentsViewModel @Inject constructor(
     }
 
     private suspend fun toggleCollapsedState(comment: Comment) {
-        val comments = comments.value
+        val comments = allComments.value
         val isCollapsed = !comment.isCollapsed
 
         val collapsedIndex = comments.indexOf(CommentKind.Full(comment))
