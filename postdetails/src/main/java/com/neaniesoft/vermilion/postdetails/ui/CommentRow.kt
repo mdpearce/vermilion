@@ -95,28 +95,26 @@ fun CommentRow(
             onClick = { onClick(comment) }
         )
     ) {
-        AnimatedVisibility(visible = !comment.isHidden) {
-            Column {
-                AnimatedVisibility(visible = !comment.isCollapsed) {
-                    CommentRowContent(
-                        comment = comment,
-                        modifier = modifier,
-                        onUriClicked = onUriClicked
-                    )
-                }
+        Column {
+            AnimatedVisibility(visible = !comment.isCollapsed) {
+                CommentRowContent(
+                    comment = comment,
+                    modifier = modifier,
+                    onUriClicked = onUriClicked
+                )
+            }
+            AnimatedVisibility(visible = comment.isCollapsed) {
+                CommentRowCollapsed(comment = comment, modifier = modifier)
+            }
 
-                AnimatedVisibility(visible = comment.isCollapsed) {
-                    CommentRowCollapsed(comment = comment, modifier = modifier)
-                }
 
-                AnimatedVisibility(visible = comment.showActionsRow) {
-                    CommentActionsRow(
-                        onUpVoteClicked = { onUpVoteClicked(comment) },
-                        onDownVoteClicked = { onDownVoteClicked(comment) },
-                        isUpVoted = comment.isUpVoted(),
-                        isDownVoted = comment.isDownVoted()
-                    )
-                }
+            AnimatedVisibility(visible = comment.showActionsRow) {
+                CommentActionsRow(
+                    onUpVoteClicked = { onUpVoteClicked(comment) },
+                    onDownVoteClicked = { onDownVoteClicked(comment) },
+                    isUpVoted = comment.isUpVoted(),
+                    isDownVoted = comment.isDownVoted()
+                )
             }
         }
     }
