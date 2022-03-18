@@ -107,7 +107,6 @@ fun CommentRow(
                 CommentRowCollapsed(comment = comment, modifier = modifier)
             }
 
-
             AnimatedVisibility(visible = comment.showActionsRow) {
                 CommentActionsRow(
                     onUpVoteClicked = { onUpVoteClicked(comment) },
