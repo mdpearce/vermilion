@@ -1,6 +1,7 @@
 package com.neaniesoft.vermilion.posts.ui
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -305,26 +306,32 @@ fun PostTypeIndicator(type: Post.Type, modifier: Modifier = Modifier) {
 
 @Composable
 fun Thumbnail(thumbnail: Thumbnail, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    Log.d("Thumbnail", "thumbnail: $thumbnail (${thumbnail.identifier})")
     val painter = when (thumbnail) {
-        is SelfThumbnail, is DefaultThumbnail, is NoThumbnail, is NsfwThumbnail, is SpoilerThumbnail -> painterResource(
+        is SelfThumbnail, is DefaultThumbnail, is NsfwThumbnail, is SpoilerThumbnail -> painterResource(
             id = R.drawable.ic_baseline_image_72
         )
         is UriThumbnail -> {
             rememberImagePainter(thumbnail.uri)
         }
+        is NoThumbnail -> {
+            null
+        }
     }
-    Surface(
-        shape = MaterialTheme.shapes.small, elevation = 4.dp,
-        modifier = modifier
-            .size(72.dp)
-            .clickable { onClick() }
-    ) {
-        Image(
-            modifier = Modifier.size(72.dp),
-            contentScale = ContentScale.Crop,
-            painter = painter,
-            contentDescription = "Thumbnail"
-        )
+    if (painter != null) {
+        Surface(
+            shape = MaterialTheme.shapes.small, elevation = 4.dp,
+            modifier = modifier
+                .size(72.dp)
+                .clickable { onClick() }
+        ) {
+            Image(
+                modifier = Modifier.size(72.dp),
+                contentScale = ContentScale.Crop,
+                painter = painter,
+                contentDescription = "Thumbnail"
+            )
+        }
     }
 }
 

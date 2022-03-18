@@ -200,13 +200,13 @@ internal fun Preview.animatedImagePreview(): AnimatedImagePreview? {
     }?.choosePreviewImage()
 }
 
-internal fun String.thumbnail(): Thumbnail {
+fun String.thumbnail(): Thumbnail {
     return when {
-        this.isEmpty() -> NoThumbnail
-        this == "self" -> SelfThumbnail
-        this == "default" -> DefaultThumbnail
-        this == "spoiler" -> SpoilerThumbnail
-        this == "nsfw" -> NsfwThumbnail
+        this.isEmpty() || this == NoThumbnail.identifier -> NoThumbnail
+        this == SelfThumbnail.identifier -> NoThumbnail
+        this == DefaultThumbnail.identifier -> DefaultThumbnail
+        this == SpoilerThumbnail.identifier -> SpoilerThumbnail
+        this == NsfwThumbnail.identifier -> NsfwThumbnail
         this.isNotEmpty() -> UriThumbnail(this.toUri())
         else -> DefaultThumbnail
     }
