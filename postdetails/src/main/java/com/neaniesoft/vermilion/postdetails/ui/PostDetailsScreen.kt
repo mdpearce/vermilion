@@ -132,6 +132,7 @@ fun PostDetailsScreen(
         onMoreCommentsClicked = { commentsViewModel.onMoreCommentsClicked(it) },
         onThreadClicked = { postDetailsViewModel.onThreadClicked(it) },
         onCommentNavDownClicked = { commentsViewModel.onCommentNavDownClicked(it) },
+        onCommentClicked = { commentsViewModel.onCommentClicked(it) },
         onCommentLongPressed = { commentsViewModel.onCommentLongPressed(it) },
         onCommentUpVoteClicked = { commentsViewModel.onCommentUpVoteClicked(it) },
         onCommentDownVoteClicked = { commentsViewModel.onCommentDownVoteClicked(it) }
@@ -153,6 +154,7 @@ fun PostDetailsScreenContent(
     onThreadClicked: (ThreadStub) -> Unit,
     onCommentNavDownClicked: (Int) -> Unit,
     onCommentLongPressed: (Comment) -> Unit,
+    onCommentClicked: (Comment) -> Unit,
     onCommentUpVoteClicked: (Comment) -> Unit,
     onCommentDownVoteClicked: (Comment) -> Unit
 ) {
@@ -183,6 +185,7 @@ fun PostDetailsScreenContent(
                             Modifier.fillMaxWidth(),
                             onUriClicked = { onOpenUri(it.toUri()) },
                             onLongPress = onCommentLongPressed,
+                            onClick = onCommentClicked,
                             onUpVoteClicked = onCommentUpVoteClicked,
                             onDownVoteClicked = onCommentDownVoteClicked
                         )
@@ -286,6 +289,7 @@ fun PostDetailsScreenDark() {
             onDownVoteClicked = {},
             onThreadClicked = {},
             onCommentLongPressed = {},
+            onCommentClicked = {},
             onCommentUpVoteClicked = {},
             onCommentDownVoteClicked = {}
         )

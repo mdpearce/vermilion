@@ -115,7 +115,7 @@ class CommentsViewModel @Inject constructor(
             val index = comments.indexOf(CommentKind.Full(comment))
             if (index != -1) {
                 val updatedList =
-                    comments.take(index) + CommentKind.Full(comment.copy(isExpanded = !comment.isExpanded)) + comments.subList(
+                    comments.take(index) + CommentKind.Full(comment.copy(showActionsRow = !comment.showActionsRow)) + comments.subList(
                         index + 1,
                         comments.size
                     )
@@ -133,6 +133,46 @@ class CommentsViewModel @Inject constructor(
     fun onCommentDownVoteClicked(comment: Comment) {
         viewModelScope.launch {
             commentRepository.toggleDownVote(comment)
+        }
+    }
+
+    fun onCommentClicked(comment: Comment) {
+        viewModelScope.launch {
+            toggleCollapsedState(comment)
+        }
+    }
+
+    private suspend fun toggleCollapsedState(comment: Comment) {
+        val comments = comments.value
+        val isCollapsed = !comment.isCollapsed
+
+        val collapsedIndex = comments.indexOf(CommentKind.Full(comment))
+        if (collapsedIndex != -1) {
+            val nextCommentIndex = (
+                comments.subList(collapsedIndex + 1, comments.size)
+                    .indexOfFirst { it.depth.value <= comment.depth.value } + collapsedIndex + 1
+                ).takeIf { it != 0 }
+                ?: comments.size
+
+            val collapsedTree =
+                listOf(CommentKind.Full(comment.copy(isCollapsed = isCollapsed))) + comments.subList(
+                    collapsedIndex + 1,
+                    nextCommentIndex
+                ).map {
+                    when (it) {
+                        is CommentKind.Full -> CommentKind.Full(it.comment.copy(isHidden = isCollapsed))
+                        is CommentKind.Stub -> CommentKind.Stub(it.stub.copy(isHidden = isCollapsed))
+                        is CommentKind.Thread -> CommentKind.Thread(it.stub.copy(isHidden = isCollapsed))
+                    }
+                }
+
+            val updatedList =
+                comments.subList(0, collapsedIndex) + collapsedTree + comments.subList(
+                    nextCommentIndex,
+                    comments.size
+                )
+
+            _comments.emit(updatedList)
         }
     }
 }

@@ -26,7 +26,7 @@ interface CommentDao {
     @Query("SELECT insertedAt FROM comments WHERE postId == :postId ORDER BY insertedAt DESC LIMIT 1")
     suspend fun getLastInsertedAtForPost(postId: String): Long?
 
-    @Query("SELECT path FROM comments WHERE id == :commentId")
+    @Query("SELECT path FROM comments WHERE commentId == :commentId")
     suspend fun getPathForComment(commentId: String): String?
 
     @Insert
