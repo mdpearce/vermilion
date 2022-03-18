@@ -4,7 +4,6 @@ import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,6 +25,7 @@ import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -55,6 +55,7 @@ import com.neaniesoft.vermilion.postdetails.domain.entities.CommentId
 import com.neaniesoft.vermilion.postdetails.domain.entities.CommentStub
 import com.neaniesoft.vermilion.postdetails.domain.entities.ControversialIndex
 import com.neaniesoft.vermilion.postdetails.domain.entities.DurationString
+import com.neaniesoft.vermilion.postdetails.domain.entities.MoreCommentsCount
 import com.neaniesoft.vermilion.postdetails.domain.entities.ThreadStub
 import com.neaniesoft.vermilion.postdetails.domain.entities.UpVotesCount
 import com.neaniesoft.vermilion.postdetails.domain.entities.isDownVoted
@@ -328,17 +329,14 @@ fun MoreCommentsStubRow(
     Row(
         modifier
             .height(intrinsicSize = IntrinsicSize.Min)
-            .clickable { onClick(stub) }
     ) {
         DepthIndicators(depth = stub.depth.value)
-        Text(
-            text = stringResource(id = R.string.more_comments, stub.count.value),
-            style = MaterialTheme.typography.caption,
-            color = MaterialTheme.colors.primary,
-            modifier = Modifier
-                .alignByBaseline()
-                .padding(8.dp)
-        )
+        TextButton(onClick = { onClick(stub) }, modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = stringResource(id = R.string.more_comments, stub.count.value),
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
     }
 }
 
@@ -348,20 +346,14 @@ fun ThreadStubRow(
     modifier: Modifier = Modifier,
     onClick: (ThreadStub) -> Unit
 ) {
-    Row(
-        modifier
-            .height(intrinsicSize = IntrinsicSize.Min)
-            .clickable { onClick(stub) }
-    ) {
+    Row(modifier.height(intrinsicSize = IntrinsicSize.Min)) {
         DepthIndicators(depth = stub.depth.value)
-        Text(
-            text = stringResource(id = R.string.continue_thread),
-            style = MaterialTheme.typography.caption,
-            color = MaterialTheme.colors.primary,
-            modifier = Modifier
-                .alignByBaseline()
-                .padding(8.dp)
-        )
+        TextButton(onClick = { onClick(stub) }, modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = stringResource(id = R.string.continue_thread),
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
     }
 }
 
@@ -472,6 +464,23 @@ fun EditedCOmmentRowPreview() {
     VermilionTheme(darkTheme = true) {
         Surface {
             CommentRow(EDITED_DUMMY_COMMENT)
+        }
+    }
+}
+
+@Preview
+@Composable
+fun StubRowPreview() {
+    VermilionTheme(darkTheme = true) {
+        Surface {
+            MoreCommentsStubRow(
+                stub = CommentStub(
+                    PostId(""), CommentId(""), MoreCommentsCount(6), CommentId(""),
+                    CommentDepth(3),
+                    emptyList()
+                ),
+                onClick = {}
+            )
         }
     }
 }
