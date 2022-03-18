@@ -391,18 +391,16 @@ fun MoreCommentsStubRow(
     onClick: (CommentStub) -> Unit
 ) {
     Column {
-        AnimatedVisibility(visible = !stub.isHidden) {
-            Row(
-                modifier
-                    .height(intrinsicSize = IntrinsicSize.Min)
-            ) {
-                DepthIndicators(depth = stub.depth.value)
-                TextButton(onClick = { onClick(stub) }, modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        text = stringResource(id = R.string.more_comments, stub.count.value),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
+        Row(
+            modifier
+                .height(intrinsicSize = IntrinsicSize.Min)
+        ) {
+            DepthIndicators(depth = stub.depth.value)
+            TextButton(onClick = { onClick(stub) }, modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = stringResource(id = R.string.more_comments, stub.count.value),
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
     }
@@ -415,15 +413,13 @@ fun ThreadStubRow(
     onClick: (ThreadStub) -> Unit
 ) {
     Column {
-        AnimatedVisibility(visible = !stub.isHidden) {
-            Row(modifier.height(intrinsicSize = IntrinsicSize.Min)) {
-                DepthIndicators(depth = stub.depth.value)
-                TextButton(onClick = { onClick(stub) }, modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        text = stringResource(id = R.string.continue_thread),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
+        Row(modifier.height(intrinsicSize = IntrinsicSize.Min)) {
+            DepthIndicators(depth = stub.depth.value)
+            TextButton(onClick = { onClick(stub) }, modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = stringResource(id = R.string.continue_thread),
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
     }
