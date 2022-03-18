@@ -154,7 +154,7 @@ fun PostContent(
                     text = post.title.value,
                     style = MaterialTheme.typography.subtitle1,
                     modifier = Modifier
-                        .padding(bottom = 8.dp, end = 8.dp)
+                        .padding(end = 8.dp)
                         .weight(0.1f)
                         .alpha(contentAlpha)
                 )
