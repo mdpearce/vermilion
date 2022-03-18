@@ -94,21 +94,29 @@ fun CommentRow(
             },
             onClick = { onClick(comment) })
     ) {
-        AnimatedVisibility(visible = !comment.isCollapsed) {
-            CommentRowContent(comment = comment, modifier = modifier, onUriClicked = onUriClicked)
-        }
+        AnimatedVisibility(visible = !comment.isHidden) {
+            Column {
+                AnimatedVisibility(visible = !comment.isCollapsed) {
+                    CommentRowContent(
+                        comment = comment,
+                        modifier = modifier,
+                        onUriClicked = onUriClicked
+                    )
+                }
 
-        AnimatedVisibility(visible = comment.isCollapsed) {
-            CommentRowCollapsed(comment = comment, modifier = modifier)
-        }
+                AnimatedVisibility(visible = comment.isCollapsed) {
+                    CommentRowCollapsed(comment = comment, modifier = modifier)
+                }
 
-        AnimatedVisibility(visible = comment.showActionsRow) {
-            CommentActionsRow(
-                onUpVoteClicked = { onUpVoteClicked(comment) },
-                onDownVoteClicked = { onDownVoteClicked(comment) },
-                isUpVoted = comment.isUpVoted(),
-                isDownVoted = comment.isDownVoted()
-            )
+                AnimatedVisibility(visible = comment.showActionsRow) {
+                    CommentActionsRow(
+                        onUpVoteClicked = { onUpVoteClicked(comment) },
+                        onDownVoteClicked = { onDownVoteClicked(comment) },
+                        isUpVoted = comment.isUpVoted(),
+                        isDownVoted = comment.isDownVoted()
+                    )
+                }
+            }
         }
     }
 }
@@ -384,16 +392,20 @@ fun MoreCommentsStubRow(
     modifier: Modifier = Modifier,
     onClick: (CommentStub) -> Unit
 ) {
-    Row(
-        modifier
-            .height(intrinsicSize = IntrinsicSize.Min)
-    ) {
-        DepthIndicators(depth = stub.depth.value)
-        TextButton(onClick = { onClick(stub) }, modifier = Modifier.fillMaxWidth()) {
-            Text(
-                text = stringResource(id = R.string.more_comments, stub.count.value),
-                modifier = Modifier.fillMaxWidth()
-            )
+    Column {
+        AnimatedVisibility(visible = !stub.isHidden) {
+            Row(
+                modifier
+                    .height(intrinsicSize = IntrinsicSize.Min)
+            ) {
+                DepthIndicators(depth = stub.depth.value)
+                TextButton(onClick = { onClick(stub) }, modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = stringResource(id = R.string.more_comments, stub.count.value),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
         }
     }
 }
@@ -404,13 +416,17 @@ fun ThreadStubRow(
     modifier: Modifier = Modifier,
     onClick: (ThreadStub) -> Unit
 ) {
-    Row(modifier.height(intrinsicSize = IntrinsicSize.Min)) {
-        DepthIndicators(depth = stub.depth.value)
-        TextButton(onClick = { onClick(stub) }, modifier = Modifier.fillMaxWidth()) {
-            Text(
-                text = stringResource(id = R.string.continue_thread),
-                modifier = Modifier.fillMaxWidth()
-            )
+    Column {
+        AnimatedVisibility(visible = !stub.isHidden) {
+            Row(modifier.height(intrinsicSize = IntrinsicSize.Min)) {
+                DepthIndicators(depth = stub.depth.value)
+                TextButton(onClick = { onClick(stub) }, modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = stringResource(id = R.string.continue_thread),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
         }
     }
 }
@@ -533,7 +549,7 @@ fun StubRowPreview() {
         Surface {
             MoreCommentsStubRow(
                 stub = CommentStub(
-                    PostId(""), CommentId(""), "", MoreCommentsCount(6), CommentId(""),
+                    PostId(""), CommentId(""), MoreCommentsCount(6), CommentId(""),
                     CommentDepth(3),
                     emptyList()
                 ),
@@ -545,7 +561,6 @@ fun StubRowPreview() {
 
 val DUMMY_COMMENT = Comment(
     CommentId("id"),
-    "",
     CommentContent("This is a pretty long comment that might split over several lines. It's got several sentences and goes on for some time. Still going here."),
     Parser.builder().build()
         .parse("This is a pretty long comment that might split over several lines. It's got several sentences and goes on for some time. Still going here."),

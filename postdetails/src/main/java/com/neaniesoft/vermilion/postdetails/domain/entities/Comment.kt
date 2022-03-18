@@ -9,7 +9,6 @@ import java.time.Instant
 
 data class Comment(
     val id: CommentId,
-    override val path: String,
     val content: CommentContent,
     val contentMarkdown: Node,
     val flags: Set<CommentFlags>,
@@ -28,9 +27,8 @@ data class Comment(
     val commentFlair: CommentFlair,
     val showActionsRow: Boolean = false,
     val isCollapsed: Boolean = false,
-    override val isHidden: Boolean = false
-) : Hideable, HasPath
-
+    val isHidden: Boolean = false
+)
 fun Comment.isUpVoted(): Boolean = flags.contains(CommentFlags.UP_VOTED)
 
 fun Comment.isDownVoted(): Boolean = flags.contains(CommentFlags.DOWN_VOTED)

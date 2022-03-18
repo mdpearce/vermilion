@@ -189,18 +189,19 @@ class CommentRepositoryImpl @Inject constructor(
 
         database.withTransaction {
             dao.deleteAllForThread(postId.value, threadId.value)
-
-            newCommentRecords.forEach { record ->
-                dao.insertAll(record)
-                val parentId = record.parentId
-                val parentPath = if (parentId != null) {
-                    dao.getPathForComment(parentId) + "/"
-                } else {
-                    ""
-                }
-                val updatedRecord = record.copy(path = "$parentPath${record.id}")
-                dao.update(updatedRecord)
-            }
+            dao.insertAll(newCommentRecords)
+            // newCommentRecords.forEach { record ->
+            //     dao.insertAll(record)
+            //     val parentId = record.parentId
+            //     val parentPath = if (parentId != null) {
+            //         dao.getPathForComment(parentId) + "/"
+            //     } else {
+            //         ""
+            //     }
+            //     logger.debugIfEnabled { "updating path: $parentPath${record.commentId}" }
+            //     val updatedRecord = record.copy(path = "$parentPath${record.commentId}")
+            //     dao.update(updatedRecord)
+            // } // TODO: Get the path construction working
         }
 
         _networkActivityUpdates.emit(NetworkActivityUpdate(networkActivityIdentifier, false))
@@ -237,18 +238,19 @@ class CommentRepositoryImpl @Inject constructor(
             // Finally, delete the old entries and insert the new ones and then return the new ones from the DAO
             database.withTransaction {
                 dao.deleteAllForPost(postId.value)
-
-                newCommentRecords.forEach { record ->
-                    dao.insertAll(record)
-                    val parentId = record.parentId
-                    val parentPath = if (parentId != null) {
-                        dao.getPathForComment(parentId) + "/"
-                    } else {
-                        ""
-                    }
-                    val updatedRecord = record.copy(path = "$parentPath${record.id}")
-                    dao.update(updatedRecord)
-                }
+                dao.insertAll(newCommentRecords)
+                // newCommentRecords.forEach { record ->
+                //     dao.insertAll(record)
+                //     val parentId = record.parentId
+                //     val parentPath = if (parentId != null) {
+                //         dao.getPathForComment(parentId) + "/"
+                //     } else {
+                //         ""
+                //     }
+                //     logger.debugIfEnabled { "updating path: $parentPath${record.commentId}" }
+                //     val updatedRecord = record.copy(path = "$parentPath${record.commentId}")
+                //     dao.update(updatedRecord)
+                // } // TODO: Get the path construction working
             }
             _networkActivityUpdates.emit(NetworkActivityUpdate(networkActivityIdentifier, false))
         } else {
@@ -332,7 +334,6 @@ class CommentRepositoryImpl @Inject constructor(
         return CommentStub(
             postId = PostId(postId),
             id = CommentId(commentId),
-            path = path ?: "",
             count = MoreCommentsCount(score), // TODO stop using score as a proxy field for child count
             parentId = parentId?.let { CommentId(it) },
             depth = CommentDepth(depth),
@@ -343,7 +344,6 @@ class CommentRepositoryImpl @Inject constructor(
     private fun CommentRecord.toThreadStub(): ThreadStub {
         return ThreadStub(
             postId = PostId(postId),
-            path = path ?: "",
             parentId = CommentId(requireNotNull(parentId).replace("t1_", "")),
             depth = CommentDepth(depth)
         )
@@ -352,7 +352,6 @@ class CommentRepositoryImpl @Inject constructor(
     private fun CommentRecord.toComment(): Comment {
         return Comment(
             id = CommentId(commentId),
-            path = path ?: "",
             content = CommentContent(body),
             contentMarkdown = markdownParser.parse(body),
             flags = getFlags(),
