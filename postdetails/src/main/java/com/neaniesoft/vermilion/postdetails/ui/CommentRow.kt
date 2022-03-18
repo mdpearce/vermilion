@@ -144,7 +144,10 @@ fun CommentRowCollapsed(comment: Comment, modifier: Modifier) {
                     .size(24.dp)
             )
         }
-        Divider()
+        // Top-level comments draw a divider across their top, so we don't want to duplicate it with a bottom divider here
+        if (comment.depth != CommentDepth(0)) {
+            Divider()
+        }
     }
 }
 
