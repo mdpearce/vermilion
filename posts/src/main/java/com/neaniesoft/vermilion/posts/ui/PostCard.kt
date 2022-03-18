@@ -1,18 +1,17 @@
 package com.neaniesoft.vermilion.posts.ui
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
@@ -122,13 +121,12 @@ fun PostContent(
                     onMediaClicked(post)
                 }
                 Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.Bottom,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp)
                 ) {
-                    LinkHostChip(host = post.linkHost)
                     PostTypeIndicator(type = post.type)
                 }
             }
@@ -142,18 +140,21 @@ fun PostContent(
         }
         val hasPreview = post.imagePreview != null
 
-        Column(Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp)) {
+        Column(Modifier.padding(top = 8.dp, start = 16.dp, end = 16.dp)) {
+            if (post.type != Post.Type.TEXT) {
+                LinkHost(host = post.linkHost)
+            }
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 8.dp)
+                    .padding(bottom = 8.dp, top = 8.dp)
             ) {
                 Text(
                     text = post.title.value,
                     style = MaterialTheme.typography.subtitle1,
                     modifier = Modifier
-                        .padding(bottom = 8.dp, end = 8.dp)
+                        .padding(end = 8.dp)
                         .weight(0.1f)
                         .alpha(contentAlpha)
                 )
@@ -168,16 +169,7 @@ fun PostContent(
                 }
             }
 
-            Row(
-                Modifier
-                    .padding(bottom = 4.dp)
-                    .fillMaxWidth()
-            ) {
-                if (!hasPreview) {
-                    LinkHostChip(host = post.linkHost, modifier = Modifier.padding(end = 8.dp))
-                }
-                PostFlair(flair = post.flair)
-            }
+            PostFlair(flair = post.flair, Modifier.padding(bottom = 4.dp))
 
             if (post.text != null) {
                 TextSummary(
@@ -261,20 +253,13 @@ fun PostFlair(flair: PostFlair, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun LinkHostChip(host: LinkHost, modifier: Modifier = Modifier) {
+fun LinkHost(host: LinkHost, modifier: Modifier = Modifier) {
     if (!host.value.startsWith("self.")) {
-        Chip(
-            modifier = modifier,
-            elevation = 4.dp
-        ) {
-            Text(
-                text = host.value,
-                style = MaterialTheme.typography.caption,
-                modifier = Modifier.padding(4.dp)
-            )
-        }
-    } else {
-        Spacer(modifier = Modifier.width(16.dp))
+        Text(
+            text = host.value,
+            style = MaterialTheme.typography.caption,
+            modifier = modifier
+        )
     }
 }
 
@@ -305,26 +290,32 @@ fun PostTypeIndicator(type: Post.Type, modifier: Modifier = Modifier) {
 
 @Composable
 fun Thumbnail(thumbnail: Thumbnail, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    Log.d("Thumbnail", "thumbnail: $thumbnail (${thumbnail.identifier})")
     val painter = when (thumbnail) {
-        is SelfThumbnail, is DefaultThumbnail, is NoThumbnail, is NsfwThumbnail, is SpoilerThumbnail -> painterResource(
+        is SelfThumbnail, is DefaultThumbnail, is NsfwThumbnail, is SpoilerThumbnail -> painterResource(
             id = R.drawable.ic_baseline_image_72
         )
         is UriThumbnail -> {
             rememberImagePainter(thumbnail.uri)
         }
+        is NoThumbnail -> {
+            null
+        }
     }
-    Surface(
-        shape = MaterialTheme.shapes.small, elevation = 4.dp,
-        modifier = modifier
-            .size(72.dp)
-            .clickable { onClick() }
-    ) {
-        Image(
-            modifier = Modifier.size(72.dp),
-            contentScale = ContentScale.Crop,
-            painter = painter,
-            contentDescription = "Thumbnail"
-        )
+    if (painter != null) {
+        Surface(
+            shape = MaterialTheme.shapes.small, elevation = 4.dp,
+            modifier = modifier
+                .size(72.dp)
+                .clickable { onClick() }
+        ) {
+            Image(
+                modifier = Modifier.size(72.dp),
+                contentScale = ContentScale.Crop,
+                painter = painter,
+                contentDescription = "Thumbnail"
+            )
+        }
     }
 }
 

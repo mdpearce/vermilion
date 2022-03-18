@@ -137,7 +137,7 @@ fun PostsList(
     SwipeRefresh(state = refreshState, onRefresh = { posts.refresh() }) {
         LazyColumn(state = listState, modifier = Modifier.padding(start = 8.dp, end = 8.dp)) {
             items(posts) { post ->
-                Box(modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)) {
+                Box(modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)) {
                     if (post != null) {
                         PostCard(
                             post = post,

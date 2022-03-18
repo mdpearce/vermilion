@@ -19,6 +19,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.CommentCount
 import com.neaniesoft.vermilion.posts.domain.entities.DefaultThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.LinkHost
 import com.neaniesoft.vermilion.posts.domain.entities.MarkdownText
+import com.neaniesoft.vermilion.posts.domain.entities.NoThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.NsfwThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlags
@@ -68,18 +69,19 @@ fun Link.toPost(markdownParser: Parser): Post {
         flags(),
         url.toUri(),
         flair(),
-        postHint?.let {
-            when {
-                it.endsWith("link") -> Post.Type.LINK
-                it.endsWith("video") -> Post.Type.VIDEO
-                it.endsWith("image") -> Post.Type.IMAGE
-                it.endsWith("self") -> Post.Type.TEXT
-                else -> {
-                    Post.Type.LINK
-                }
-            }
-        } ?: Post.Type.LINK
+        type()
     )
+}
+
+internal fun Link.type(): Post.Type {
+    val hint = postHint
+    return when {
+        hint?.endsWith("link") == true -> Post.Type.LINK
+        hint?.endsWith("video") == true -> Post.Type.VIDEO
+        hint?.endsWith("image") == true -> Post.Type.IMAGE
+        hint?.endsWith("self") == true || isSelf -> Post.Type.TEXT
+        else -> Post.Type.LINK
+    }
 }
 
 internal fun Link.attachedVideo(): VideoDescriptor? {
@@ -198,12 +200,13 @@ internal fun Preview.animatedImagePreview(): AnimatedImagePreview? {
     }?.choosePreviewImage()
 }
 
-internal fun String.thumbnail(): Thumbnail {
+fun String.thumbnail(): Thumbnail {
     return when {
-        this == "self" -> SelfThumbnail
-        this == "default" -> DefaultThumbnail
-        this == "spoiler" -> SpoilerThumbnail
-        this == "nsfw" -> NsfwThumbnail
+        this.isEmpty() || this == NoThumbnail.identifier -> NoThumbnail
+        this == SelfThumbnail.identifier -> NoThumbnail
+        this == DefaultThumbnail.identifier -> DefaultThumbnail
+        this == SpoilerThumbnail.identifier -> SpoilerThumbnail
+        this == NsfwThumbnail.identifier -> NsfwThumbnail
         this.isNotEmpty() -> UriThumbnail(this.toUri())
         else -> DefaultThumbnail
     }
