@@ -182,13 +182,13 @@ fun PostContent(
                 }
             }
 
-            Divider(modifier = Modifier.padding(top = 8.dp, bottom = 8.dp))
+            Divider(modifier = Modifier.padding(top = 8.dp))
 
             PostDetails(
                 post = post,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 8.dp),
+                    .padding(bottom = 4.dp),
                 onCommunityClicked = onCommunityClicked,
                 onUpVoteClicked = onUpVoteClicked,
                 onDownVoteClicked = onDownVoteClicked,
