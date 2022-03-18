@@ -148,8 +148,10 @@ class CommentsViewModel @Inject constructor(
 
         val collapsedIndex = comments.indexOf(CommentKind.Full(comment))
         if (collapsedIndex != -1) {
-            val nextCommentIndex = (comments.subList(collapsedIndex + 1, comments.size)
-                .indexOfFirst { it.depth.value <= comment.depth.value } + collapsedIndex + 1).takeIf { it != 0 }
+            val nextCommentIndex = (
+                comments.subList(collapsedIndex + 1, comments.size)
+                    .indexOfFirst { it.depth.value <= comment.depth.value } + collapsedIndex + 1
+                ).takeIf { it != 0 }
                 ?: comments.size
 
             val collapsedTree =

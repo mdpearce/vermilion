@@ -92,7 +92,8 @@ fun CommentRow(
                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                 onLongPress(comment)
             },
-            onClick = { onClick(comment) })
+            onClick = { onClick(comment) }
+        )
     ) {
         AnimatedVisibility(visible = !comment.isHidden) {
             Column {
