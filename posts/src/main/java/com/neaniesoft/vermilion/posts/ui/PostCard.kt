@@ -1,7 +1,6 @@
 package com.neaniesoft.vermilion.posts.ui
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -290,7 +289,6 @@ fun PostTypeIndicator(type: Post.Type, modifier: Modifier = Modifier) {
 
 @Composable
 fun Thumbnail(thumbnail: Thumbnail, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    Log.d("Thumbnail", "thumbnail: $thumbnail (${thumbnail.identifier})")
     val painter = when (thumbnail) {
         is SelfThumbnail, is DefaultThumbnail, is NsfwThumbnail, is SpoilerThumbnail -> painterResource(
             id = R.drawable.ic_baseline_image_72
