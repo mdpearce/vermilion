@@ -3,6 +3,7 @@ package com.neaniesoft.vermilion.ui.images
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -11,6 +12,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
+import com.neaniesoft.vermilion.ui.dialogs.FullscreenDialog
 
 @ExperimentalPagerApi
 @Composable
@@ -27,5 +29,15 @@ fun ImageGallery(
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Fit
         )
+    }
+}
+
+@ExperimentalPagerApi
+@ExperimentalMaterialApi
+@Composable
+fun ImageGalleryDialog(images: List<Uri>, onDismiss: () -> Unit) {
+    FullscreenDialog(onDismiss = onDismiss) {
+        val state = rememberPagerState()
+        ImageGallery(images = images, modifier = Modifier.fillMaxSize(), pagerState = state)
     }
 }
