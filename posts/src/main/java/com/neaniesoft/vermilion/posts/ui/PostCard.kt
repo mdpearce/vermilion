@@ -435,7 +435,8 @@ val DUMMY_TEXT_POST = Post(
         PostFlairBackgroundColor(0),
         PostFlairTextColor.DARK
     ),
-    Post.Type.TEXT
+    Post.Type.TEXT,
+    emptyList()
 )
 
 val DUMMY_LINK_POST = DUMMY_TEXT_POST.copy(
