@@ -179,26 +179,28 @@ fun PostDetailsScreenContent(
                 }
 
                 items(comments) { item ->
-                    when (item) {
-                        is CommentKind.Full -> CommentRow(
-                            comment = item.comment,
-                            Modifier.fillMaxWidth(),
-                            onUriClicked = { onOpenUri(it.toUri()) },
-                            onLongPress = onCommentLongPressed,
-                            onClick = onCommentClicked,
-                            onUpVoteClicked = onCommentUpVoteClicked,
-                            onDownVoteClicked = onCommentDownVoteClicked
-                        )
-                        is CommentKind.Stub -> MoreCommentsStubRow(
-                            stub = item.stub,
-                            Modifier.fillMaxWidth(),
-                            onClick = { onMoreCommentsClicked(it) }
-                        )
-                        is CommentKind.Thread -> ThreadStubRow(
-                            stub = item.stub,
-                            Modifier.fillMaxWidth(),
-                            onClick = { onThreadClicked(it) }
-                        )
+                    if (!item.isHidden) {
+                        when (item) {
+                            is CommentKind.Full -> CommentRow(
+                                comment = item.comment,
+                                Modifier.fillMaxWidth(),
+                                onUriClicked = { onOpenUri(it.toUri()) },
+                                onLongPress = onCommentLongPressed,
+                                onClick = onCommentClicked,
+                                onUpVoteClicked = onCommentUpVoteClicked,
+                                onDownVoteClicked = onCommentDownVoteClicked
+                            )
+                            is CommentKind.Stub -> MoreCommentsStubRow(
+                                stub = item.stub,
+                                Modifier.fillMaxWidth(),
+                                onClick = { onMoreCommentsClicked(it) }
+                            )
+                            is CommentKind.Thread -> ThreadStubRow(
+                                stub = item.stub,
+                                Modifier.fillMaxWidth(),
+                                onClick = { onThreadClicked(it) }
+                            )
+                        }
                     }
                 }
             }

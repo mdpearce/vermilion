@@ -95,28 +95,25 @@ fun CommentRow(
             onClick = { onClick(comment) }
         )
     ) {
-        AnimatedVisibility(visible = !comment.isHidden) {
-            Column {
-                AnimatedVisibility(visible = !comment.isCollapsed) {
-                    CommentRowContent(
-                        comment = comment,
-                        modifier = modifier,
-                        onUriClicked = onUriClicked
-                    )
-                }
+        Column {
+            AnimatedVisibility(visible = !comment.isCollapsed) {
+                CommentRowContent(
+                    comment = comment,
+                    modifier = modifier,
+                    onUriClicked = onUriClicked
+                )
+            }
+            AnimatedVisibility(visible = comment.isCollapsed) {
+                CommentRowCollapsed(comment = comment, modifier = modifier)
+            }
 
-                AnimatedVisibility(visible = comment.isCollapsed) {
-                    CommentRowCollapsed(comment = comment, modifier = modifier)
-                }
-
-                AnimatedVisibility(visible = comment.showActionsRow) {
-                    CommentActionsRow(
-                        onUpVoteClicked = { onUpVoteClicked(comment) },
-                        onDownVoteClicked = { onDownVoteClicked(comment) },
-                        isUpVoted = comment.isUpVoted(),
-                        isDownVoted = comment.isDownVoted()
-                    )
-                }
+            AnimatedVisibility(visible = comment.showActionsRow) {
+                CommentActionsRow(
+                    onUpVoteClicked = { onUpVoteClicked(comment) },
+                    onDownVoteClicked = { onDownVoteClicked(comment) },
+                    isUpVoted = comment.isUpVoted(),
+                    isDownVoted = comment.isDownVoted()
+                )
             }
         }
     }
@@ -147,7 +144,10 @@ fun CommentRowCollapsed(comment: Comment, modifier: Modifier) {
                     .size(24.dp)
             )
         }
-        Divider()
+        // Top-level comments draw a divider across their top, so we don't want to duplicate it with a bottom divider here
+        if (comment.depth != CommentDepth(0)) {
+            Divider()
+        }
     }
 }
 
@@ -394,18 +394,16 @@ fun MoreCommentsStubRow(
     onClick: (CommentStub) -> Unit
 ) {
     Column {
-        AnimatedVisibility(visible = !stub.isHidden) {
-            Row(
-                modifier
-                    .height(intrinsicSize = IntrinsicSize.Min)
-            ) {
-                DepthIndicators(depth = stub.depth.value)
-                TextButton(onClick = { onClick(stub) }, modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        text = stringResource(id = R.string.more_comments, stub.count.value),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
+        Row(
+            modifier
+                .height(intrinsicSize = IntrinsicSize.Min)
+        ) {
+            DepthIndicators(depth = stub.depth.value)
+            TextButton(onClick = { onClick(stub) }, modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = stringResource(id = R.string.more_comments, stub.count.value),
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
     }
@@ -418,15 +416,13 @@ fun ThreadStubRow(
     onClick: (ThreadStub) -> Unit
 ) {
     Column {
-        AnimatedVisibility(visible = !stub.isHidden) {
-            Row(modifier.height(intrinsicSize = IntrinsicSize.Min)) {
-                DepthIndicators(depth = stub.depth.value)
-                TextButton(onClick = { onClick(stub) }, modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        text = stringResource(id = R.string.continue_thread),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
+        Row(modifier.height(intrinsicSize = IntrinsicSize.Min)) {
+            DepthIndicators(depth = stub.depth.value)
+            TextButton(onClick = { onClick(stub) }, modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = stringResource(id = R.string.continue_thread),
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
     }
