@@ -69,8 +69,18 @@ fun Link.toPost(markdownParser: Parser): Post {
         flags(),
         url.toUri(),
         flair(),
-        type()
+        type(),
+        gallery()
     )
+}
+
+internal fun Link.gallery(): List<UriImage> {
+    return mediaMetadata?.values?.map {
+        // TODO Pull the different sized previews in so we can download the correct one
+        with(it.source) {
+            UriImage(uri = uri.toUri(), width = width, height = height)
+        }
+    } ?: emptyList()
 }
 
 internal fun Link.type(): Post.Type {
@@ -80,6 +90,7 @@ internal fun Link.type(): Post.Type {
         hint?.endsWith("video") == true -> Post.Type.VIDEO
         hint?.endsWith("image") == true -> Post.Type.IMAGE
         hint?.endsWith("self") == true || isSelf -> Post.Type.TEXT
+        isGallery == true -> Post.Type.GALLERY
         else -> Post.Type.LINK
     }
 }

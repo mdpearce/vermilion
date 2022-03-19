@@ -24,10 +24,11 @@ data class Post(
     val flags: Set<PostFlags>,
     val link: Uri,
     val flair: PostFlair,
-    val type: Type
+    val type: Type,
+    val gallery: List<UriImage>
 ) {
     enum class Type {
-        TEXT, IMAGE, LINK, VIDEO
+        TEXT, IMAGE, LINK, VIDEO, GALLERY
     }
 }
 
