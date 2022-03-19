@@ -87,6 +87,18 @@ fun PostDetails(
                     )
                 )
             }
+
+            if (subredditName.isNotEmpty()) {
+                Text(
+                    style = MaterialTheme.typography.button,
+                    color = MaterialTheme.colors.primary,
+                    text = subredditName,
+                    modifier = Modifier
+                        .clickable { onCommunityClicked(post.community) }
+                        .padding(bottom = 8.dp, top = 8.dp)
+                )
+            }
+
             Text(
                 text = postedAtTime,
                 style = MaterialTheme.typography.caption,
@@ -98,15 +110,6 @@ fun PostDetails(
                 style = MaterialTheme.typography.caption,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-
-            if (subredditName.isNotEmpty()) {
-                Text(
-                    style = MaterialTheme.typography.body2,
-                    text = subredditName,
-                    modifier = Modifier
-                        .clickable { onCommunityClicked(post.community) }
-                )
-            }
         }
         Spacer(modifier = Modifier.weight(1.0f))
         Text(
