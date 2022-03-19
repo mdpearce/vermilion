@@ -119,8 +119,25 @@ fun PostRecord.toPost(markdownParser: Parser, additionalFlags: Set<PostFlags> = 
             PostType.IMAGE -> Post.Type.IMAGE
             PostType.LINK -> Post.Type.LINK
             PostType.VIDEO -> Post.Type.VIDEO
-        }
+            PostType.GALLERY -> Post.Type.GALLERY
+        },
+        gallery = gallery()
     )
+}
+
+// TODO this is truly disgusting. Use a separate table!
+private fun PostRecord.gallery(): List<UriImage> {
+    val uris = galleryItemUris?.split(",") ?: emptyList()
+    val widths = galleryItemWidths?.split(",")?.map { it.toInt() } ?: emptyList()
+    val heights = galleryItemHeights?.split(",")?.map { it.toInt() } ?: emptyList()
+
+    if (uris.size != widths.size || uris.size != heights.size) {
+        throw IllegalStateException("Invalid serialized gallery, field counts do not match. uris: ${uris.size}, widths: ${widths.size}, heights: ${heights.size}")
+    }
+
+    return uris.mapIndexed { i, uri ->
+        UriImage(uri.toUri(), width = widths[i], height = heights[i])
+    }
 }
 
 fun Post.toPostRecord(query: String, clock: Clock): PostRecord = PostRecord(
@@ -134,6 +151,7 @@ fun Post.toPostRecord(query: String, clock: Clock): PostRecord = PostRecord(
         Post.Type.IMAGE -> PostType.IMAGE
         Post.Type.LINK -> PostType.LINK
         Post.Type.VIDEO -> PostType.VIDEO
+        Post.Type.GALLERY -> PostType.GALLERY
     },
     linkHost = link.host ?: "",
     thumbnailUri = thumbnail.identifier,
@@ -173,5 +191,8 @@ fun Post.toPostRecord(query: String, clock: Clock): PostRecord = PostRecord(
     flairTextColor = when (flair) {
         is PostFlair.NoFlair -> PostFlairTextColor.DARK.name
         is PostFlair.TextFlair -> flair.textColor.name
-    }
+    },
+    galleryItemUris = gallery.joinToString(",") { it.uri.toString() },
+    galleryItemWidths = gallery.joinToString(",") { it.width.toString() },
+    galleryItemHeights = gallery.joinToString(",") { it.height.toString() }
 )

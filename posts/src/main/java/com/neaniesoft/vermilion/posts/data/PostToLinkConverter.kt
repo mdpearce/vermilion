@@ -78,7 +78,11 @@ internal fun Link.gallery(): List<UriImage> {
     return mediaMetadata?.values?.map {
         // TODO Pull the different sized previews in so we can download the correct one
         with(it.source) {
-            UriImage(uri = uri.toUri(), width = width, height = height)
+            UriImage(
+                uri = StringEscapeUtils.escapeHtml4(uri).toUri(),
+                width = width,
+                height = height
+            )
         }
     } ?: emptyList()
 }
