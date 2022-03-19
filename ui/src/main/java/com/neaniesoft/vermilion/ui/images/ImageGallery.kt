@@ -19,7 +19,7 @@ fun ImageGallery(
     modifier: Modifier = Modifier,
     pagerState: PagerState = rememberPagerState()
 ) {
-    HorizontalPager(count = images.size, state = pagerState) {
+    HorizontalPager(count = images.size, state = pagerState, modifier = modifier) {
         val painter = rememberImagePainter(images[currentPage])
         Image(
             painter = painter,
