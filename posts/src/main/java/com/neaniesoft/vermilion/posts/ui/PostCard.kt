@@ -132,7 +132,13 @@ fun PostContent(
                         .fillMaxWidth()
                         .padding(8.dp)
                 ) {
-                    PostTypeIndicator(type = post.type)
+                    PostTypeIndicator(
+                        type = post.type, text = if (post.type == Post.Type.GALLERY) {
+                            post.gallery.size.toString()
+                        } else {
+                            ""
+                        }
+                    )
                 }
             }
         }
@@ -281,11 +287,13 @@ fun PostTypeIndicator(type: Post.Type, modifier: Modifier = Modifier, text: Stri
             id = resource
         )
         Surface(
-            shape = MaterialTheme.shapes.small.copy(all = CornerSize(50)),
+            shape = MaterialTheme.shapes.small,
+            color = AlmostBlack.copy(alpha = 0.7f),
+            contentColor = Color.White,
             modifier = modifier,
-            elevation = 4.dp
+            elevation = 0.dp
         ) {
-            Row {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     painter = painter,
                     contentDescription = type.name,
@@ -295,7 +303,7 @@ fun PostTypeIndicator(type: Post.Type, modifier: Modifier = Modifier, text: Stri
                     Text(
                         text = text,
                         style = MaterialTheme.typography.caption,
-                        modifier = Modifier.padding(bottom = 0.dp, end = 8.dp)
+                        modifier = Modifier.padding(end = 8.dp)
                     )
                 }
             }
