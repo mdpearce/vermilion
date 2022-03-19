@@ -107,10 +107,16 @@ fun PostContent(
 ) {
     Column(modifier = modifier.padding(0.dp)) {
 
-        if (post.imagePreview != null) {
+        val imagePreview = post.imagePreview ?: if (post.gallery.isNotEmpty()) {
+            post.gallery.first()
+        } else {
+            null
+        }
+
+        if (imagePreview != null) {
             Box(contentAlignment = Alignment.BottomStart) {
                 ImageSummary(
-                    image = post.imagePreview,
+                    image = imagePreview,
                     isNsfw = if (shouldHideNsfw) {
                         post.isNsfw()
                     } else {
@@ -137,7 +143,7 @@ fun PostContent(
                 1.0f
             }
         }
-        val hasPreview = post.imagePreview != null
+        val hasPreview = imagePreview != null
 
         Column(Modifier.padding(top = 8.dp, start = 16.dp, end = 16.dp)) {
             if (post.type != Post.Type.TEXT) {
