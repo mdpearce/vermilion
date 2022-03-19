@@ -79,7 +79,7 @@ internal fun Link.gallery(): List<UriImage> {
         // TODO Pull the different sized previews in so we can download the correct one
         with(it.source) {
             UriImage(
-                uri = StringEscapeUtils.escapeHtml4(uri).toUri(),
+                uri = StringEscapeUtils.unescapeHtml4(uri).toUri(),
                 width = width,
                 height = height
             )
