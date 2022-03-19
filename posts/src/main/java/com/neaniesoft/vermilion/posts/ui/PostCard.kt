@@ -269,10 +269,11 @@ fun LinkHost(host: LinkHost, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun PostTypeIndicator(type: Post.Type, modifier: Modifier = Modifier) {
+fun PostTypeIndicator(type: Post.Type, modifier: Modifier = Modifier, text: String = "") {
     val resource = when (type) {
         Post.Type.LINK -> R.drawable.ic_baseline_link_24
         Post.Type.VIDEO -> R.drawable.ic_baseline_ondemand_video_24
+        Post.Type.GALLERY -> R.drawable.ic_baseline_gallery_24
         else -> 0
     }
     if (resource != 0) {
@@ -284,11 +285,20 @@ fun PostTypeIndicator(type: Post.Type, modifier: Modifier = Modifier) {
             modifier = modifier,
             elevation = 4.dp
         ) {
-            Icon(
-                painter = painter,
-                contentDescription = type.name,
-                modifier = Modifier.padding(8.dp)
-            )
+            Row {
+                Icon(
+                    painter = painter,
+                    contentDescription = type.name,
+                    modifier = Modifier.padding(8.dp)
+                )
+                if (text.isNotEmpty()) {
+                    Text(
+                        text = text,
+                        style = MaterialTheme.typography.caption,
+                        modifier = Modifier.padding(bottom = 0.dp, end = 8.dp)
+                    )
+                }
+            }
         }
     }
 }

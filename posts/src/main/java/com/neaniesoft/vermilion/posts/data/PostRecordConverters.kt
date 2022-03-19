@@ -127,9 +127,11 @@ fun PostRecord.toPost(markdownParser: Parser, additionalFlags: Set<PostFlags> = 
 
 // TODO this is truly disgusting. Use a separate table!
 private fun PostRecord.gallery(): List<UriImage> {
-    val uris = galleryItemUris?.split(",") ?: emptyList()
-    val widths = galleryItemWidths?.split(",")?.map { it.toInt() } ?: emptyList()
-    val heights = galleryItemHeights?.split(",")?.map { it.toInt() } ?: emptyList()
+    val uris = galleryItemUris?.split(",")?.filterNot { it.isEmpty() } ?: emptyList()
+    val widths =
+        galleryItemWidths?.split(",")?.filterNot { it.isEmpty() }?.map { it.toInt() } ?: emptyList()
+    val heights = galleryItemHeights?.split(",")?.filterNot { it.isEmpty() }?.map { it.toInt() }
+        ?: emptyList()
 
     if (uris.size != widths.size || uris.size != heights.size) {
         throw IllegalStateException("Invalid serialized gallery, field counts do not match. uris: ${uris.size}, widths: ${widths.size}, heights: ${heights.size}")
