@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import coil.transform.BlurTransformation
 import com.neaniesoft.vermilion.posts.R
-import com.neaniesoft.vermilion.posts.domain.entities.UriImage
+import com.neaniesoft.vermilion.coreentities.UriImage
 import com.neaniesoft.vermilion.ui.markdown.MarkdownDocument
 import org.commonmark.node.Document
 

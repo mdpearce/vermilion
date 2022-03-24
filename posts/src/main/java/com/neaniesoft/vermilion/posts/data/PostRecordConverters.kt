@@ -22,7 +22,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.PostFlairTextColor
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.PostTitle
 import com.neaniesoft.vermilion.posts.domain.entities.Score
-import com.neaniesoft.vermilion.posts.domain.entities.UriImage
+import com.neaniesoft.vermilion.coreentities.UriImage
 import com.neaniesoft.vermilion.ui.videos.direct.VideoDescriptor
 import com.neaniesoft.vermilion.ui.videos.direct.VideoHeight
 import com.neaniesoft.vermilion.ui.videos.direct.VideoWidth

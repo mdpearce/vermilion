@@ -33,7 +33,7 @@ import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.posts.domain.entities.SelfThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.SpoilerThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.Thumbnail
-import com.neaniesoft.vermilion.posts.domain.entities.UriImage
+import com.neaniesoft.vermilion.coreentities.UriImage
 import com.neaniesoft.vermilion.posts.domain.entities.UriThumbnail
 import com.neaniesoft.vermilion.ui.videos.direct.VideoDescriptor
 import com.neaniesoft.vermilion.ui.videos.direct.VideoHeight
