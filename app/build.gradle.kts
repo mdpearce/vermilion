@@ -145,6 +145,7 @@ dependencies {
     implementation(platform(Deps.FIREBASE_BOM))
     implementation(Deps.FIREBASE_ANALYTICS)
     implementation(Deps.FIREBASE_CRASHLYTICS)
+    implementation(Deps.ACCOMPANIST_PAGER)
     implementation(project(":posts"))
     implementation(project(":postdetails"))
     implementation(project(":ui"))

@@ -8,6 +8,7 @@ enum class VermilionScreen {
     MyAccount,
     CustomTab,
     Image,
+    ImageGallery,
     Video,
     ExternalVideo,
     YouTube;
@@ -21,6 +22,7 @@ enum class VermilionScreen {
             MyAccount.name -> MyAccount
             CustomTab.name -> CustomTab
             Image.name -> Image
+            ImageGallery.name -> ImageGallery
             Video.name -> Video
             ExternalVideo.name -> ExternalVideo
             YouTube.name -> YouTube

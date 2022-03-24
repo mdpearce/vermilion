@@ -8,12 +8,14 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.paging.ExperimentalPagingApi
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
+import com.google.accompanist.pager.ExperimentalPagerApi
 import com.neaniesoft.vermilion.accounts.domain.UserAccountService
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
 import java.time.Clock
 import javax.inject.Inject
 
+@ExperimentalPagerApi
 @FlowPreview
 @ExperimentalMaterialApi
 @ExperimentalComposeUiApi
