@@ -9,6 +9,7 @@ import com.neaniesoft.vermilion.api.entities.Preview
 import com.neaniesoft.vermilion.coreentities.CommunityId
 import com.neaniesoft.vermilion.coreentities.CommunityName
 import com.neaniesoft.vermilion.coreentities.NamedCommunity
+import com.neaniesoft.vermilion.coreentities.UriImage
 import com.neaniesoft.vermilion.posts.domain.choosePreviewImage
 import com.neaniesoft.vermilion.posts.domain.entities.AnimatedImagePreview
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
@@ -33,7 +34,6 @@ import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.posts.domain.entities.SelfThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.SpoilerThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.Thumbnail
-import com.neaniesoft.vermilion.posts.domain.entities.UriImage
 import com.neaniesoft.vermilion.posts.domain.entities.UriThumbnail
 import com.neaniesoft.vermilion.ui.videos.direct.VideoDescriptor
 import com.neaniesoft.vermilion.ui.videos.direct.VideoHeight
@@ -69,8 +69,22 @@ fun Link.toPost(markdownParser: Parser): Post {
         flags(),
         url.toUri(),
         flair(),
-        type()
+        type(),
+        gallery()
     )
+}
+
+internal fun Link.gallery(): List<UriImage> {
+    return mediaMetadata?.values?.map {
+        // TODO Pull the different sized previews in so we can download the correct one
+        with(it.source) {
+            UriImage(
+                uri = StringEscapeUtils.unescapeHtml4(uri).toUri(),
+                width = width,
+                height = height
+            )
+        }
+    } ?: emptyList()
 }
 
 internal fun Link.type(): Post.Type {
@@ -80,6 +94,7 @@ internal fun Link.type(): Post.Type {
         hint?.endsWith("video") == true -> Post.Type.VIDEO
         hint?.endsWith("image") == true -> Post.Type.IMAGE
         hint?.endsWith("self") == true || isSelf -> Post.Type.TEXT
+        isGallery == true -> Post.Type.GALLERY
         else -> Post.Type.LINK
     }
 }

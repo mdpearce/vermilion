@@ -134,6 +134,9 @@ class PostsViewModel @Inject constructor(
             } else if (post.type == Post.Type.IMAGE && post.animatedImagePreview != null) {
                 logger.debugIfEnabled { "Found image with animated preview, loading video with animated preview" }
                 buildVideoRoute(post.animatedImagePreview.uri)
+            } else if (post.type == Post.Type.GALLERY && post.gallery.isNotEmpty()) {
+                logger.debugIfEnabled { "Found gallery, loading gallery dialog" }
+                buildGalleryRoute(post.id)
             } else {
                 logger.debugIfEnabled { "Falling back to link route" }
                 buildLinkRoute(post.link)
@@ -141,6 +144,10 @@ class PostsViewModel @Inject constructor(
 
             _routeEvents.emit(route)
         }
+    }
+
+    private fun buildGalleryRoute(postId: PostId): String {
+        return "ImageGallery/${postId.value}"
     }
 
     private fun buildVideoRoute(video: VideoDescriptor): String {

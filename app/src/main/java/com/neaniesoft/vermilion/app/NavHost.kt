@@ -17,6 +17,7 @@ import androidx.navigation.navArgument
 import androidx.paging.ExperimentalPagingApi
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.bottomSheet
+import com.google.accompanist.pager.ExperimentalPagerApi
 import com.neaniesoft.vermilion.accounts.adapters.driving.ui.UserAccountScreen
 import com.neaniesoft.vermilion.app.customtabs.customTab
 import com.neaniesoft.vermilion.coreentities.CommunityId
@@ -26,6 +27,7 @@ import com.neaniesoft.vermilion.postdetails.domain.entities.CommentId
 import com.neaniesoft.vermilion.postdetails.ui.CommentThreadScreen
 import com.neaniesoft.vermilion.postdetails.ui.PostDetailsScreen
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
+import com.neaniesoft.vermilion.posts.ui.PostGalleryDialog
 import com.neaniesoft.vermilion.posts.ui.PostsScreen
 import com.neaniesoft.vermilion.ui.images.ImageDialog
 import com.neaniesoft.vermilion.ui.videos.custom.youtube.YouTubeDialog
@@ -34,6 +36,7 @@ import com.neaniesoft.vermilion.ui.videos.external.ExternalVideoDialog
 import kotlinx.coroutines.FlowPreview
 import java.net.URLDecoder
 
+@ExperimentalPagerApi
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @ExperimentalComposeUiApi
@@ -196,6 +199,21 @@ fun VermilionNavHost(
                 requireNotNull(backStackEntry.arguments?.getString("videoId"))
 
             YouTubeDialog(videoId, onDismiss = {
+                navController.popBackStack(backStackEntry.destination.id, true)
+            })
+        }
+
+        // Fullscreen image gallery
+        dialog(
+            route = "${VermilionScreen.ImageGallery}/{postId}",
+            arguments = listOf(
+                navArgument("postId") { type = NavType.StringType }
+            ),
+            dialogProperties = DialogProperties(usePlatformDefaultWidth = false)
+        ) { backStackEntry ->
+            val postId = requireNotNull(backStackEntry.arguments?.getString("postId"))
+
+            PostGalleryDialog(postId = PostId(postId), onDismiss = {
                 navController.popBackStack(backStackEntry.destination.id, true)
             })
         }

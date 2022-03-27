@@ -2,6 +2,7 @@ package com.neaniesoft.vermilion.posts.domain.entities
 
 import android.net.Uri
 import com.neaniesoft.vermilion.coreentities.Community
+import com.neaniesoft.vermilion.coreentities.UriImage
 import com.neaniesoft.vermilion.ui.videos.direct.VideoDescriptor
 import java.time.Instant
 
@@ -24,10 +25,11 @@ data class Post(
     val flags: Set<PostFlags>,
     val link: Uri,
     val flair: PostFlair,
-    val type: Type
+    val type: Type,
+    val gallery: List<UriImage>
 ) {
     enum class Type {
-        TEXT, IMAGE, LINK, VIDEO
+        TEXT, IMAGE, LINK, VIDEO, GALLERY
     }
 }
 

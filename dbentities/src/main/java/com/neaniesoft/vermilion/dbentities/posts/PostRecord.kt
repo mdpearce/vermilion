@@ -43,14 +43,19 @@ data class PostRecord(
     val flags: String,
     val flairText: String?,
     val flairBackgroundColor: Int,
-    val flairTextColor: String
+    val flairTextColor: String,
+    // TODO: This is really gross - we should be using a different table ideally
+    val galleryItemUris: String?,
+    val galleryItemWidths: String?,
+    val galleryItemHeights: String?
 )
 
 enum class PostType {
     IMAGE,
     LINK,
     TEXT,
-    VIDEO
+    VIDEO,
+    GALLERY
 }
 
 data class PostWithHistory(
