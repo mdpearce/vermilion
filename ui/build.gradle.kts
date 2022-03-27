@@ -21,4 +21,5 @@ dependencies {
     debugImplementation(Deps.COMPOSE_UI_TOOLING)
     implementation(Deps.KOTLINX_SERIALIZATION_JSON)
     implementation(Deps.ACCOMPANIST_PAGER)
+    implementation(Deps.ACCOMPANIST_PAGER_INDICATORS)
 }
