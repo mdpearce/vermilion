@@ -1,13 +1,21 @@
 package com.neaniesoft.vermilion.ui.images
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -28,7 +36,16 @@ fun ImageGallery(
     images: List<UriImage>,
     pagerState: PagerState = rememberPagerState()
 ) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
+    var isBottomBarVisible: Boolean by remember {
+        mutableStateOf(true)
+    }
+
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .clickable {
+            isBottomBarVisible = !isBottomBarVisible
+        }, contentAlignment = Alignment.BottomCenter
+    ) {
         HorizontalPager(
             count = images.size,
             state = pagerState,
@@ -43,16 +60,18 @@ fun ImageGallery(
             )
         }
 
-        Box(
-            modifier = Modifier
-                .background(AlmostBlack.copy(alpha = 0.5f))
-                .fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        ) {
-            HorizontalPagerIndicator(
-                pagerState = pagerState, modifier = Modifier
-                    .padding(16.dp)
-            )
+        AnimatedVisibility(visible = isBottomBarVisible, enter = fadeIn(), exit = fadeOut()) {
+            Box(
+                modifier = Modifier
+                    .background(AlmostBlack.copy(alpha = 0.5f))
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                HorizontalPagerIndicator(
+                    pagerState = pagerState, modifier = Modifier
+                        .padding(16.dp)
+                )
+            }
         }
     }
 }
