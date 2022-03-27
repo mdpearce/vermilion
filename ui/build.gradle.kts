@@ -14,6 +14,7 @@ dependencies {
     implementation(Deps.JACKSON_ANNOTATIONS)
     implementation(project(":utils"))
     implementation(project(":api"))
+    implementation(project(":coreentities"))
     api(Deps.COMMONMARK)
     implementation(Deps.COMMONMARK_EXT_AUTOLINK)
     implementation(Deps.COIL_COMPOSE)

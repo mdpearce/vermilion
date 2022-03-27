@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.neaniesoft.vermilion.coreentities.UriImage
 import com.neaniesoft.vermilion.posts.data.PostRepository
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.ui.images.ImageGalleryDialog
@@ -35,9 +36,9 @@ fun PostGalleryDialog(
 class PostGalleryDialogViewModel @Inject constructor(private val postRepository: PostRepository) :
     ViewModel() {
 
-    fun imagesForPost(postId: PostId): Flow<List<Uri>> {
+    fun imagesForPost(postId: PostId): Flow<List<UriImage>> {
         return postRepository.postFlow(postId).map { post ->
-            post.gallery.map { uriImage -> uriImage.uri }
+            post.gallery.map { uriImage -> uriImage }
         }
     }
 }
