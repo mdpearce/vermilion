@@ -33,7 +33,10 @@ data class Link(
     @JsonProperty("link_flair_text_color") val linkFlairTextColor: String,
     @JsonProperty("link_flair_background_color") val linkFlairBackgroundColor: String?,
     @JsonProperty("link_flair_type") val linkFlairType: String,
-    @JsonProperty("likes") val likes: Boolean?
+    @JsonProperty("likes") val likes: Boolean?,
+    @JsonProperty("is_gallery") val isGallery: Boolean?,
+    @JsonProperty("media_metadata") val mediaMetadata: Map<String, MediaMetadataItem>?,
+    @JsonProperty("gallery_data") val galleryData: GalleryData?
 ) : ThingData()
 
 data class CommentData(
@@ -88,4 +91,27 @@ data class SubredditData(
 
 data class SecureMedia(
     @JsonProperty("reddit_video") val redditVideo: RedditVideo?
+)
+
+data class MediaMetadataItem(
+    @JsonProperty("status") val status: String,
+    @JsonProperty("m") val mediaType: String,
+    @JsonProperty("p") val previews: List<MediaMetadataImage>,
+    @JsonProperty("s") val source: MediaMetadataImage,
+    @JsonProperty("id") val id: String
+)
+
+data class MediaMetadataImage(
+    @JsonProperty("y") val height: Int,
+    @JsonProperty("x") val width: Int,
+    @JsonProperty("u") val uri: String
+)
+
+data class GalleryData(
+    @JsonProperty("items") val items: List<GalleryItem>
+)
+
+data class GalleryItem(
+    @JsonProperty("media_id") val mediaId: String,
+    @JsonProperty("id") val id: Long
 )

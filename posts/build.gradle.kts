@@ -24,6 +24,7 @@ dependencies {
     implementation(project(":db"))
     implementation(project(":coreentities"))
     implementation(project(":uistate"))
+    implementation(Deps.ACCOMPANIST_PAGER)
     debugImplementation(Deps.COMPOSE_UI_TOOLING)
     implementation(Deps.KOTLINX_SERIALIZATION_JSON)
 

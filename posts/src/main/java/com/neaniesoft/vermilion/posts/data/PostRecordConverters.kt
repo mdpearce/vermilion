@@ -5,6 +5,7 @@ import com.neaniesoft.vermilion.coreentities.CommunityId
 import com.neaniesoft.vermilion.coreentities.CommunityName
 import com.neaniesoft.vermilion.coreentities.FrontPage
 import com.neaniesoft.vermilion.coreentities.NamedCommunity
+import com.neaniesoft.vermilion.coreentities.UriImage
 import com.neaniesoft.vermilion.dbentities.posts.PostRecord
 import com.neaniesoft.vermilion.dbentities.posts.PostType
 import com.neaniesoft.vermilion.dbentities.posts.PostWithHistory
@@ -22,7 +23,6 @@ import com.neaniesoft.vermilion.posts.domain.entities.PostFlairTextColor
 import com.neaniesoft.vermilion.posts.domain.entities.PostId
 import com.neaniesoft.vermilion.posts.domain.entities.PostTitle
 import com.neaniesoft.vermilion.posts.domain.entities.Score
-import com.neaniesoft.vermilion.posts.domain.entities.UriImage
 import com.neaniesoft.vermilion.ui.videos.direct.VideoDescriptor
 import com.neaniesoft.vermilion.ui.videos.direct.VideoHeight
 import com.neaniesoft.vermilion.ui.videos.direct.VideoWidth
@@ -119,8 +119,27 @@ fun PostRecord.toPost(markdownParser: Parser, additionalFlags: Set<PostFlags> = 
             PostType.IMAGE -> Post.Type.IMAGE
             PostType.LINK -> Post.Type.LINK
             PostType.VIDEO -> Post.Type.VIDEO
-        }
+            PostType.GALLERY -> Post.Type.GALLERY
+        },
+        gallery = gallery()
     )
+}
+
+// TODO this is truly disgusting. Use a separate table!
+private fun PostRecord.gallery(): List<UriImage> {
+    val uris = galleryItemUris?.split(",")?.filterNot { it.isEmpty() } ?: emptyList()
+    val widths =
+        galleryItemWidths?.split(",")?.filterNot { it.isEmpty() }?.map { it.toInt() } ?: emptyList()
+    val heights = galleryItemHeights?.split(",")?.filterNot { it.isEmpty() }?.map { it.toInt() }
+        ?: emptyList()
+
+    if (uris.size != widths.size || uris.size != heights.size) {
+        throw IllegalStateException("Invalid serialized gallery, field counts do not match. uris: ${uris.size}, widths: ${widths.size}, heights: ${heights.size}")
+    }
+
+    return uris.mapIndexed { i, uri ->
+        UriImage(uri.toUri(), width = widths[i], height = heights[i])
+    }
 }
 
 fun Post.toPostRecord(query: String, clock: Clock): PostRecord = PostRecord(
@@ -134,6 +153,7 @@ fun Post.toPostRecord(query: String, clock: Clock): PostRecord = PostRecord(
         Post.Type.IMAGE -> PostType.IMAGE
         Post.Type.LINK -> PostType.LINK
         Post.Type.VIDEO -> PostType.VIDEO
+        Post.Type.GALLERY -> PostType.GALLERY
     },
     linkHost = link.host ?: "",
     thumbnailUri = thumbnail.identifier,
@@ -173,5 +193,8 @@ fun Post.toPostRecord(query: String, clock: Clock): PostRecord = PostRecord(
     flairTextColor = when (flair) {
         is PostFlair.NoFlair -> PostFlairTextColor.DARK.name
         is PostFlair.TextFlair -> flair.textColor.name
-    }
+    },
+    galleryItemUris = gallery.joinToString(",") { it.uri.toString() },
+    galleryItemWidths = gallery.joinToString(",") { it.width.toString() },
+    galleryItemHeights = gallery.joinToString(",") { it.height.toString() }
 )

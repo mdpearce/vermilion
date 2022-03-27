@@ -34,6 +34,7 @@ import androidx.paging.ExperimentalPagingApi
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
+import com.google.accompanist.pager.ExperimentalPagerApi
 import com.neaniesoft.vermilion.accounts.domain.UserAccountService
 import com.neaniesoft.vermilion.app.customtabs.CustomTabNavigator
 import com.neaniesoft.vermilion.communities.ui.CommunityList
@@ -44,6 +45,7 @@ import kotlinx.coroutines.launch
 import rememberVermilionAppState
 import java.time.Clock
 
+@ExperimentalPagerApi
 @FlowPreview
 @ExperimentalMaterialApi
 @ExperimentalComposeUiApi

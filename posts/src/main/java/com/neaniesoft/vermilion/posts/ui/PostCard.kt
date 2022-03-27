@@ -1,7 +1,6 @@
 package com.neaniesoft.vermilion.posts.ui
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -108,10 +107,16 @@ fun PostContent(
 ) {
     Column(modifier = modifier.padding(0.dp)) {
 
-        if (post.imagePreview != null) {
+        val imagePreview = post.imagePreview ?: if (post.gallery.isNotEmpty()) {
+            post.gallery.first()
+        } else {
+            null
+        }
+
+        if (imagePreview != null) {
             Box(contentAlignment = Alignment.BottomStart) {
                 ImageSummary(
-                    image = post.imagePreview,
+                    image = imagePreview,
                     isNsfw = if (shouldHideNsfw) {
                         post.isNsfw()
                     } else {
@@ -127,7 +132,14 @@ fun PostContent(
                         .fillMaxWidth()
                         .padding(8.dp)
                 ) {
-                    PostTypeIndicator(type = post.type)
+                    PostTypeIndicator(
+                        type = post.type,
+                        text = if (post.type == Post.Type.GALLERY) {
+                            post.gallery.size.toString()
+                        } else {
+                            ""
+                        }
+                    )
                 }
             }
         }
@@ -138,7 +150,7 @@ fun PostContent(
                 1.0f
             }
         }
-        val hasPreview = post.imagePreview != null
+        val hasPreview = imagePreview != null
 
         Column(Modifier.padding(top = 8.dp, start = 16.dp, end = 16.dp)) {
             if (post.type != Post.Type.TEXT) {
@@ -264,10 +276,11 @@ fun LinkHost(host: LinkHost, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun PostTypeIndicator(type: Post.Type, modifier: Modifier = Modifier) {
+fun PostTypeIndicator(type: Post.Type, modifier: Modifier = Modifier, text: String = "") {
     val resource = when (type) {
         Post.Type.LINK -> R.drawable.ic_baseline_link_24
         Post.Type.VIDEO -> R.drawable.ic_baseline_ondemand_video_24
+        Post.Type.GALLERY -> R.drawable.ic_baseline_gallery_24
         else -> 0
     }
     if (resource != 0) {
@@ -275,22 +288,32 @@ fun PostTypeIndicator(type: Post.Type, modifier: Modifier = Modifier) {
             id = resource
         )
         Surface(
-            shape = MaterialTheme.shapes.small.copy(all = CornerSize(50)),
+            shape = MaterialTheme.shapes.small,
+            color = AlmostBlack.copy(alpha = 0.7f),
+            contentColor = Color.White,
             modifier = modifier,
-            elevation = 4.dp
+            elevation = 0.dp
         ) {
-            Icon(
-                painter = painter,
-                contentDescription = type.name,
-                modifier = Modifier.padding(8.dp)
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    painter = painter,
+                    contentDescription = type.name,
+                    modifier = Modifier.padding(8.dp)
+                )
+                if (text.isNotEmpty()) {
+                    Text(
+                        text = text,
+                        style = MaterialTheme.typography.caption,
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                }
+            }
         }
     }
 }
 
 @Composable
 fun Thumbnail(thumbnail: Thumbnail, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    Log.d("Thumbnail", "thumbnail: $thumbnail (${thumbnail.identifier})")
     val painter = when (thumbnail) {
         is SelfThumbnail, is DefaultThumbnail, is NsfwThumbnail, is SpoilerThumbnail -> painterResource(
             id = R.drawable.ic_baseline_image_72
@@ -437,7 +460,8 @@ val DUMMY_TEXT_POST = Post(
         PostFlairBackgroundColor(0),
         PostFlairTextColor.DARK
     ),
-    Post.Type.TEXT
+    Post.Type.TEXT,
+    emptyList()
 )
 
 val DUMMY_LINK_POST = DUMMY_TEXT_POST.copy(
