@@ -45,7 +45,8 @@ fun ImageGallery(
             .fillMaxSize()
             .clickable {
                 isBottomBarVisible = !isBottomBarVisible
-            }, contentAlignment = Alignment.BottomCenter
+            },
+        contentAlignment = Alignment.BottomCenter
     ) {
         HorizontalPager(
             count = images.size,
@@ -75,7 +76,8 @@ fun ImageGallery(
                 contentAlignment = Alignment.Center
             ) {
                 HorizontalPagerIndicator(
-                    pagerState = pagerState, modifier = Modifier
+                    pagerState = pagerState,
+                    modifier = Modifier
                         .padding(16.dp)
                 )
             }

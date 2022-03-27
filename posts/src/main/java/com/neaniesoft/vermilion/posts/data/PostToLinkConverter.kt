@@ -9,6 +9,7 @@ import com.neaniesoft.vermilion.api.entities.Preview
 import com.neaniesoft.vermilion.coreentities.CommunityId
 import com.neaniesoft.vermilion.coreentities.CommunityName
 import com.neaniesoft.vermilion.coreentities.NamedCommunity
+import com.neaniesoft.vermilion.coreentities.UriImage
 import com.neaniesoft.vermilion.posts.domain.choosePreviewImage
 import com.neaniesoft.vermilion.posts.domain.entities.AnimatedImagePreview
 import com.neaniesoft.vermilion.posts.domain.entities.AuthorName
@@ -33,7 +34,6 @@ import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.posts.domain.entities.SelfThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.SpoilerThumbnail
 import com.neaniesoft.vermilion.posts.domain.entities.Thumbnail
-import com.neaniesoft.vermilion.coreentities.UriImage
 import com.neaniesoft.vermilion.posts.domain.entities.UriThumbnail
 import com.neaniesoft.vermilion.ui.videos.direct.VideoDescriptor
 import com.neaniesoft.vermilion.ui.videos.direct.VideoHeight

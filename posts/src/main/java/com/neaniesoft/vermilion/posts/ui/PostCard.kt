@@ -133,7 +133,8 @@ fun PostContent(
                         .padding(8.dp)
                 ) {
                     PostTypeIndicator(
-                        type = post.type, text = if (post.type == Post.Type.GALLERY) {
+                        type = post.type,
+                        text = if (post.type == Post.Type.GALLERY) {
                             post.gallery.size.toString()
                         } else {
                             ""
