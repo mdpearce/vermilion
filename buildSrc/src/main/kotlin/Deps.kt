@@ -53,8 +53,8 @@ object Deps {
     const val SEMVER = "net.thauvin.erik.gradle:semver:1.0.4"
     const val GOOGLE_SERVICES_PLUGIN = "com.google.gms:google-services:4.3.10"
     const val FIREBASE_BOM = "com.google.firebase:firebase-bom:29.3.0"
-    const val FIREBASE_CRASHLYTICS = "com.google.firebase:firebase-crashlytics-ktx"
     const val FIREBASE_ANALYTICS = "com.google.firebase:firebase-analytics-ktx"
+    const val FIREBASE_CRASHLYTICS = "com.google.firebase:firebase-crashlytics-ktx"
     const val FIREBASE_CRASHLYTICS_GRADLE_PLUGIN =
         "com.google.firebase:firebase-crashlytics-gradle:2.8.1"
     const val ACCOMPANIST_SWIPE_REFRESH = "com.google.accompanist:accompanist-swiperefresh:0.23.1"
