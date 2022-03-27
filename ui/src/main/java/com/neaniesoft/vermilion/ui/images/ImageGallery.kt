@@ -40,11 +40,12 @@ fun ImageGallery(
         mutableStateOf(true)
     }
 
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .clickable {
-            isBottomBarVisible = !isBottomBarVisible
-        }, contentAlignment = Alignment.BottomCenter
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .clickable {
+                isBottomBarVisible = !isBottomBarVisible
+            }, contentAlignment = Alignment.BottomCenter
     ) {
         HorizontalPager(
             count = images.size,
@@ -52,12 +53,18 @@ fun ImageGallery(
             modifier = Modifier.fillMaxSize()
         ) { page ->
             val painter = rememberImagePainter(images[page].uri)
-            Image(
-                painter = painter,
-                contentDescription = "Image ${page + 1}",
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Fit
-            )
+            val zoomableState = rememberZoomableState(maxScale = 6f)
+            Zoomable(
+                state = zoomableState,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Image(
+                    painter = painter,
+                    contentDescription = "Image ${page + 1}",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Fit
+                )
+            }
         }
 
         AnimatedVisibility(visible = isBottomBarVisible, enter = fadeIn(), exit = fadeOut()) {
