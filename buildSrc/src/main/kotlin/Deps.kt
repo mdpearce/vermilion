@@ -18,7 +18,7 @@ object Deps {
     const val RETROFIT = "com.squareup.retrofit2:retrofit:2.9.0"
     const val RETROFIT_JACKSON_CONVERTER = "com.squareup.retrofit2:converter-jackson:2.9.0"
     const val JACKSON_MODULE_KOTLIN = "com.fasterxml.jackson.module:jackson-module-kotlin:2.13.2"
-    const val JACKSON_ANNOTATIONS = "com.fasterxml.jackson.core:jackson-annotations:2.13.2"
+    const val JACKSON_ANNOTATIONS = "com.fasterxml.jackson.core:jackson-annotations:2.13.3"
     const val OKHTTP = "com.squareup.okhttp3:okhttp:3.14.9"
     const val OKHTTP_LOGGING_INTERCEPTOR = "com.squareup.okhttp3:logging-interceptor:3.14.9"
     const val MATERIAL = "com.google.android.material:material:1.5.0"
