@@ -45,7 +45,7 @@ object Deps {
     const val COMMONS_TEXT = "org.apache.commons:commons-text:1.9"
     const val PAGING_RUNTIME = "androidx.paging:paging-runtime:3.1.1"
     const val PAGING_COMPOSE = "androidx.paging:paging-compose:1.0.0-alpha14"
-    const val KOTLIN_RESULT = "com.michael-bull.kotlin-result:kotlin-result:1.1.14"
+    const val KOTLIN_RESULT = "com.michael-bull.kotlin-result:kotlin-result:1.1.16"
     const val ANDROIDX_BROWSER = "androidx.browser:browser:1.4.0"
     const val PRETTY_TIME = "org.ocpsoft.prettytime:prettytime:5.0.2.Final"
     const val COMMONMARK = "org.commonmark:commonmark:0.18.2"
