@@ -4,7 +4,7 @@ object Deps {
     const val HILT_ANDROID_TESTING = "com.google.dagger:hilt-android-testing:2.41"
     const val LIFECYCLE_VIEWMODEL_COMPOSE =
         "androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0"
-    const val LIFECYCLE_VIEWMODEL = "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.0-alpha01"
+    const val LIFECYCLE_VIEWMODEL = "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.0"
     const val LIFECYCLE_RUNTIME = "androidx.lifecycle:lifecycle-runtime-ktx:2.5.0"
     const val HILT_NAVIGATION_COMPOSE = "androidx.hilt:hilt-navigation-compose:1.0.0"
     const val ANDROIDX_CORE = "androidx.core:core-ktx:1.7.0"
