@@ -58,7 +58,7 @@ object Deps {
     const val FIREBASE_CRASHLYTICS_GRADLE_PLUGIN =
         "com.google.firebase:firebase-crashlytics-gradle:2.8.1"
     const val ACCOMPANIST_SWIPE_REFRESH = "com.google.accompanist:accompanist-swiperefresh:0.23.1"
-    const val EXOPLAYER = "com.google.android.exoplayer:exoplayer:2.18.0"
+    const val EXOPLAYER = "com.google.android.exoplayer:exoplayer:2.18.1"
     const val KOTLINX_SERIALIZATION_GRADLE_PLUGIN =
         "org.jetbrains.kotlin:kotlin-serialization:1.6.10"
     const val KOTLINX_SERIALIZATION_JSON = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2"
