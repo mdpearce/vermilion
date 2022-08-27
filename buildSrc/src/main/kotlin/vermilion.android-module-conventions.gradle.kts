@@ -30,7 +30,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.1.0-rc03"
+        kotlinCompilerExtensionVersion = "1.3.0"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8

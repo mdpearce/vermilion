@@ -29,7 +29,7 @@ val Typography = Typography(
     defaultFontFamily = OpenSansFamily,
     body1 = TextStyle(
         fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
+        fontSize = 16.sp
     ),
     subtitle1 = TextStyle(
         fontWeight = FontWeight.Medium,

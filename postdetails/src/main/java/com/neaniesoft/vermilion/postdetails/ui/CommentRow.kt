@@ -164,13 +164,11 @@ private fun CommentRowContent(
         Row(
             modifier.height(intrinsicSize = IntrinsicSize.Min)
         ) {
-
             DepthIndicators(depth = comment.depth.value)
             Column(
                 Modifier
                     .padding(top = 8.dp, bottom = 8.dp, end = 8.dp)
             ) {
-
                 Row(
                     Modifier
                         .fillMaxWidth()
@@ -207,7 +205,7 @@ fun CommentActionsRow(
 ) {
     Surface(
         elevation = 0.dp,
-        color = MaterialTheme.colors.background,
+        color = MaterialTheme.colors.background
     ) {
         Row(
             modifier = Modifier
@@ -546,7 +544,10 @@ fun StubRowPreview() {
         Surface {
             MoreCommentsStubRow(
                 stub = CommentStub(
-                    PostId(""), CommentId(""), MoreCommentsCount(6), CommentId(""),
+                    PostId(""),
+                    CommentId(""),
+                    MoreCommentsCount(6),
+                    CommentId(""),
                     CommentDepth(3),
                     emptyList()
                 ),

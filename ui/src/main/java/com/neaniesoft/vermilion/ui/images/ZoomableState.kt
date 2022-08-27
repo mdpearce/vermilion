@@ -29,13 +29,13 @@ import kotlinx.coroutines.launch
 @Composable
 fun rememberZoomableState(
     @FloatRange(from = 0.0) minScale: Float = 1f,
-    @FloatRange(from = 0.0) maxScale: Float = Float.MAX_VALUE,
+    @FloatRange(from = 0.0) maxScale: Float = Float.MAX_VALUE
 ): ZoomableState = rememberSaveable(
     saver = ZoomableState.Saver
 ) {
     ZoomableState(
         minScale = minScale,
-        maxScale = maxScale,
+        maxScale = maxScale
     )
 }
 
@@ -56,7 +56,7 @@ class ZoomableState(
     @FloatRange(from = 0.0) val maxScale: Float = Float.MAX_VALUE,
     @FloatRange(from = 0.0) initialTranslateX: Float = 0f,
     @FloatRange(from = 0.0) initialTranslateY: Float = 0f,
-    @FloatRange(from = 0.0) initialScale: Float = minScale,
+    @FloatRange(from = 0.0) initialScale: Float = minScale
 ) {
     private val velocityTracker = VelocityTracker()
     private val _translateY = Animatable(initialTranslateY)
@@ -104,12 +104,12 @@ class ZoomableState(
     suspend fun animateScaleTo(
         scale: Float,
         animationSpec: AnimationSpec<Float> = spring(),
-        initialVelocity: Float = 0f,
+        initialVelocity: Float = 0f
     ) = coroutineScope {
         _scale.animateTo(
             targetValue = scale.coerceIn(minimumValue = minScale, maximumValue = maxScale),
             animationSpec = animationSpec,
-            initialVelocity = initialVelocity,
+            initialVelocity = initialVelocity
         )
     }
 
@@ -176,7 +176,7 @@ class ZoomableState(
                     it.translateY,
                     it.scale,
                     it.minScale,
-                    it.maxScale,
+                    it.maxScale
                 )
             },
             restore = {
@@ -185,7 +185,7 @@ class ZoomableState(
                     initialTranslateY = it[1],
                     initialScale = it[2],
                     minScale = it[3],
-                    maxScale = it[4],
+                    maxScale = it[4]
                 )
             }
         )

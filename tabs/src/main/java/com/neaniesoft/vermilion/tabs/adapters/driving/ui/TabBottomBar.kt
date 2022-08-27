@@ -50,7 +50,6 @@ fun TabBottomBar(
     onRoute: (String) -> Unit,
     viewModel: TabBottomBarViewModel = hiltViewModel()
 ) {
-
     LaunchedEffect(Unit) {
         viewModel.routeEvents.collect {
             onRoute(it)
@@ -80,7 +79,7 @@ fun TabBottomBarContent(
     activeTab: Int,
     onHomeButtonClicked: () -> Unit,
     onTabClicked: (TabState) -> Unit,
-    onTabCloseClicked: (TabState) -> Unit,
+    onTabCloseClicked: (TabState) -> Unit
 ) {
     ScrollableTabRow(selectedTabIndex = activeTab) {
         LeadingIconTab(
@@ -159,7 +158,8 @@ fun ContentTab(
                 Text(
                     text = text,
                     style = MaterialTheme.typography.button.copy(textAlign = TextAlign.Center),
-                    maxLines = 1, overflow = TextOverflow.Ellipsis
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }

@@ -31,7 +31,7 @@ class TabSupervisor @Inject constructor(
     private val repository: TabRepository,
     private val postRepository: PostRepository,
     private val commentRepository: CommentRepository,
-    private val clock: Clock,
+    private val clock: Clock
 ) : UiStateProvider {
     val currentTabs = repository.currentTabs
     val activeTab = repository.activeTab
