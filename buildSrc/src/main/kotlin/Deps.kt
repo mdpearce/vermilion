@@ -62,7 +62,7 @@ object Deps {
     const val KOTLINX_SERIALIZATION_GRADLE_PLUGIN =
         "org.jetbrains.kotlin:kotlin-serialization:1.6.10"
     const val KOTLINX_SERIALIZATION_JSON = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0"
-    const val ANDROID_YOUTUBE_PLAYER = "com.pierfrancescosoffritti.androidyoutubeplayer:core:11.0.1"
+    const val ANDROID_YOUTUBE_PLAYER = "com.pierfrancescosoffritti.androidyoutubeplayer:core:11.1.0"
     const val ACCOMPANIST_PAGER = "com.google.accompanist:accompanist-pager:0.23.1"
     const val ACCOMPANIST_PAGER_INDICATORS = "com.google.accompanist:accompanist-pager-indicators:0.23.1"
 }
