@@ -7,7 +7,7 @@ object Deps {
     const val LIFECYCLE_VIEWMODEL = "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1"
     const val LIFECYCLE_RUNTIME = "androidx.lifecycle:lifecycle-runtime-ktx:2.5.1"
     const val HILT_NAVIGATION_COMPOSE = "androidx.hilt:hilt-navigation-compose:1.0.0"
-    const val ANDROIDX_CORE = "androidx.core:core-ktx:1.7.0"
+    const val ANDROIDX_CORE = "androidx.core:core-ktx:1.8.0"
     const val ANDROIDX_APPCOMPAT = "androidx.appcompat:appcompat:1.4.1"
     const val KOTLINX_COROUTINES_ANDROID = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0"
     const val JUNIT = "junit:junit:4.13.2"
