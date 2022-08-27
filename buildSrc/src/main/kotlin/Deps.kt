@@ -3,11 +3,11 @@ object Deps {
     const val HILT_ANDROID = "com.google.dagger:hilt-android:2.41"
     const val HILT_ANDROID_TESTING = "com.google.dagger:hilt-android-testing:2.41"
     const val LIFECYCLE_VIEWMODEL_COMPOSE =
-        "androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0-alpha01"
-    const val LIFECYCLE_VIEWMODEL = "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.0-alpha01"
-    const val LIFECYCLE_RUNTIME = "androidx.lifecycle:lifecycle-runtime-ktx:2.5.0-alpha01"
+        "androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1"
+    const val LIFECYCLE_VIEWMODEL = "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1"
+    const val LIFECYCLE_RUNTIME = "androidx.lifecycle:lifecycle-runtime-ktx:2.5.1"
     const val HILT_NAVIGATION_COMPOSE = "androidx.hilt:hilt-navigation-compose:1.0.0"
-    const val ANDROIDX_CORE = "androidx.core:core-ktx:1.7.0"
+    const val ANDROIDX_CORE = "androidx.core:core-ktx:1.8.0"
     const val ANDROIDX_APPCOMPAT = "androidx.appcompat:appcompat:1.4.2"
     const val KOTLINX_COROUTINES_ANDROID = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0"
     const val JUNIT = "junit:junit:4.13.2"
@@ -25,7 +25,7 @@ object Deps {
     const val COMPOSE_MATERIAL = "androidx.compose.material:material:1.1.1"
     const val COMPOSE_UI_TOOLING_PREVIEW = "androidx.compose.ui:ui-tooling-preview:1.1.1"
     const val COMPOSE_UI_TOOLING = "androidx.compose.ui:ui-tooling:1.1.1"
-    const val ANDROIDX_NAVIGATION_COMPOSE = "androidx.navigation:navigation-compose:2.5.0-alpha01"
+    const val ANDROIDX_NAVIGATION_COMPOSE = "androidx.navigation:navigation-compose:2.5.1"
     const val ANDROIDX_ACTIVITY_COMPOSE = "androidx.activity:activity-compose:1.5.0-alpha01"
     const val COMPOSE_UI_TEST_JUNIT4 = "androidx.compose.ui:ui-test-junit4:1.1.1"
     const val ANDROID_GRADLE_PLUGIN = "com.android.tools.build:gradle:7.1.2"
@@ -58,7 +58,7 @@ object Deps {
     const val FIREBASE_CRASHLYTICS_GRADLE_PLUGIN =
         "com.google.firebase:firebase-crashlytics-gradle:2.8.1"
     const val ACCOMPANIST_SWIPE_REFRESH = "com.google.accompanist:accompanist-swiperefresh:0.23.1"
-    const val EXOPLAYER = "com.google.android.exoplayer:exoplayer:2.17.1"
+    const val EXOPLAYER = "com.google.android.exoplayer:exoplayer:2.18.1"
     const val KOTLINX_SERIALIZATION_GRADLE_PLUGIN =
         "org.jetbrains.kotlin:kotlin-serialization:1.6.10"
     const val KOTLINX_SERIALIZATION_JSON = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2"
