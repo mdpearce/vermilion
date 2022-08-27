@@ -230,7 +230,6 @@ fun PostDetails(
     onUpVoteClicked: (Post) -> Unit,
     onDownVoteClicked: (Post) -> Unit
 ) {
-
     when (val post = postState) {
         is PostState.Post -> {
             Surface(modifier = Modifier.fillMaxWidth(), elevation = 4.dp) {
@@ -279,7 +278,7 @@ fun PostDetailsScreenDark() {
                 CommentKind.Full(DUMMY_COMMENT),
                 CommentKind.Full(DUMMY_COMMENT),
                 CommentKind.Full(DUMMY_COMMENT),
-                CommentKind.Full(DUMMY_COMMENT),
+                CommentKind.Full(DUMMY_COMMENT)
             ),
             lazyListState = rememberLazyListState(),
             swipeRefreshState = rememberSwipeRefreshState(isRefreshing = false),
