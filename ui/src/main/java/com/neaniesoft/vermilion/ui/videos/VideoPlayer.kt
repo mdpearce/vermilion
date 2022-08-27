@@ -30,7 +30,8 @@ fun rememberVideoPlayerState(
     saver = VideoPlayerState.Saver
 ) {
     VideoPlayerState(
-        initialAutoPlay, initialPosition
+        initialAutoPlay,
+        initialPosition
     )
 }
 

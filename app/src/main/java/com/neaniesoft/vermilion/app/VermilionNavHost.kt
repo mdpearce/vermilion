@@ -80,7 +80,8 @@ fun VermilionNavHost(
             val name = it.arguments?.getString("communityName")
                 ?: throw IllegalStateException("Cannot navigate to posts without a community name")
             val community = NamedCommunity(
-                CommunityName(name), CommunityId("")
+                CommunityName(name),
+                CommunityId("")
             )
             PostsScreen(
                 appState = appState,
