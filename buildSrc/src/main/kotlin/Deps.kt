@@ -52,11 +52,11 @@ object Deps {
     const val COMMONMARK_EXT_AUTOLINK = "org.commonmark:commonmark-ext-autolink:0.18.2"
     const val SEMVER = "net.thauvin.erik.gradle:semver:1.0.4"
     const val GOOGLE_SERVICES_PLUGIN = "com.google.gms:google-services:4.3.10"
-    const val FIREBASE_BOM = "com.google.firebase:firebase-bom:29.2.1"
-    const val FIREBASE_CRASHLYTICS = "com.google.firebase:firebase-crashlytics-ktx"
+    const val FIREBASE_BOM = "com.google.firebase:firebase-bom:30.3.2"
     const val FIREBASE_ANALYTICS = "com.google.firebase:firebase-analytics-ktx"
+    const val FIREBASE_CRASHLYTICS = "com.google.firebase:firebase-crashlytics-ktx"
     const val FIREBASE_CRASHLYTICS_GRADLE_PLUGIN =
-        "com.google.firebase:firebase-crashlytics-gradle:2.8.1"
+        "com.google.firebase:firebase-crashlytics-gradle:2.9.1"
     const val ACCOMPANIST_SWIPE_REFRESH = "com.google.accompanist:accompanist-swiperefresh:0.23.1"
     const val EXOPLAYER = "com.google.android.exoplayer:exoplayer:2.18.1"
     const val KOTLINX_SERIALIZATION_GRADLE_PLUGIN =
