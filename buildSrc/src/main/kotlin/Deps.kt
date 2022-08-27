@@ -9,7 +9,7 @@ object Deps {
     const val HILT_NAVIGATION_COMPOSE = "androidx.hilt:hilt-navigation-compose:1.0.0"
     const val ANDROIDX_CORE = "androidx.core:core-ktx:1.8.0"
     const val ANDROIDX_APPCOMPAT = "androidx.appcompat:appcompat:1.4.1"
-    const val KOTLINX_COROUTINES_ANDROID = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0"
+    const val KOTLINX_COROUTINES_ANDROID = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"
     const val JUNIT = "junit:junit:4.13.2"
     const val ANDROIDX_TEST_EXT = "androidx.test.ext:junit:1.1.3"
     const val ANDROIDX_TEST_ESPRESSO = "androidx.test.espresso:espresso-core:3.4.0"
@@ -61,7 +61,7 @@ object Deps {
     const val EXOPLAYER = "com.google.android.exoplayer:exoplayer:2.18.1"
     const val KOTLINX_SERIALIZATION_GRADLE_PLUGIN =
         "org.jetbrains.kotlin:kotlin-serialization:1.6.10"
-    const val KOTLINX_SERIALIZATION_JSON = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2"
+    const val KOTLINX_SERIALIZATION_JSON = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0"
     const val ANDROID_YOUTUBE_PLAYER = "com.pierfrancescosoffritti.androidyoutubeplayer:core:11.0.1"
     const val ACCOMPANIST_PAGER = "com.google.accompanist:accompanist-pager:0.23.1"
     const val ACCOMPANIST_PAGER_INDICATORS = "com.google.accompanist:accompanist-pager-indicators:0.23.1"
