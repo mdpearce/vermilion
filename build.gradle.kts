@@ -43,7 +43,7 @@ fun getLocalProperties(): java.util.Properties {
 fun getEnvVarOrLocalProperty(propertyName: String): String {
     val envVar = System.getenv(propertyName)
     return if (envVar == null || envVar.isEmpty()) {
-        getLocalProperties().getProperty(propertyName)
+        getLocalProperties().getProperty(propertyName) ?: ""
     } else {
         envVar
     }
