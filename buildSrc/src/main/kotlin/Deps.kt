@@ -29,7 +29,7 @@ object Deps {
     const val ANDROIDX_ACTIVITY_COMPOSE = "androidx.activity:activity-compose:1.5.0-alpha01"
     const val COMPOSE_UI_TEST_JUNIT4 = "androidx.compose.ui:ui-test-junit4:1.1.1"
     const val ANDROID_GRADLE_PLUGIN = "com.android.tools.build:gradle:7.2.1"
-    const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10"
+    const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.10"
     const val HILT_ANDROID_GRADLE_PLUGIN = "com.google.dagger:hilt-android-gradle-plugin:2.42"
     const val KOTLINTER_GRADLE_PLUGIN = "org.jmailen.gradle:kotlinter-gradle:3.9.0"
     const val ROOM_RUNTIME = "androidx.room:room-runtime:2.4.2"
@@ -60,7 +60,7 @@ object Deps {
     const val ACCOMPANIST_SWIPE_REFRESH = "com.google.accompanist:accompanist-swiperefresh:0.23.1"
     const val EXOPLAYER = "com.google.android.exoplayer:exoplayer:2.18.1"
     const val KOTLINX_SERIALIZATION_GRADLE_PLUGIN =
-        "org.jetbrains.kotlin:kotlin-serialization:1.6.10"
+        "org.jetbrains.kotlin:kotlin-serialization:1.7.10"
     const val KOTLINX_SERIALIZATION_JSON = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0"
     const val ANDROID_YOUTUBE_PLAYER = "com.pierfrancescosoffritti.androidyoutubeplayer:core:11.0.1"
     const val ACCOMPANIST_PAGER = "com.google.accompanist:accompanist-pager:0.23.1"
