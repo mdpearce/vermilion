@@ -25,7 +25,7 @@ import com.neaniesoft.vermilion.ui.videos.exoplayer.rememberExoPlayerState
 fun ExternalVideoDialog(
     unresolvedUri: Uri,
     onDismiss: () -> Unit,
-    viewModel: ExternalVideoDialogViewModel = hiltViewModel(),
+    viewModel: ExternalVideoDialogViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val zoomableState = rememberZoomableState(maxScale = 6f)

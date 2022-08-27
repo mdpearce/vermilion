@@ -22,7 +22,7 @@ fun ImageDialog(imageUri: Uri, onDismiss: () -> Unit) {
             modifier = Modifier.fillMaxSize(),
             painter = painter,
             contentDescription = "Full size image",
-            contentScale = ContentScale.FillWidth,
+            contentScale = ContentScale.FillWidth
         )
     }
 }
