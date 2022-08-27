@@ -4,6 +4,7 @@ import android.net.Uri
 import android.os.Parcelable
 import androidx.core.net.toUri
 import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.RawValue
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -15,8 +16,8 @@ import kotlinx.serialization.encoding.Encoder
 @Parcelize
 @Serializable
 data class VideoDescriptor(
-    val width: VideoWidth,
-    val height: VideoHeight,
+    val width: @RawValue VideoWidth,
+    val height: @RawValue VideoHeight,
     @Serializable(with = UriAsStringSerializer::class) val dash: Uri,
     @Serializable(with = UriAsStringSerializer::class) val hls: Uri,
     @Serializable(with = UriAsStringSerializer::class) val fallback: Uri

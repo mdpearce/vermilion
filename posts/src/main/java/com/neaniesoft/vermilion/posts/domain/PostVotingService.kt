@@ -45,7 +45,7 @@ class PostVotingService @Inject constructor(
 
     private suspend fun vote(
         direction: Int,
-        post: Post,
+        post: Post
     ) {
         val flags = when (direction) {
             -1 -> post.flags + PostFlags.DOWN_VOTED - PostFlags.UP_VOTED

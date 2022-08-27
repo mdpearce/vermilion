@@ -50,7 +50,7 @@ fun PostDetails(
     val numberFormatter = remember { NumberFormat.getIntegerInstance() }
     Row(
         modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         val postedAtTime = remember {
             LocalPrettyTimeFormatter.format(post.postedAt)
@@ -150,7 +150,8 @@ fun VoteSaveBlock(
                 }
                 Icon(
                     painter = painterResource(id = R.drawable.ic_baseline_arrow_upward_24),
-                    contentDescription = "Up vote", tint = tint
+                    contentDescription = "Up vote",
+                    tint = tint
                 )
             }
         }

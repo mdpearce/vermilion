@@ -44,18 +44,18 @@ fun Zoomable(
     modifier: Modifier = Modifier,
     enable: Boolean = true,
     doubleTapScale: (() -> Float)? = null,
-    content: @Composable BoxScope.() -> Unit,
+    content: @Composable BoxScope.() -> Unit
 ) {
     val scope = rememberCoroutineScope()
     BoxWithConstraints(
-        modifier = modifier,
+        modifier = modifier
     ) {
         var childWidth by remember { mutableStateOf(0) }
         var childHeight by remember { mutableStateOf(0) }
         LaunchedEffect(
             childHeight,
             childWidth,
-            state.scale,
+            state.scale
         ) {
             val maxX = (childWidth * state.scale - constraints.maxWidth)
                 .coerceAtLeast(0F) / 2F
@@ -110,7 +110,7 @@ fun Zoomable(
                                     state.dragEnd()
                                 }
                             }
-                        },
+                        }
                     )
                 }
                 .then(doubleTapModifier)

@@ -37,7 +37,7 @@ class PostsRemoteMediator(
     private val postRemoteKeyDao: PostRemoteKeyDao,
     private val postRepository: PostRepository,
     private val database: VermilionDatabase,
-    private val clock: Clock,
+    private val clock: Clock
 ) : RemoteMediator<Int, PostWithHistory>() {
 
     private val logger by logger()
@@ -54,7 +54,6 @@ class PostsRemoteMediator(
         loadType: LoadType,
         state: PagingState<Int, PostWithHistory>
     ): MediatorResult {
-
         val loadKey = when (loadType) {
             LoadType.REFRESH -> null // Send no `after` key on refresh
             LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
