@@ -18,7 +18,9 @@ fun CommunityRecord.toCommunity(): Community {
 
 fun SubredditData.toCommunity(): Community {
     return NamedCommunity(
-        CommunityName(displayName), CommunityId(id), isSubscribed = userIsSubscriber
+        CommunityName(displayName),
+        CommunityId(id),
+        isSubscribed = userIsSubscriber
     )
 }
 

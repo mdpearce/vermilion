@@ -31,7 +31,7 @@ object Deps {
     const val ANDROID_GRADLE_PLUGIN = "com.android.tools.build:gradle:7.2.1"
     const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.10"
     const val HILT_ANDROID_GRADLE_PLUGIN = "com.google.dagger:hilt-android-gradle-plugin:2.42"
-    const val KOTLINTER_GRADLE_PLUGIN = "org.jmailen.gradle:kotlinter-gradle:3.9.0"
+    const val KOTLINTER_GRADLE_PLUGIN = "org.jmailen.gradle:kotlinter-gradle:3.11.1"
     const val ROOM_RUNTIME = "androidx.room:room-runtime:2.4.2"
     const val ROOM_PAGING = "androidx.room:room-paging:2.4.2"
     const val ROOM_COMPILER = "androidx.room:room-compiler:2.4.2"

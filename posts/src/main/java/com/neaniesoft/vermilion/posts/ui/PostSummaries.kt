@@ -29,7 +29,6 @@ fun TextSummary(
     onUriClicked: (String) -> Unit = {},
     onClick: (() -> Unit)? = null
 ) {
-
     Column((if (onClick != null) modifier.clickable { onClick() } else modifier)) {
         Divider(Modifier.padding(bottom = 8.dp, top = 8.dp))
         MarkdownDocument(
