@@ -106,7 +106,6 @@ fun PostContent(
     onDownVoteClicked: (Post) -> Unit
 ) {
     Column(modifier = modifier.padding(0.dp)) {
-
         val imagePreview = post.imagePreview ?: if (post.gallery.isNotEmpty()) {
             post.gallery.first()
         } else {
@@ -327,7 +326,8 @@ fun Thumbnail(thumbnail: Thumbnail, modifier: Modifier = Modifier, onClick: () -
     }
     if (painter != null) {
         Surface(
-            shape = MaterialTheme.shapes.small, elevation = 4.dp,
+            shape = MaterialTheme.shapes.small,
+            elevation = 4.dp,
             modifier = modifier
                 .size(72.dp)
                 .clickable { onClick() }

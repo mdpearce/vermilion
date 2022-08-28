@@ -32,7 +32,11 @@ val DepthGreen = Color(0xFF4E8F4E)
 val DepthPurple = Color(0xFF9040BD)
 
 val DepthsArray = arrayOf(
-    DepthRed, DepthBlue, DepthOrange, DepthGreen, DepthPurple
+    DepthRed,
+    DepthBlue,
+    DepthOrange,
+    DepthGreen,
+    DepthPurple
 )
 
 fun colorForDepth(depth: Int): Color {

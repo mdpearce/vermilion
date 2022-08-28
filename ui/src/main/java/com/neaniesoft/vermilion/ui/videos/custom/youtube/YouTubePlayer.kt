@@ -24,7 +24,8 @@ fun rememberYouTubePlayerState(
     saver = YouTubePlayerState.Saver
 ) {
     YouTubePlayerState(
-        initialAutoPlay, initialPosition
+        initialAutoPlay,
+        initialPosition
     )
 }
 
