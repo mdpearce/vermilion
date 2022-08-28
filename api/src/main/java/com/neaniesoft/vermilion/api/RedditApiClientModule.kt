@@ -99,7 +99,7 @@ class RedditApiClientModule {
     fun provideBasicAuthenticator(@Named(REDDIT_API_CLIENT_ID) clientId: String): Authenticator =
         Authenticator { _, response ->
             val credential = Credentials.basic(clientId, "")
-            response.request().newBuilder().header("Authorization", credential).build()
+            response.request.newBuilder().header("Authorization", credential).build()
         }
 
     @Provides
