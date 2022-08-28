@@ -72,12 +72,12 @@ abstract class BuildGoogleServicesJsonTask @Inject constructor() : DefaultTask()
 tasks.register("buildGoogleServicesJson", BuildGoogleServicesJsonTask::class)
 
 android {
-    compileSdk = 31
+    compileSdk = 33
 
     defaultConfig {
         applicationId = "com.neaniesoft.vermilion"
         minSdk = 26
-        targetSdk = 31
+        targetSdk = 33
         versionCode = versionCodeFromSemVer()
         versionName = versionNameFromSemVer()
 
