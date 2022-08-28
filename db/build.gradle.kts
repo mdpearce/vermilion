@@ -2,6 +2,8 @@ plugins {
     id("vermilion.android-module-conventions")
 }
 
+apply(plugin = "com.squareup.sqldelight")
+
 android {
     defaultConfig {
         javaCompileOptions {

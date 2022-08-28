@@ -65,4 +65,5 @@ object Deps {
     const val ANDROID_YOUTUBE_PLAYER = "com.pierfrancescosoffritti.androidyoutubeplayer:core:11.1.0"
     const val ACCOMPANIST_PAGER = "com.google.accompanist:accompanist-pager:0.25.1"
     const val ACCOMPANIST_PAGER_INDICATORS = "com.google.accompanist:accompanist-pager-indicators:0.25.1"
+    const val SQL_DELIGHT_GRADLE_PLUGIN = "com.squareup.sqldelight:gradle-plugin:1.5.3"
 }
