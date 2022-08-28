@@ -109,7 +109,7 @@ fun MarkdownBlockQuote(blockQuote: BlockQuote, modifier: Modifier = Modifier) {
     Box(Modifier.padding(bottom = 8.dp)) {
         Surface(
             elevation = 2.dp,
-            shape = MaterialTheme.shapes.medium,
+            shape = MaterialTheme.shapes.medium
         ) {
             Box(
                 modifier = Modifier

@@ -9,11 +9,11 @@ plugins {
 apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
 
 android {
-    compileSdk = 31
+    compileSdk = 33
 
     defaultConfig {
         minSdk = 26
-        targetSdk = 31
+        targetSdk = 33
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -30,7 +30,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.1.0-rc03"
+        kotlinCompilerExtensionVersion = "1.3.0"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8

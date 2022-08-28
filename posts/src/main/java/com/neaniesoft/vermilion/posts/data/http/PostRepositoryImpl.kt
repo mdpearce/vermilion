@@ -81,7 +81,7 @@ class PostRepositoryImpl @Inject constructor(
             ResultSet(
                 posts,
                 response.data.before?.let { BeforeKey(it) },
-                response.data.after?.let { AfterKey(it) },
+                response.data.after?.let { AfterKey(it) }
             )
         }
     }
