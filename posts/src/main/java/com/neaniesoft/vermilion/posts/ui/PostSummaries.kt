@@ -59,10 +59,9 @@ fun ImageSummary(image: UriImage, isNsfw: Boolean, onClick: () -> Unit) {
                     if (isNsfw) {
                         it.blur(24.dp)
                     }
-                }
-                .blur(24.dp),
+                },
             contentDescription = "",
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.FillWidth
         )
     }
 }
