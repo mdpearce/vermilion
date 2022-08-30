@@ -1,0 +1,5 @@
+CREATE TABLE postHistory (
+`id` INTEGER PRIMARY KEY NOT NULL, `post_id` TEXT NOT NULL, `visited_at` INTEGER NOT NULL
+);
+
+CREATE INDEX postHistory_post_id ON postHistory(post_id);

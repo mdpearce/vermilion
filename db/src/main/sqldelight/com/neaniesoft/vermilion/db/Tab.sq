@@ -1,0 +1,13 @@
+CREATE TABLE tab (
+'id' INTEGER PRIMARY KEY NOT NULL,
+'type' TEXT NOT NULL,
+'parent_id' TEXT NOT NULL,
+'display_name' TEXT NOT NULL,
+'created_at' INTEGER NOT NULL,
+'tab_sort_order' INTEGER NOT NULL,
+'scroll_position' INTEGER NOT NULL,
+'scroll_offset' INTEGER NOT NULL,
+'is_active' INTEGER NOT NULL
+);
+
+CREATE INDEX tab_parent_id ON tab(parent_id);

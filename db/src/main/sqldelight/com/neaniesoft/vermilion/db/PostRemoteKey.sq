@@ -1,0 +1,5 @@
+CREATE TABLE postRemoteKey (
+'label' TEXT NOT NULL, 'next_key' TEXT, PRIMARY KEY('label')
+);
+
+CREATE INDEX postRemoteKey_label ON postRemoteKey(label);

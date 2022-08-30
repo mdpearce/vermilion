@@ -1,0 +1,5 @@
+CREATE TABLE community (
+`id` INTEGER PRIMARY KEY NOT NULL, `inserted_at` INTEGER NOT NULL, `community_id` TEXT NOT NULL, `name` TEXT NOT NULL, `is_subscribed` INTEGER NOT NULL
+);
+
+CREATE INDEX community_community_id ON community(community_id);
