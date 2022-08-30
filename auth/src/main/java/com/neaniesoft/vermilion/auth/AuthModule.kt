@@ -31,15 +31,17 @@ class AuthModule {
         @Named(AUTH_PREFS_FILENAME) authPrefsFilename: String,
         @ApplicationContext context: Context
     ): SharedPreferences {
-        val masterKey = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+//        val masterKey = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+//
+//        return EncryptedSharedPreferences.create(
+//            authPrefsFilename,
+//            masterKey,
+//            context,
+//            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+//            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+//        )
 
-        return EncryptedSharedPreferences.create(
-            authPrefsFilename,
-            masterKey,
-            context,
-            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-        )
+        return context.getSharedPreferences(authPrefsFilename, Context.MODE_PRIVATE)
     }
 
     @Provides
