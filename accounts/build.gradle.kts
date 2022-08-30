@@ -23,5 +23,7 @@ dependencies {
     implementation(project(":dbentities"))
     implementation(project(":db"))
     implementation(project(":tabs"))
+    implementation(Deps.SQL_DELIGHT_COROUTINES)
+
     implementation(Deps.APP_AUTH)
 }
