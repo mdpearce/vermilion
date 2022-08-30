@@ -20,4 +20,5 @@ dependencies {
     testImplementation(Deps.ROOM_TESTING)
     implementation(Deps.RETROFIT)
     implementation(Deps.RETROFIT_JACKSON_CONVERTER)
+    implementation(Deps.SQL_DELIGHT_COROUTINES)
 }

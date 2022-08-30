@@ -37,3 +37,17 @@ fun Community.toCommunityRecord(clock: Clock): CommunityRecord {
         throw IllegalArgumentException("Only named communities can be converted to records")
     }
 }
+
+fun Community.toCommunitySqlRecord(clock: Clock): com.neaniesoft.vermilion.db.Community {
+    if (this is NamedCommunity) {
+        return com.neaniesoft.vermilion.db.Community(
+            id = 0,
+            inserted_at = clock.millis(),
+            community_id = id.value,
+            name = name.value,
+            is_subscribed = if (isSubscribed) { 1L } else { 0L }
+        )
+    } else {
+        throw IllegalArgumentException("Only named communities can be converted to records")
+    }
+}
