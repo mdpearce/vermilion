@@ -21,6 +21,7 @@ dependencies {
     testImplementation(Deps.ROOM_TESTING)
     implementation(Deps.PAGING_RUNTIME)
     implementation(Deps.ROOM_PAGING)
+    implementation(Deps.SQL_DELIGHT_ANDROID_DRIVER)
 
     implementation(project(":dbentities"))
 }
