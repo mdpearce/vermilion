@@ -3,3 +3,15 @@ CREATE TABLE community (
 );
 
 CREATE INDEX community_community_id ON community(community_id);
+
+selectAllSubscribedCommunities:
+SELECT * FROM community WHERE is_subscribed == 1 ORDER BY name ASC;
+
+deleteAllCommunities:
+DELETE FROM community;
+
+insert:
+INSERT INTO community(inserted_at, community_id, name, is_subscribed) VALUES (?, ?, ?, ?);
+
+selectLastInsertedTime:
+SELECT inserted_at FROM community WHERE is_subscribed == 1 ORDER BY inserted_at DESC LIMIT 1;
