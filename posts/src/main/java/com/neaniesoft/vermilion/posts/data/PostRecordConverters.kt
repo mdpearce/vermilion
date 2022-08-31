@@ -198,3 +198,60 @@ fun Post.toPostRecord(query: String, clock: Clock): PostRecord = PostRecord(
     galleryItemWidths = gallery.joinToString(",") { it.width.toString() },
     galleryItemHeights = gallery.joinToString(",") { it.height.toString() }
 )
+
+fun Post.toPostSqlRecord(query: String, clock: Clock): com.neaniesoft.vermilion.db.Post = com.neaniesoft.vermilion.db.Post(
+    id = 0,
+    post_id = id.value,
+    query = query,
+    inserted_at = clock.millis(),
+    title = title.value,
+    post_type = when (type) {
+        Post.Type.TEXT -> PostType.TEXT.name
+        Post.Type.IMAGE -> PostType.IMAGE.name
+        Post.Type.LINK -> PostType.LINK.name
+        Post.Type.VIDEO -> PostType.VIDEO.name
+        Post.Type.GALLERY -> PostType.GALLERY.name
+    },
+    link_host = link.host ?: "",
+    thumbnail_uri = thumbnail.identifier,
+    preview_uri = imagePreview?.uri?.toString(),
+    preview_width = imagePreview?.width?.toLong(),
+    preview_height = imagePreview?.height?.toLong(),
+    link_uri = link.toString(),
+    preview_text = text?.raw,
+    preview_video_width = videoPreview?.width?.value?.toLong(),
+    preview_video_height = videoPreview?.height?.value?.toLong(),
+    preview_video_dash = videoPreview?.dash?.toString(),
+    preview_video_hls = videoPreview?.hls?.toString(),
+    preview_video_fallback = videoPreview?.fallback?.toString(),
+    animated_preview_width = animatedImagePreview?.width?.toLong(),
+    animated_preview_height = animatedImagePreview?.height?.toLong(),
+    animated_preview_uri = animatedImagePreview?.uri?.toString(),
+    video_width = attachedVideo?.width?.value?.toLong(),
+    video_height = attachedVideo?.height?.value?.toLong(),
+    video_dash = attachedVideo?.dash?.toString(),
+    video_hls = attachedVideo?.hls?.toString(),
+    video_fallback = attachedVideo?.fallback?.toString(),
+    community_name = community.routeName,
+    community_id = (community as? NamedCommunity)?.id?.value ?: "",
+    author_name = authorName.value,
+    posted_at = postedAt.toEpochMilli(),
+    comment_count = commentCount.value.toLong(),
+    score = score.value.toLong(),
+    flags = flags.joinToString(",") { it.name },
+    flair_text = when (flair) {
+        is PostFlair.NoFlair -> null
+        is PostFlair.TextFlair -> flair.text.value
+    },
+    flair_background_color = when (flair) {
+        is PostFlair.NoFlair -> 0L
+        is PostFlair.TextFlair -> flair.backgroundColor.value.toLong()
+    },
+    flair_text_color = when (flair) {
+        is PostFlair.NoFlair -> PostFlairTextColor.DARK.name
+        is PostFlair.TextFlair -> flair.textColor.name
+    },
+    gallery_item_uris = gallery.joinToString(",") { it.uri.toString() },
+    gallery_item_widths = gallery.joinToString(",") { it.width.toString() },
+    gallery_item_heights = gallery.joinToString(",") { it.height.toString() }
+)

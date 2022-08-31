@@ -15,6 +15,7 @@ import com.neaniesoft.vermilion.coreentities.CommunityId
 import com.neaniesoft.vermilion.coreentities.CommunityName
 import com.neaniesoft.vermilion.coreentities.FrontPage
 import com.neaniesoft.vermilion.coreentities.NamedCommunity
+import com.neaniesoft.vermilion.db.PostQueries
 import com.neaniesoft.vermilion.db.VermilionDatabase
 import com.neaniesoft.vermilion.dbentities.posts.PostDao
 import com.neaniesoft.vermilion.dbentities.posts.PostRemoteKey
@@ -22,6 +23,7 @@ import com.neaniesoft.vermilion.dbentities.posts.PostRemoteKeyDao
 import com.neaniesoft.vermilion.dbentities.posts.PostWithHistory
 import com.neaniesoft.vermilion.posts.data.PostRepository
 import com.neaniesoft.vermilion.posts.data.toPostRecord
+import com.neaniesoft.vermilion.posts.data.toPostSqlRecord
 import com.neaniesoft.vermilion.posts.domain.errors.PostsPersistenceError
 import com.neaniesoft.vermilion.utils.logger
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +35,7 @@ import java.util.concurrent.TimeUnit
 @ExperimentalPagingApi
 class PostsRemoteMediator(
     private val query: String,
-    private val postDao: PostDao,
+    private val postQueries: PostQueries,
     private val postRemoteKeyDao: PostRemoteKeyDao,
     private val postRepository: PostRepository,
     private val database: VermilionDatabase,
@@ -88,7 +90,8 @@ class PostsRemoteMediator(
                         database.withTransaction {
                             if (loadType == LoadType.REFRESH) {
                                 postRemoteKeyDao.deleteByQuery(query)
-                                postDao.deleteByQuery(query)
+//                                postDao.deleteByQuery(query)
+                                postQueries.deleteByQuery(query)
                             }
 
                             // Update the remote key for this page
@@ -100,14 +103,20 @@ class PostsRemoteMediator(
                             )
 
                             // Insert new posts into db, which invalidates current PagingData
-                            postDao.insertAll(
-                                response.results.map { post ->
-                                    post.toPostRecord(
-                                        query,
-                                        clock
-                                    )
-                                }
-                            )
+//                            postDao.insertAll(
+//                                response.results.map { post ->
+//                                    post.toPostRecord(
+//                                        query,
+//                                        clock
+//                                    )
+//                                }
+//                            )
+                            response.results.map { post ->
+                                post.toPostSqlRecord(query, clock)
+                            }.forEach { postRecord ->
+                                postQueries.insert(postRecord)
+                            }
+
                             response
                         }
                     }.mapError { PostsPersistenceError(it) }
@@ -126,13 +135,13 @@ class PostsRemoteMediator(
     }
 
     override suspend fun initialize(): InitializeAction {
-        if (postDao.postCount(query) > 0) {
+        if (postQueries.postCount(query).executeAsOne() > 0) {
             logger.debugIfEnabled { "Switching to tab with existing data, skipping refresh" }
             return InitializeAction.SKIP_INITIAL_REFRESH // We have an existing tab, lets not refresh and annoy the user
         } else {
             val cacheTimeout = TimeUnit.MILLISECONDS.convert(5, TimeUnit.MINUTES)
             logger.debugIfEnabled { "clock.millis(): ${clock.millis()}, cacheTimeout = $cacheTimeout" }
-            return if (clock.millis() - (postDao.lastUpdatedAt(query) ?: 0L) <= cacheTimeout) {
+            return if (clock.millis() - (postQueries.lastUpdatedAt(query).executeAsOneOrNull() ?: 0L) <= cacheTimeout) {
                 logger.debugIfEnabled { "Cache is up to date, skipping refresh" }
                 // Cache is up to date, skip refresh
                 InitializeAction.SKIP_INITIAL_REFRESH
