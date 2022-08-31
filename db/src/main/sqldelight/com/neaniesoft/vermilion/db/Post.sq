@@ -67,3 +67,7 @@ UPDATE post SET flags = ? WHERE post_id == ?;
 
 update:
 INSERT OR REPLACE INTO post VALUES ?;
+
+postQuery:
+SELECT * FROM post WHERE query == :query
+LIMIT :limit OFFSET :offset;
