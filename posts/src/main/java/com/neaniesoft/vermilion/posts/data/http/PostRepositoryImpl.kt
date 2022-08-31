@@ -9,6 +9,7 @@ import com.neaniesoft.vermilion.api.entities.LinkThing
 import com.neaniesoft.vermilion.coreentities.Community
 import com.neaniesoft.vermilion.coreentities.FrontPage
 import com.neaniesoft.vermilion.coreentities.NamedCommunity
+import com.neaniesoft.vermilion.db.PostQueries
 import com.neaniesoft.vermilion.db.VermilionDatabase
 import com.neaniesoft.vermilion.dbentities.posts.PostDao
 import com.neaniesoft.vermilion.posts.data.PostRepository
@@ -22,6 +23,8 @@ import com.neaniesoft.vermilion.posts.domain.entities.ResultSet
 import com.neaniesoft.vermilion.posts.domain.errors.PostError
 import com.neaniesoft.vermilion.posts.domain.errors.PostsApiError
 import com.neaniesoft.vermilion.utils.logger
+import com.squareup.sqldelight.runtime.coroutines.asFlow
+import com.squareup.sqldelight.runtime.coroutines.mapToOne
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.commonmark.parser.Parser
@@ -35,6 +38,7 @@ class PostRepositoryImpl @Inject constructor(
     private val markdownParser: Parser,
     private val database: VermilionDatabase,
     private val postDao: PostDao,
+    private val postQueries: PostQueries,
     private val clock: Clock
 ) : PostRepository {
 
@@ -87,7 +91,9 @@ class PostRepositoryImpl @Inject constructor(
     }
 
     override fun postFlow(postId: PostId): Flow<Post> {
-        return postDao.postWithIdFlow(postId.value).map { it.toPost(markdownParser) }
+        return postQueries.postWithId(postId.value).asFlow().mapToOne().map {
+            it.toPost(markdownParser)
+        }
     }
 
     override suspend fun update(postId: PostId, post: Post) {
