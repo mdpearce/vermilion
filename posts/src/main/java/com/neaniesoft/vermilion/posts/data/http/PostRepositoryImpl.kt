@@ -1,6 +1,5 @@
 package com.neaniesoft.vermilion.posts.data.http
 
-import androidx.room.withTransaction
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.map
 import com.github.michaelbull.result.mapError
@@ -10,11 +9,9 @@ import com.neaniesoft.vermilion.coreentities.Community
 import com.neaniesoft.vermilion.coreentities.FrontPage
 import com.neaniesoft.vermilion.coreentities.NamedCommunity
 import com.neaniesoft.vermilion.db.PostQueries
-import com.neaniesoft.vermilion.db.VermilionDatabase
-import com.neaniesoft.vermilion.dbentities.posts.PostDao
 import com.neaniesoft.vermilion.posts.data.PostRepository
 import com.neaniesoft.vermilion.posts.data.toPost
-import com.neaniesoft.vermilion.posts.data.toPostRecord
+import com.neaniesoft.vermilion.posts.data.toPostSqlRecord
 import com.neaniesoft.vermilion.posts.domain.entities.AfterKey
 import com.neaniesoft.vermilion.posts.domain.entities.BeforeKey
 import com.neaniesoft.vermilion.posts.domain.entities.Post
@@ -36,8 +33,6 @@ import javax.inject.Singleton
 class PostRepositoryImpl @Inject constructor(
     private val postsService: PostsService,
     private val markdownParser: Parser,
-    private val database: VermilionDatabase,
-    private val postDao: PostDao,
     private val postQueries: PostQueries,
     private val clock: Clock
 ) : PostRepository {
@@ -97,22 +92,21 @@ class PostRepositoryImpl @Inject constructor(
     }
 
     override suspend fun update(postId: PostId, post: Post) {
-        database.withTransaction {
-            val existingRecord = postDao.postWithId(postId.value)
+        postQueries.transaction {
+            val existingRecord = postQueries.postWithId(postId.value).executeAsOneOrNull()
             if (existingRecord != null) {
                 logger.debugIfEnabled { "Updating post record ${postId.value}" }
-                val newRecord = post.toPostRecord(query = existingRecord.query, clock)
+                val newRecord = post.toPostSqlRecord(query = existingRecord.query, clock)
                     .copy(id = existingRecord.id)
-                postDao.update(newRecord)
+                postQueries.update(newRecord)
             } else {
                 logger.warnIfEnabled { "Existing record not found for ${postId.value}" }
             }
         }
+
     }
 
     override suspend fun deleteByQuery(query: String) {
-        database.withTransaction {
-            postDao.deleteByQuery(query)
-        }
+        postQueries.deleteByQuery(query)
     }
 }
