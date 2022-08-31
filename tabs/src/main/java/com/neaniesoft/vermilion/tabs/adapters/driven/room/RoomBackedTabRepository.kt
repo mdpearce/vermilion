@@ -1,8 +1,8 @@
 package com.neaniesoft.vermilion.tabs.adapters.driven.room
 
 import androidx.room.withTransaction
+import com.neaniesoft.vermilion.db.PostQueries
 import com.neaniesoft.vermilion.db.VermilionDatabase
-import com.neaniesoft.vermilion.dbentities.posts.PostDao
 import com.neaniesoft.vermilion.dbentities.tabs.NewTabStateRecord
 import com.neaniesoft.vermilion.dbentities.tabs.TabStateDao
 import com.neaniesoft.vermilion.dbentities.tabs.TabStateRecord
@@ -26,7 +26,7 @@ import javax.inject.Singleton
 class RoomBackedTabRepository @Inject constructor(
     private val database: VermilionDatabase,
     private val tabStateDao: TabStateDao,
-    private val postDao: PostDao
+    private val postQueries: PostQueries
 ) : TabRepository {
 
     private val logger by logger()
@@ -107,7 +107,7 @@ class RoomBackedTabRepository @Inject constructor(
     }
 
     private suspend fun displayNameForPostDetails(parentId: ParentId): DisplayName {
-        val post = postDao.postWithId(parentId.value)
+        val post = postQueries.postWithId(parentId.value).executeAsOneOrNull()
             ?: throw IllegalStateException("Post ${parentId.value} not found in db")
 
         return DisplayName(post.title)

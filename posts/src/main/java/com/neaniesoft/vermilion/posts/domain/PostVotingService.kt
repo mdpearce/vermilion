@@ -1,8 +1,8 @@
 package com.neaniesoft.vermilion.posts.domain
 
 import androidx.room.withTransaction
+import com.neaniesoft.vermilion.db.PostQueries
 import com.neaniesoft.vermilion.db.VermilionDatabase
-import com.neaniesoft.vermilion.dbentities.posts.PostDao
 import com.neaniesoft.vermilion.posts.data.http.PostsService
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlags
@@ -21,8 +21,8 @@ import javax.inject.Singleton
 @Singleton
 class PostVotingService @Inject constructor(
     private val database: VermilionDatabase,
-    private val postDao: PostDao,
     private val postsService: PostsService,
+    private val postQueries: PostQueries,
     @Named(CoroutinesModule.IO_DISPATCHER) private val coroutineDispatcher: CoroutineDispatcher
 ) {
     private val logger by logger()
@@ -55,7 +55,7 @@ class PostVotingService @Inject constructor(
         }
         withContext(coroutineDispatcher) {
             database.withTransaction {
-                postDao.updateFlags(post.id.value, flags.joinToString(",") { it.name })
+                postQueries.updateFlags(post.id.value, flags.joinToString(",") { it.name })
             }
             try {
                 postsService.vote(direction, post.id.fullName())
