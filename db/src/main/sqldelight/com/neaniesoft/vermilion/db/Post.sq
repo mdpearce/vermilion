@@ -41,5 +41,29 @@ CREATE TABLE post (
 PRIMARY KEY('id')
 );
 
-CREATE INDEX post_post_id ON post(post_id);
+CREATE UNIQUE INDEX post_post_id ON post(post_id);
 CREATE INDEX post_query ON post(query);
+
+insert:
+INSERT INTO post VALUES ?;
+
+deleteByQuery:
+DELETE FROM post WHERE query == ?;
+
+lastUpdatedAt:
+SELECT inserted_at FROM post WHERE query == ? ORDER BY inserted_at DESC LIMIT 1;
+
+postWithId:
+SELECT * FROM post WHERE post_id == ? ORDER BY inserted_at DESC LIMIT 1;
+
+deleteAll:
+DELETE FROM post;
+
+postCount:
+SELECT count(id) FROM post WHERE query == ?;
+
+updateFlags:
+UPDATE post SET flags = ? WHERE post_id == ?;
+
+update:
+INSERT OR REPLACE INTO post VALUES ?;
