@@ -47,7 +47,7 @@ object Deps {
     const val PAGING_COMPOSE = "androidx.paging:paging-compose:1.0.0-alpha14"
     const val KOTLIN_RESULT = "com.michael-bull.kotlin-result:kotlin-result:1.1.16"
     const val ANDROIDX_BROWSER = "androidx.browser:browser:1.4.0"
-    const val PRETTY_TIME = "org.ocpsoft.prettytime:prettytime:5.0.3.Final"
+    const val PRETTY_TIME = "org.ocpsoft.prettytime:prettytime:5.0.4.Final"
     const val COMMONMARK = "org.commonmark:commonmark:0.19.0"
     const val COMMONMARK_EXT_AUTOLINK = "org.commonmark:commonmark-ext-autolink:0.19.0"
     const val SEMVER = "net.thauvin.erik.gradle:semver:1.0.4"
