@@ -70,5 +70,5 @@ INSERT OR REPLACE INTO post VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,
 postQuery:
 SELECT * FROM post
 LEFT JOIN postHistory ON postHistory.post_id = post.post_id
-WHERE query == :query AND visited_at IS NULL
+WHERE query == :query
 LIMIT :limit OFFSET :offset;
