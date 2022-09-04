@@ -1,5 +1,5 @@
 CREATE TABLE post (
-'id' INTEGER NOT NULL,
+'id' INTEGER PRIMARY KEY,
 'post_id' TEXT NOT NULL,
 'query' TEXT NOT NULL,
 'inserted_at' INTEGER NOT NULL,
@@ -37,15 +37,14 @@ CREATE TABLE post (
 'flair_text_color' TEXT NOT NULL,
 'gallery_item_uris' TEXT,
 'gallery_item_widths' TEXT,
-'gallery_item_heights' TEXT,
-PRIMARY KEY('id')
+'gallery_item_heights' TEXT
 );
 
 CREATE UNIQUE INDEX post_post_id ON post(post_id);
 CREATE INDEX post_query ON post(query);
 
 insert:
-INSERT INTO post VALUES ?;
+INSERT INTO post VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
 
 deleteByQuery:
 DELETE FROM post WHERE query == ?;
@@ -66,8 +65,10 @@ updateFlags:
 UPDATE post SET flags = ? WHERE post_id == ?;
 
 update:
-INSERT OR REPLACE INTO post VALUES ?;
+INSERT OR REPLACE INTO post VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
 
 postQuery:
-SELECT * FROM post WHERE query == :query
+SELECT * FROM post
+LEFT JOIN postHistory ON postHistory.post_id = post.post_id
+WHERE query == :query AND visited_at IS NULL
 LIMIT :limit OFFSET :offset;

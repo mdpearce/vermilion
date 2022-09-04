@@ -33,4 +33,5 @@ dependencies {
     implementation(Deps.ROOM_KOTLIN)
     testImplementation(Deps.ROOM_TESTING)
     implementation(Deps.SQL_DELIGHT_COROUTINES)
+    implementation(Deps.SQL_DELIGHT_PAGING)
 }

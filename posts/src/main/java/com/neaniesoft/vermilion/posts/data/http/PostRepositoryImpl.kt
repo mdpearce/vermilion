@@ -11,7 +11,6 @@ import com.neaniesoft.vermilion.coreentities.NamedCommunity
 import com.neaniesoft.vermilion.db.PostQueries
 import com.neaniesoft.vermilion.posts.data.PostRepository
 import com.neaniesoft.vermilion.posts.data.toPost
-import com.neaniesoft.vermilion.posts.data.toPostSqlRecord
 import com.neaniesoft.vermilion.posts.domain.entities.AfterKey
 import com.neaniesoft.vermilion.posts.domain.entities.BeforeKey
 import com.neaniesoft.vermilion.posts.domain.entities.Post
@@ -96,9 +95,47 @@ class PostRepositoryImpl @Inject constructor(
             val existingRecord = postQueries.postWithId(postId.value).executeAsOneOrNull()
             if (existingRecord != null) {
                 logger.debugIfEnabled { "Updating post record ${postId.value}" }
-                val newRecord = post.toPostSqlRecord(query = existingRecord.query, clock)
-                    .copy(id = existingRecord.id)
-                postQueries.update(newRecord)
+                postQueries.update(
+                    id = existingRecord.id,
+                    post_id = existingRecord.post_id,
+                    query = existingRecord.query,
+                    inserted_at = existingRecord.inserted_at,
+                    title = existingRecord.title,
+                    post_type = existingRecord.post_type,
+                    link_host = existingRecord.link_host,
+                    thumbnail_uri = existingRecord.thumbnail_uri,
+                    preview_uri = existingRecord.preview_uri,
+                    preview_width = existingRecord.preview_width,
+                    preview_height = existingRecord.preview_height,
+                    preview_video_width = existingRecord.preview_video_width,
+                    preview_video_height = existingRecord.preview_video_height,
+                    preview_video_dash = existingRecord.preview_video_dash,
+                    preview_video_hls = existingRecord.preview_video_hls,
+                    preview_video_fallback = existingRecord.preview_video_fallback,
+                    animated_preview_width = existingRecord.animated_preview_width,
+                    animated_preview_height = existingRecord.animated_preview_height,
+                    animated_preview_uri = existingRecord.animated_preview_uri,
+                    video_width = existingRecord.video_width,
+                    video_height = existingRecord.video_height,
+                    video_dash = existingRecord.video_dash,
+                    video_hls = existingRecord.video_hls,
+                    video_fallback = existingRecord.video_fallback,
+                    link_uri = existingRecord.link_uri,
+                    preview_text = existingRecord.preview_text,
+                    community_name = existingRecord.community_name,
+                    community_id = existingRecord.community_id,
+                    author_name = existingRecord.author_name,
+                    posted_at = existingRecord.posted_at,
+                    comment_count = existingRecord.comment_count,
+                    score = existingRecord.score,
+                    flags = existingRecord.flags,
+                    flair_text = existingRecord.flair_text,
+                    flair_background_color = existingRecord.flair_background_color,
+                    flair_text_color = existingRecord.flair_text_color,
+                    gallery_item_uris = existingRecord.gallery_item_uris,
+                    gallery_item_widths = existingRecord.gallery_item_widths,
+                    gallery_item_heights = existingRecord.gallery_item_heights
+                )
             } else {
                 logger.warnIfEnabled { "Existing record not found for ${postId.value}" }
             }

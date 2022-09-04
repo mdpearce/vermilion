@@ -6,6 +6,7 @@ import com.neaniesoft.vermilion.coreentities.CommunityName
 import com.neaniesoft.vermilion.coreentities.FrontPage
 import com.neaniesoft.vermilion.coreentities.NamedCommunity
 import com.neaniesoft.vermilion.coreentities.UriImage
+import com.neaniesoft.vermilion.db.PostQuery
 import com.neaniesoft.vermilion.dbentities.posts.PostRecord
 import com.neaniesoft.vermilion.dbentities.posts.PostType
 import com.neaniesoft.vermilion.dbentities.posts.PostWithHistory
@@ -39,6 +40,89 @@ fun PostWithHistory.toPost(markdownParser: Parser): Post {
         } else {
             emptySet()
         }
+    )
+}
+
+fun PostQuery.toPost(markdownParser: Parser): Post {
+    return Post(
+        id = PostId(post_id),
+        title = PostTitle(title),
+        imagePreview = preview_uri?.let {
+            UriImage(
+                it.toUri(),
+                preview_width?.toInt() ?: 0,
+                preview_height?.toInt() ?: 0
+            )
+        },
+        animatedImagePreview = animated_preview_uri?.let {
+            AnimatedImagePreview(
+                it.toUri(),
+                animated_preview_width?.toInt() ?: 0,
+                animated_preview_height?.toInt() ?: 0
+            )
+        },
+        thumbnail = thumbnail_uri?.thumbnail() ?: DefaultThumbnail,
+        linkHost = LinkHost(link_host),
+        text = preview_text?.markdownText(markdownParser),
+        videoPreview = if (preview_video_fallback == null) {
+            null
+        } else {
+            VideoDescriptor(
+                width = VideoWidth(requireNotNull(preview_video_width).toInt()),
+                height = VideoHeight(requireNotNull(preview_video_height).toInt()),
+                dash = requireNotNull(preview_video_dash).toUri(),
+                hls = requireNotNull(preview_video_hls).toUri(),
+                fallback = requireNotNull(preview_video_fallback).toUri()
+            )
+        },
+        attachedVideo = if (video_fallback == null) {
+            null
+        } else {
+            VideoDescriptor(
+                width = VideoWidth(requireNotNull(video_width).toInt()),
+                height = VideoHeight(requireNotNull(video_height).toInt()),
+                dash = requireNotNull(video_dash).toUri(),
+                hls = requireNotNull(video_hls).toUri(),
+                fallback = requireNotNull(video_fallback).toUri()
+            )
+        },
+        community = if (community_name == FrontPage.routeName) {
+            FrontPage
+        } else {
+            NamedCommunity(CommunityName(community_name), CommunityId(community_id))
+        },
+        authorName = AuthorName(author_name),
+        postedAt = Instant.ofEpochMilli(posted_at),
+        awardCounts = emptyMap(), // TODO implement caching of awards
+        commentCount = CommentCount(comment_count.toInt()),
+        score = Score(score.toInt()),
+        flags = flags.split(",").filter { it.isNotEmpty() }.map { PostFlags.valueOf(it) }.toSet()
+            .plus(
+                if (visited_at != null) {
+                    setOf(PostFlags.VIEWED)
+                } else {
+                    emptySet()
+                }
+            ),
+        link = link_uri.toUri(),
+        flair = when (val text = flair_text) {
+            null -> {
+                PostFlair.NoFlair
+            }
+            else -> {
+                PostFlair.TextFlair(
+                    PostFlairText(text),
+                    PostFlairBackgroundColor(flair_background_color.toInt()),
+                    when (flair_text_color) {
+                        PostFlairTextColor.DARK.name -> PostFlairTextColor.DARK
+                        PostFlairTextColor.LIGHT.name -> PostFlairTextColor.LIGHT
+                        else -> throw IllegalStateException("Unable to parse flair text color")
+                    }
+                )
+            }
+        },
+        type = Post.Type.valueOf(post_type),
+        gallery = gallery()
     )
 }
 
@@ -240,6 +324,24 @@ private fun com.neaniesoft.vermilion.db.Post.gallery(): List<UriImage> {
     }
 }
 
+// TODO this is truly disgusting. Use a separate table!
+private fun PostQuery.gallery(): List<UriImage> {
+    val uris = gallery_item_uris?.split(",")?.filterNot { it.isEmpty() } ?: emptyList()
+    val widths =
+        gallery_item_widths?.split(",")?.filterNot { it.isEmpty() }?.map { it.toInt() }
+            ?: emptyList()
+    val heights = gallery_item_heights?.split(",")?.filterNot { it.isEmpty() }?.map { it.toInt() }
+        ?: emptyList()
+
+    if (uris.size != widths.size || uris.size != heights.size) {
+        throw IllegalStateException("Invalid serialized gallery, field counts do not match. uris: ${uris.size}, widths: ${widths.size}, heights: ${heights.size}")
+    }
+
+    return uris.mapIndexed { i, uri ->
+        UriImage(uri.toUri(), width = widths[i], height = heights[i])
+    }
+}
+
 fun Post.toPostRecord(query: String, clock: Clock): PostRecord = PostRecord(
     id = UUID.randomUUID().toString(),
     postId = id.value,
@@ -299,7 +401,7 @@ fun Post.toPostRecord(query: String, clock: Clock): PostRecord = PostRecord(
 
 fun Post.toPostSqlRecord(query: String, clock: Clock): com.neaniesoft.vermilion.db.Post =
     com.neaniesoft.vermilion.db.Post(
-        id = 0,
+        id = 0L,
         post_id = id.value,
         query = query,
         inserted_at = clock.millis(),
