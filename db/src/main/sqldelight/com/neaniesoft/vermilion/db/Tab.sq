@@ -1,5 +1,5 @@
 CREATE TABLE tab (
-'id' INTEGER PRIMARY KEY NOT NULL,
+'id' INTEGER PRIMARY KEY,
 'type' TEXT NOT NULL,
 'parent_id' TEXT NOT NULL,
 'display_name' TEXT NOT NULL,
@@ -11,3 +11,42 @@ CREATE TABLE tab (
 );
 
 CREATE INDEX tab_parent_id ON tab(parent_id);
+
+selectAllCurrentTabs:
+SELECT * FROM tab WHERE type != 'HOME' ORDER BY tab_sort_order ASC;
+
+insert:
+INSERT INTO tab VALUES (?,?,?,?,?,?,?,?,?);
+
+deleteTabWithId:
+DELETE FROM tab WHERE id == :id;
+
+findByParentAndType:
+SELECT * FROM tab WHERE parent_id == :parentId AND type == :type ORDER BY created_at DESC LIMIT 1;
+
+selectLeftMostSortIndex:
+SELECT tab_sort_order FROM tab ORDER BY tab_sort_order ASC LIMIT 1;
+
+shiftAllTabsFrom:
+UPDATE tab SET tab_sort_order = tab_sort_order + 1 WHERE tab_sort_order >= :from;
+
+deleteAll:
+DELETE FROM tab;
+
+updateTabWithScrollState:
+UPDATE tab SET
+scroll_position = :scrollPosition,
+scroll_offset = :scrollOffset
+WHERE
+parent_id == :parentId
+AND
+type == :type;
+
+updateAllTabsToInactive:
+UPDATE tab SET is_active = 'false';
+
+setActiveTab:
+UPDATE tab SET is_active = 'true' WHERE parent_id == :parentId AND type == :type;
+
+selectActiveTab:
+SELECT * FROM tab WHERE is_active == 'true' LIMIT 1;
