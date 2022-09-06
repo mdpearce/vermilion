@@ -3,3 +3,12 @@ CREATE TABLE postRemoteKey (
 );
 
 CREATE INDEX postRemoteKey_label ON postRemoteKey(label);
+
+insertOrReplace:
+INSERT OR REPLACE INTO postRemoteKey VALUES (?, ?);
+
+remoteKeyByQuery:
+SELECT label, next_key FROM postRemoteKey WHERE label = :query;
+
+deleteByQuery:
+DELETE FROM postRemoteKey WHERE label = :query;

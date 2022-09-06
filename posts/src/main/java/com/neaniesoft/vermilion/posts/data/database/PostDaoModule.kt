@@ -20,4 +20,8 @@ class PostDaoModule {
     @Provides
     @Singleton
     fun providePostQueries(db: Database) = db.postQueries
+
+    @Provides
+    @Singleton
+    fun providePostRemoteKeyQueries(db: Database) = db.postRemoteKeyQueries
 }

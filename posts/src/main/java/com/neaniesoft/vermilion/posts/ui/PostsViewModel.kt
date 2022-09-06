@@ -15,6 +15,7 @@ import com.neaniesoft.vermilion.coreentities.CommunityName
 import com.neaniesoft.vermilion.coreentities.NamedCommunity
 import com.neaniesoft.vermilion.coreentities.ScrollPosition
 import com.neaniesoft.vermilion.db.PostQueries
+import com.neaniesoft.vermilion.db.PostRemoteKeyQueries
 import com.neaniesoft.vermilion.db.VermilionDatabase
 import com.neaniesoft.vermilion.dbentities.posts.PostDao
 import com.neaniesoft.vermilion.dbentities.posts.PostRemoteKeyDao
@@ -48,7 +49,7 @@ class PostsViewModel @Inject constructor(
     private val postRepository: PostRepository,
     private val postDao: PostDao,
     private val postQueries: PostQueries,
-    private val postRemoteKeyDao: PostRemoteKeyDao,
+    private val postRemoteKeyQueries: PostRemoteKeyQueries,
     private val postHistoryService: PostHistoryService,
     private val database: VermilionDatabase,
     private val clock: Clock,
@@ -76,7 +77,7 @@ class PostsViewModel @Inject constructor(
                 remoteMediator = PostsRemoteMediator(
                     key,
                     postQueries,
-                    postRemoteKeyDao,
+                    postRemoteKeyQueries,
                     postRepository,
                     database,
                     clock
