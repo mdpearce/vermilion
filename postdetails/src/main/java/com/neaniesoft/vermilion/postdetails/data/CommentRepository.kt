@@ -41,7 +41,6 @@ import com.neaniesoft.vermilion.utils.logger
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -393,25 +392,25 @@ class CommentRepositoryImpl @Inject constructor(
         flair_text_color: String,
         thread_identifier: String?
     ) -> CommentKind = { id: Long,
-                         comment_id: String,
-                         post_id: String,
-                         parent_id: String?,
-                         path: String?,
-                         body: String,
-                         flags: String,
-                         author: String,
-                         created_at: Long,
-                         edited_at: Long,
-                         inserted_at: Long,
-                         score: Long,
-                         link: String,
-                         controversial_index: Long,
-                         depth: Long,
-                         up_votes: Long,
-                         flair_text: String?,
-                         flair_background_color: Long,
-                         flair_text_color: String,
-                         thread_identifier: String? ->
+        comment_id: String,
+        post_id: String,
+        parent_id: String?,
+        path: String?,
+        body: String,
+        flags: String,
+        author: String,
+        created_at: Long,
+        edited_at: Long,
+        inserted_at: Long,
+        score: Long,
+        link: String,
+        controversial_index: Long,
+        depth: Long,
+        up_votes: Long,
+        flair_text: String?,
+        flair_background_color: Long,
+        flair_text_color: String,
+        thread_identifier: String? ->
 
         if (flags == CommentFlags.MORE_COMMENTS_STUB.name) {
             if (score == 0L) {
@@ -428,14 +427,16 @@ class CommentRepositoryImpl @Inject constructor(
                     )
                 )
             } else {
-                CommentKind.Stub(CommentStub(
-                    postId = PostId(post_id),
-                    id = CommentId(comment_id),
-                    count = MoreCommentsCount(score.toInt()), // TODO stop using score as a proxy field for child count
-                    parentId = parent_id?.let { CommentId(it) },
-                    depth = CommentDepth(depth.toInt()),
-                    children = body.split(",").map { CommentId((it)) }
-                ))
+                CommentKind.Stub(
+                    CommentStub(
+                        postId = PostId(post_id),
+                        id = CommentId(comment_id),
+                        count = MoreCommentsCount(score.toInt()), // TODO stop using score as a proxy field for child count
+                        parentId = parent_id?.let { CommentId(it) },
+                        depth = CommentDepth(depth.toInt()),
+                        children = body.split(",").map { CommentId((it)) }
+                    )
+                )
             }
         } else {
             CommentKind.Full(

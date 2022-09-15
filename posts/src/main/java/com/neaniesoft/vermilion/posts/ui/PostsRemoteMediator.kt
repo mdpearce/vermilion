@@ -172,8 +172,10 @@ class PostsRemoteMediator(
         } else {
             val cacheTimeout = TimeUnit.MILLISECONDS.convert(5, TimeUnit.MINUTES)
             logger.debugIfEnabled { "clock.millis(): ${clock.millis()}, cacheTimeout = $cacheTimeout" }
-            return if (clock.millis() - (postQueries.lastUpdatedAt(query).executeAsOneOrNull()
-                    ?: 0L) <= cacheTimeout
+            return if (clock.millis() - (
+                postQueries.lastUpdatedAt(query).executeAsOneOrNull()
+                    ?: 0L
+                ) <= cacheTimeout
             ) {
                 logger.debugIfEnabled { "Cache is up to date, skipping refresh" }
                 // Cache is up to date, skip refresh

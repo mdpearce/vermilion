@@ -3,7 +3,11 @@ package com.neaniesoft.vermilion.accounts.adapters.driven.sqldelight
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.map
 import com.github.michaelbull.result.mapError
-import com.neaniesoft.vermilion.accounts.domain.entities.*
+import com.neaniesoft.vermilion.accounts.domain.entities.AccountError
+import com.neaniesoft.vermilion.accounts.domain.entities.DatabaseError
+import com.neaniesoft.vermilion.accounts.domain.entities.UserAccount
+import com.neaniesoft.vermilion.accounts.domain.entities.UserAccountId
+import com.neaniesoft.vermilion.accounts.domain.entities.UserName
 import com.neaniesoft.vermilion.accounts.domain.ports.UserAccountRepository
 import com.neaniesoft.vermilion.db.UserAccountQueries
 import com.squareup.sqldelight.runtime.coroutines.asFlow
@@ -51,5 +55,6 @@ class UserAccountSqlDelightRepository @Inject constructor(
 @InstallIn(SingletonComponent::class)
 class UserAccountRepositoryModule {
     @Provides
-    fun provideUserAccountRepository(queries: UserAccountQueries): UserAccountRepository = UserAccountSqlDelightRepository(queries)
+    fun provideUserAccountRepository(queries: UserAccountQueries): UserAccountRepository =
+        UserAccountSqlDelightRepository(queries)
 }

@@ -4,7 +4,12 @@ import com.neaniesoft.vermilion.coreentities.ScrollPosition
 import com.neaniesoft.vermilion.db.Database
 import com.neaniesoft.vermilion.db.PostQueries
 import com.neaniesoft.vermilion.db.TabQueries
-import com.neaniesoft.vermilion.tabs.domain.entities.*
+import com.neaniesoft.vermilion.tabs.domain.entities.DisplayName
+import com.neaniesoft.vermilion.tabs.domain.entities.NewTabState
+import com.neaniesoft.vermilion.tabs.domain.entities.ParentId
+import com.neaniesoft.vermilion.tabs.domain.entities.TabId
+import com.neaniesoft.vermilion.tabs.domain.entities.TabSortOrderIndex
+import com.neaniesoft.vermilion.tabs.domain.entities.TabState
 import com.neaniesoft.vermilion.tabs.domain.ports.TabRepository
 import com.neaniesoft.vermilion.uistate.TabType
 import com.neaniesoft.vermilion.utils.logger
@@ -53,11 +58,9 @@ class SqlDelightTabRepository @Inject constructor(
         tabQueries.selectAllCurrentTabs(tabStateMapper).asFlow()
             .mapToList()
 
-
     override val activeTab: Flow<TabState?> = tabQueries.selectActiveTab(tabStateMapper)
         .asFlow()
         .mapToOneOrNull()
-
 
     override suspend fun addNewTabIfNotExists(tab: NewTabState): TabState {
         return tabQueries.transactionWithResult {

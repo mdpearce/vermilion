@@ -51,7 +51,7 @@ class PostVotingService @Inject constructor(
             else -> throw IllegalArgumentException("Unexpected vote direction $direction")
         }
         withContext(coroutineDispatcher) {
-                postQueries.updateFlags(post.id.value, flags.joinToString(",") { it.name })
+            postQueries.updateFlags(post.id.value, flags.joinToString(",") { it.name })
             try {
                 postsService.vote(direction, post.id.fullName())
             } catch (httpException: HttpException) {

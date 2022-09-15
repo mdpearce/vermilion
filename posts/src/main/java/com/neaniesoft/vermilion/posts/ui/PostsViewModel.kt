@@ -77,7 +77,6 @@ class PostsViewModel @Inject constructor(
                     clock
                 )
             ) {
-
                 val pagingSource = QueryPagingSource(
                     countQuery = postQueries.postCount(key),
                     transacter = postQueries,

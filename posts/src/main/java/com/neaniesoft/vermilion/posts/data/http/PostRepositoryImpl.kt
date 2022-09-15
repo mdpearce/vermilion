@@ -140,7 +140,6 @@ class PostRepositoryImpl @Inject constructor(
                 logger.warnIfEnabled { "Existing record not found for ${postId.value}" }
             }
         }
-
     }
 
     override suspend fun deleteByQuery(query: String) {

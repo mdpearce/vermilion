@@ -27,7 +27,6 @@ import com.neaniesoft.vermilion.ui.videos.direct.VideoWidth
 import org.commonmark.parser.Parser
 import java.time.Clock
 import java.time.Instant
-import java.util.UUID
 
 fun PostQuery.toPost(markdownParser: Parser): Post {
     return Post(

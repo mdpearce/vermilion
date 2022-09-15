@@ -2,7 +2,6 @@ package com.neaniesoft.vermilion.posts.ui
 
 import VermilionAppState
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -39,7 +38,6 @@ import com.neaniesoft.vermilion.coreentities.Community
 import com.neaniesoft.vermilion.coreentities.ScrollPosition
 import com.neaniesoft.vermilion.posts.R
 import com.neaniesoft.vermilion.posts.domain.entities.Post
-import com.neaniesoft.vermilion.posts.domain.errors.PostsApiError
 import com.neaniesoft.vermilion.ui.theme.VermilionTheme
 import com.neaniesoft.vermilion.utils.getLogger
 import kotlinx.coroutines.FlowPreview
