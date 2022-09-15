@@ -16,9 +16,6 @@ import com.neaniesoft.vermilion.coreentities.NamedCommunity
 import com.neaniesoft.vermilion.coreentities.ScrollPosition
 import com.neaniesoft.vermilion.db.PostQueries
 import com.neaniesoft.vermilion.db.PostRemoteKeyQueries
-import com.neaniesoft.vermilion.db.VermilionDatabase
-import com.neaniesoft.vermilion.dbentities.posts.PostDao
-import com.neaniesoft.vermilion.dbentities.posts.PostRemoteKeyDao
 import com.neaniesoft.vermilion.posts.data.PostRepository
 import com.neaniesoft.vermilion.posts.data.toPost
 import com.neaniesoft.vermilion.posts.domain.LinkRouter
@@ -47,11 +44,9 @@ import javax.inject.Inject
 @HiltViewModel
 class PostsViewModel @Inject constructor(
     private val postRepository: PostRepository,
-    private val postDao: PostDao,
     private val postQueries: PostQueries,
     private val postRemoteKeyQueries: PostRemoteKeyQueries,
     private val postHistoryService: PostHistoryService,
-    private val database: VermilionDatabase,
     private val clock: Clock,
     private val markdownParser: Parser,
     private val uiStateProvider: UiStateProvider,
@@ -79,12 +74,9 @@ class PostsViewModel @Inject constructor(
                     postQueries,
                     postRemoteKeyQueries,
                     postRepository,
-                    database,
                     clock
                 )
             ) {
-                postDao.pagingSource(key)
-
 
                 val pagingSource = QueryPagingSource(
                     countQuery = postQueries.postCount(key),

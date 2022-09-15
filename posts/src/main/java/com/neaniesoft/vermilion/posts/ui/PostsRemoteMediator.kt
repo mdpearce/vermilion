@@ -4,7 +4,6 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
-import androidx.room.withTransaction
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.andThen
@@ -18,13 +17,7 @@ import com.neaniesoft.vermilion.coreentities.NamedCommunity
 import com.neaniesoft.vermilion.db.PostQueries
 import com.neaniesoft.vermilion.db.PostQuery
 import com.neaniesoft.vermilion.db.PostRemoteKeyQueries
-import com.neaniesoft.vermilion.db.VermilionDatabase
-import com.neaniesoft.vermilion.dbentities.posts.PostDao
-import com.neaniesoft.vermilion.dbentities.posts.PostRemoteKey
-import com.neaniesoft.vermilion.dbentities.posts.PostRemoteKeyDao
-import com.neaniesoft.vermilion.dbentities.posts.PostWithHistory
 import com.neaniesoft.vermilion.posts.data.PostRepository
-import com.neaniesoft.vermilion.posts.data.toPostRecord
 import com.neaniesoft.vermilion.posts.data.toPostSqlRecord
 import com.neaniesoft.vermilion.posts.domain.errors.PostsPersistenceError
 import com.neaniesoft.vermilion.utils.logger
@@ -40,7 +33,6 @@ class PostsRemoteMediator(
     private val postQueries: PostQueries,
     private val postRemoteKeyQueries: PostRemoteKeyQueries,
     private val postRepository: PostRepository,
-    private val database: VermilionDatabase,
     private val clock: Clock
 ) : RemoteMediator<Long, PostQuery>() {
 
@@ -88,20 +80,19 @@ class PostsRemoteMediator(
             )
                 .andThen { response ->
                     runCatching {
-                        database.withTransaction {
-                            postRemoteKeyQueries.transaction {
-                                if (loadType == LoadType.REFRESH) {
-                                    postRemoteKeyQueries.deleteByQuery(query)
-                                    postQueries.deleteByQuery(query)
-                                }
+                        postRemoteKeyQueries.transaction {
+                            if (loadType == LoadType.REFRESH) {
+                                postRemoteKeyQueries.deleteByQuery(query)
+                                postQueries.deleteByQuery(query)
+                            }
 
-                                // Update the remote key for this page
-                                postRemoteKeyQueries.insertOrReplace(
-                                    query,
-                                    response.afterKey?.value
-                                )
+                            // Update the remote key for this page
+                            postRemoteKeyQueries.insertOrReplace(
+                                query,
+                                response.afterKey?.value
+                            )
 
-                                // Insert new posts into db, which invalidates current PagingData
+                            // Insert new posts into db, which invalidates current PagingData
 //                            postDao.insertAll(
 //                                response.results.map { post ->
 //                                    post.toPostRecord(
@@ -110,52 +101,51 @@ class PostsRemoteMediator(
 //                                    )
 //                                }
 //                            )
-                                response.results.map { post ->
-                                    post.toPostSqlRecord(query, clock)
-                                }.forEach { existingRecord ->
-                                    postQueries.insert(
-                                        id = null,
-                                        post_id = existingRecord.post_id,
-                                        query = existingRecord.query,
-                                        inserted_at = existingRecord.inserted_at,
-                                        title = existingRecord.title,
-                                        post_type = existingRecord.post_type,
-                                        link_host = existingRecord.link_host,
-                                        thumbnail_uri = existingRecord.thumbnail_uri,
-                                        preview_uri = existingRecord.preview_uri,
-                                        preview_width = existingRecord.preview_width,
-                                        preview_height = existingRecord.preview_height,
-                                        preview_video_width = existingRecord.preview_video_width,
-                                        preview_video_height = existingRecord.preview_video_height,
-                                        preview_video_dash = existingRecord.preview_video_dash,
-                                        preview_video_hls = existingRecord.preview_video_hls,
-                                        preview_video_fallback = existingRecord.preview_video_fallback,
-                                        animated_preview_width = existingRecord.animated_preview_width,
-                                        animated_preview_height = existingRecord.animated_preview_height,
-                                        animated_preview_uri = existingRecord.animated_preview_uri,
-                                        video_width = existingRecord.video_width,
-                                        video_height = existingRecord.video_height,
-                                        video_dash = existingRecord.video_dash,
-                                        video_hls = existingRecord.video_hls,
-                                        video_fallback = existingRecord.video_fallback,
-                                        link_uri = existingRecord.link_uri,
-                                        preview_text = existingRecord.preview_text,
-                                        community_name = existingRecord.community_name,
-                                        community_id = existingRecord.community_id,
-                                        author_name = existingRecord.author_name,
-                                        posted_at = existingRecord.posted_at,
-                                        comment_count = existingRecord.comment_count,
-                                        score = existingRecord.score,
-                                        flags = existingRecord.flags,
-                                        flair_text = existingRecord.flair_text,
-                                        flair_background_color = existingRecord.flair_background_color,
-                                        flair_text_color = existingRecord.flair_text_color,
-                                        gallery_item_uris = existingRecord.gallery_item_uris,
-                                        gallery_item_widths = existingRecord.gallery_item_widths,
-                                        gallery_item_heights = existingRecord.gallery_item_heights
+                            response.results.map { post ->
+                                post.toPostSqlRecord(query, clock)
+                            }.forEach { existingRecord ->
+                                postQueries.insert(
+                                    id = null,
+                                    post_id = existingRecord.post_id,
+                                    query = existingRecord.query,
+                                    inserted_at = existingRecord.inserted_at,
+                                    title = existingRecord.title,
+                                    post_type = existingRecord.post_type,
+                                    link_host = existingRecord.link_host,
+                                    thumbnail_uri = existingRecord.thumbnail_uri,
+                                    preview_uri = existingRecord.preview_uri,
+                                    preview_width = existingRecord.preview_width,
+                                    preview_height = existingRecord.preview_height,
+                                    preview_video_width = existingRecord.preview_video_width,
+                                    preview_video_height = existingRecord.preview_video_height,
+                                    preview_video_dash = existingRecord.preview_video_dash,
+                                    preview_video_hls = existingRecord.preview_video_hls,
+                                    preview_video_fallback = existingRecord.preview_video_fallback,
+                                    animated_preview_width = existingRecord.animated_preview_width,
+                                    animated_preview_height = existingRecord.animated_preview_height,
+                                    animated_preview_uri = existingRecord.animated_preview_uri,
+                                    video_width = existingRecord.video_width,
+                                    video_height = existingRecord.video_height,
+                                    video_dash = existingRecord.video_dash,
+                                    video_hls = existingRecord.video_hls,
+                                    video_fallback = existingRecord.video_fallback,
+                                    link_uri = existingRecord.link_uri,
+                                    preview_text = existingRecord.preview_text,
+                                    community_name = existingRecord.community_name,
+                                    community_id = existingRecord.community_id,
+                                    author_name = existingRecord.author_name,
+                                    posted_at = existingRecord.posted_at,
+                                    comment_count = existingRecord.comment_count,
+                                    score = existingRecord.score,
+                                    flags = existingRecord.flags,
+                                    flair_text = existingRecord.flair_text,
+                                    flair_background_color = existingRecord.flair_background_color,
+                                    flair_text_color = existingRecord.flair_text_color,
+                                    gallery_item_uris = existingRecord.gallery_item_uris,
+                                    gallery_item_widths = existingRecord.gallery_item_widths,
+                                    gallery_item_heights = existingRecord.gallery_item_heights
 
-                                    )
-                                }
+                                )
                             }
                         }
 

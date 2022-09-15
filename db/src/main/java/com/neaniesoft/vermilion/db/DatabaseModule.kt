@@ -1,7 +1,6 @@
 package com.neaniesoft.vermilion.db
 
 import android.content.Context
-import androidx.room.Room
 import com.squareup.sqldelight.android.AndroidSqliteDriver
 import com.squareup.sqldelight.db.SqlDriver
 import dagger.Module
@@ -19,11 +18,6 @@ class DatabaseModule {
         private const val DB_NAME = "vermilion"
         private const val SQL_DB_NAME = "vermilion_store"
     }
-
-    @Provides
-    @Singleton
-    fun provideDatabase(@ApplicationContext context: Context): VermilionDatabase =
-        Room.databaseBuilder(context, VermilionDatabase::class.java, DB_NAME).fallbackToDestructiveMigration().build()
 
     @Provides
     @Singleton

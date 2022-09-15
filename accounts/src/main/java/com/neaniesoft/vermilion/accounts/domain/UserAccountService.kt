@@ -1,6 +1,5 @@
 package com.neaniesoft.vermilion.accounts.domain
 
-import androidx.room.withTransaction
 import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
 import com.neaniesoft.vermilion.accounts.domain.entities.AuthResponse
@@ -11,7 +10,6 @@ import com.neaniesoft.vermilion.accounts.domain.ports.AuthProcessor
 import com.neaniesoft.vermilion.accounts.domain.ports.UserAccountRepository
 import com.neaniesoft.vermilion.auth.AuthorizationStore
 import com.neaniesoft.vermilion.db.PostQueries
-import com.neaniesoft.vermilion.db.VermilionDatabase
 import com.neaniesoft.vermilion.tabs.domain.ports.TabRepository
 import com.neaniesoft.vermilion.utils.CoroutinesModule
 import com.neaniesoft.vermilion.utils.logger
@@ -33,7 +31,6 @@ class UserAccountService @Inject constructor(
     private val userAccountRepository: UserAccountRepository,
     private val authorizationStore: AuthorizationStore,
     private val authProcessor: AuthProcessor,
-    private val database: VermilionDatabase,
     private val postQueries: PostQueries,
     private val tabRepository: TabRepository,
     @Named(CoroutinesModule.IO_DISPATCHER) private val dispatcher: CoroutineDispatcher
@@ -79,32 +76,28 @@ class UserAccountService @Inject constructor(
         val account = UserAccount(UserAccountId(UUID.randomUUID()), UserName("Not set"))
         // This might lead to a race condition where the account is not saved before it is returned and used
         scope.launch {
-            database.withTransaction {
-                postQueries.deleteAll()
-                tabRepository.removeAll()
-                userAccountRepository.saveUserAccount(account)
-                    .onFailure { error -> logger.errorIfEnabled(error.cause) { "Error saving user account to disk. $error" } }
-                    .onSuccess { userAccount -> logger.debugIfEnabled { "Saved user account with id ${userAccount.id}" } }
-                authorizationStore.setLoggedInUserId(account.id.value)
-                _currentUserAccount.emit(account)
-            }
+            postQueries.deleteAll()
+            tabRepository.removeAll()
+            userAccountRepository.saveUserAccount(account)
+                .onFailure { error -> logger.errorIfEnabled(error.cause) { "Error saving user account to disk. $error" } }
+                .onSuccess { userAccount -> logger.debugIfEnabled { "Saved user account with id ${userAccount.id}" } }
+            authorizationStore.setLoggedInUserId(account.id.value)
+            _currentUserAccount.emit(account)
         }
     }
 
     fun logout() {
         logger.debugIfEnabled { "Logging out" }
         scope.launch {
-            database.withTransaction {
-                postQueries.deleteAll() // TODO wrap the dao in an adapter to avoid using it directly here
-                tabRepository.removeAll()
-                authorizationStore.setLoggedInUserId(null)
-                authProcessor.invalidateAuthState()
-                val currentAccount = currentUserAccount.value
-                if (currentAccount != null) {
-                    userAccountRepository.clearAccount(currentAccount)
-                }
-                _currentUserAccount.emit(null)
+            postQueries.deleteAll() // TODO wrap the dao in an adapter to avoid using it directly here
+            tabRepository.removeAll()
+            authorizationStore.setLoggedInUserId(null)
+            authProcessor.invalidateAuthState()
+            val currentAccount = currentUserAccount.value
+            if (currentAccount != null) {
+                userAccountRepository.clearAccount(currentAccount)
             }
+            _currentUserAccount.emit(null)
         }
     }
 }

@@ -8,6 +8,10 @@ import com.neaniesoft.vermilion.accounts.domain.ports.UserAccountRepository
 import com.neaniesoft.vermilion.db.UserAccountQueries
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToOne
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.util.*
@@ -41,4 +45,11 @@ class UserAccountSqlDelightRepository @Inject constructor(
     override suspend fun clearAccount(account: UserAccount) {
         queries.delete(account.id.value.toString())
     }
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+class UserAccountRepositoryModule {
+    @Provides
+    fun provideUserAccountRepository(queries: UserAccountQueries): UserAccountRepository = UserAccountSqlDelightRepository(queries)
 }

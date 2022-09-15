@@ -1,8 +1,6 @@
 package com.neaniesoft.vermilion.posts.domain
 
-import androidx.room.withTransaction
 import com.neaniesoft.vermilion.db.PostQueries
-import com.neaniesoft.vermilion.db.VermilionDatabase
 import com.neaniesoft.vermilion.posts.data.http.PostsService
 import com.neaniesoft.vermilion.posts.domain.entities.Post
 import com.neaniesoft.vermilion.posts.domain.entities.PostFlags
@@ -20,7 +18,6 @@ import javax.inject.Singleton
 
 @Singleton
 class PostVotingService @Inject constructor(
-    private val database: VermilionDatabase,
     private val postsService: PostsService,
     private val postQueries: PostQueries,
     @Named(CoroutinesModule.IO_DISPATCHER) private val coroutineDispatcher: CoroutineDispatcher
@@ -54,9 +51,7 @@ class PostVotingService @Inject constructor(
             else -> throw IllegalArgumentException("Unexpected vote direction $direction")
         }
         withContext(coroutineDispatcher) {
-            database.withTransaction {
                 postQueries.updateFlags(post.id.value, flags.joinToString(",") { it.name })
-            }
             try {
                 postsService.vote(direction, post.id.fullName())
             } catch (httpException: HttpException) {

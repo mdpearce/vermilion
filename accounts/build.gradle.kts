@@ -3,11 +3,6 @@ plugins {
 }
 
 dependencies {
-    implementation(Deps.ROOM_RUNTIME)
-    kapt(Deps.ROOM_COMPILER)
-    implementation(Deps.ROOM_KOTLIN)
-    testImplementation(Deps.ROOM_TESTING)
-
     implementation(Deps.MATERIAL)
     implementation(Deps.COMPOSE_UI)
     implementation(Deps.COMPOSE_MATERIAL)

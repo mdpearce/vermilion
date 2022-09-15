@@ -2,7 +2,6 @@ package com.neaniesoft.vermilion.postdetails.data
 
 import android.graphics.Color
 import androidx.core.net.toUri
-import androidx.room.withTransaction
 import com.neaniesoft.vermilion.api.entities.CommentData
 import com.neaniesoft.vermilion.api.entities.CommentThing
 import com.neaniesoft.vermilion.api.entities.Link
@@ -10,9 +9,6 @@ import com.neaniesoft.vermilion.api.entities.MoreCommentsData
 import com.neaniesoft.vermilion.api.entities.MoreCommentsThing
 import com.neaniesoft.vermilion.api.entities.ThingData
 import com.neaniesoft.vermilion.db.CommentQueries
-import com.neaniesoft.vermilion.db.VermilionDatabase
-import com.neaniesoft.vermilion.dbentities.comments.CommentDao
-import com.neaniesoft.vermilion.dbentities.comments.CommentRecord
 import com.neaniesoft.vermilion.postdetails.data.http.CommentApiService
 import com.neaniesoft.vermilion.postdetails.data.http.entities.CommentResponse
 import com.neaniesoft.vermilion.postdetails.domain.entities.Comment
@@ -104,8 +100,6 @@ data class NetworkActivityUpdate(
 @Singleton
 class CommentRepositoryImpl @Inject constructor(
     private val apiService: CommentApiService,
-    private val database: VermilionDatabase,
-//    private val dao: CommentDao,
     private val queries: CommentQueries,
     private val clock: Clock,
     private val markdownParser: Parser,

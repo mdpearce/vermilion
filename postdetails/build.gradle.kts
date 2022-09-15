@@ -30,9 +30,5 @@ dependencies {
     implementation(project(":coreentities"))
     debugImplementation(Deps.COMPOSE_UI_TOOLING)
 
-    implementation(Deps.ROOM_RUNTIME)
-    kapt(Deps.ROOM_COMPILER)
-    implementation(Deps.ROOM_KOTLIN)
-    testImplementation(Deps.ROOM_TESTING)
     implementation(Deps.SQL_DELIGHT_COROUTINES)
 }
