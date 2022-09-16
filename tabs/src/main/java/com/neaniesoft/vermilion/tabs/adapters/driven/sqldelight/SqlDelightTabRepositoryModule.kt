@@ -1,4 +1,4 @@
-package com.neaniesoft.vermilion.tabs.adapters.driven.room
+package com.neaniesoft.vermilion.tabs.adapters.driven.sqldelight
 
 import com.neaniesoft.vermilion.tabs.domain.ports.TabRepository
 import dagger.Binds
@@ -8,7 +8,7 @@ import dagger.hilt.components.SingletonComponent
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class TabRepositoryModule {
+abstract class SqlDelightTabRepositoryModule {
     @Binds
-    abstract fun bindTabRepository(impl: RoomBackedTabRepository): TabRepository
+    abstract fun bindSqlDelightTabRepository(impl: SqlDelightTabRepository): TabRepository
 }
