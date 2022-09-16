@@ -1,0 +1,17 @@
+CREATE TABLE community (
+`id` INTEGER PRIMARY KEY NOT NULL, `inserted_at` INTEGER NOT NULL, `community_id` TEXT NOT NULL, `name` TEXT NOT NULL, `is_subscribed` INTEGER NOT NULL
+);
+
+CREATE INDEX community_community_id ON community(community_id);
+
+selectAllSubscribedCommunities:
+SELECT * FROM community WHERE is_subscribed == 1 ORDER BY name ASC;
+
+deleteAllCommunities:
+DELETE FROM community;
+
+insert:
+INSERT INTO community(inserted_at, community_id, name, is_subscribed) VALUES ?;
+
+selectLastInsertedTime:
+SELECT inserted_at FROM community WHERE is_subscribed == 1 ORDER BY inserted_at DESC LIMIT 1;

@@ -75,14 +75,18 @@ fun Link.toPost(markdownParser: Parser): Post {
 }
 
 internal fun Link.gallery(): List<UriImage> {
-    return mediaMetadata?.values?.map {
+    return mediaMetadata?.values?.mapNotNull {
         // TODO Pull the different sized previews in so we can download the correct one
         with(it.source) {
-            UriImage(
-                uri = StringEscapeUtils.unescapeHtml4(uri).toUri(),
-                width = width,
-                height = height
-            )
+            if (uri != null) {
+                UriImage(
+                    uri = StringEscapeUtils.unescapeHtml4(uri).toUri(),
+                    width = width,
+                    height = height
+                )
+            } else {
+                null
+            }
         }
     } ?: emptyList()
 }

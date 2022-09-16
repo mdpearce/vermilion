@@ -5,16 +5,7 @@ import com.neaniesoft.vermilion.coreentities.Community
 import com.neaniesoft.vermilion.coreentities.CommunityId
 import com.neaniesoft.vermilion.coreentities.CommunityName
 import com.neaniesoft.vermilion.coreentities.NamedCommunity
-import com.neaniesoft.vermilion.dbentities.communities.CommunityRecord
 import java.time.Clock
-
-fun CommunityRecord.toCommunity(): Community {
-    return NamedCommunity(
-        CommunityName(name),
-        CommunityId(communityId),
-        isSubscribed = isSubscribed
-    )
-}
 
 fun SubredditData.toCommunity(): Community {
     return NamedCommunity(
@@ -24,14 +15,14 @@ fun SubredditData.toCommunity(): Community {
     )
 }
 
-fun Community.toCommunityRecord(clock: Clock): CommunityRecord {
+fun Community.toCommunitySqlRecord(clock: Clock): com.neaniesoft.vermilion.db.Community {
     if (this is NamedCommunity) {
-        return CommunityRecord(
+        return com.neaniesoft.vermilion.db.Community(
             id = 0,
-            insertedAt = clock.millis(),
-            communityId = id.value,
+            inserted_at = clock.millis(),
+            community_id = id.value,
             name = name.value,
-            isSubscribed = isSubscribed
+            is_subscribed = if (isSubscribed) { 1L } else { 0L }
         )
     } else {
         throw IllegalArgumentException("Only named communities can be converted to records")
