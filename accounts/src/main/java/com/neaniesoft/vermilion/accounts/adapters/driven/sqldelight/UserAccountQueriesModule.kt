@@ -1,6 +1,7 @@
-package com.neaniesoft.vermilion.posts.data.database
+package com.neaniesoft.vermilion.accounts.adapters.driven.sqldelight
 
 import com.neaniesoft.vermilion.db.Database
+import com.neaniesoft.vermilion.db.UserAccountQueries
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -9,13 +10,10 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-class PostDaoModule {
+class UserAccountQueriesModule {
 
     @Provides
     @Singleton
-    fun providePostQueries(db: Database) = db.postQueries
-
-    @Provides
-    @Singleton
-    fun providePostRemoteKeyQueries(db: Database) = db.postRemoteKeyQueries
+    fun provideUserAccountQueries(db: Database): UserAccountQueries =
+        db.userAccountQueries
 }

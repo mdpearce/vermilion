@@ -3,11 +3,6 @@ plugins {
 }
 
 dependencies {
-    implementation(Deps.ROOM_RUNTIME)
-    kapt(Deps.ROOM_COMPILER)
-    implementation(Deps.ROOM_KOTLIN)
-    testImplementation(Deps.ROOM_TESTING)
-
     implementation(Deps.MATERIAL)
     implementation(Deps.COMPOSE_UI)
     implementation(Deps.COMPOSE_MATERIAL)
@@ -23,5 +18,7 @@ dependencies {
     implementation(project(":dbentities"))
     implementation(project(":db"))
     implementation(project(":tabs"))
+    implementation(Deps.SQL_DELIGHT_COROUTINES)
+
     implementation(Deps.APP_AUTH)
 }
