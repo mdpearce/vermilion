@@ -34,15 +34,7 @@ class SqlDelightTabRepository @Inject constructor(
     private val logger by logger()
 
     private val tabStateMapper =
-        { id: Long,
-          type: String,
-          parent_id: String,
-          display_name: String,
-          created_at: Long,
-          tab_sort_order: Long,
-          scroll_position: Long,
-          scroll_offset: Long,
-          is_active: Long ->
+        { id: Long, type: String, parent_id: String, display_name: String, created_at: Long, tab_sort_order: Long, scroll_position: Long, scroll_offset: Long, is_active: Long ->
             TabState(
                 TabId(id.toInt()),
                 ParentId(parent_id),
