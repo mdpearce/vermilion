@@ -14,9 +14,8 @@ import com.neaniesoft.vermilion.coreentities.Community
 import com.neaniesoft.vermilion.coreentities.CommunityName
 import com.neaniesoft.vermilion.coreentities.NamedCommunity
 import com.neaniesoft.vermilion.coreentities.ScrollPosition
-import com.neaniesoft.vermilion.db.VermilionDatabase
-import com.neaniesoft.vermilion.dbentities.posts.PostDao
-import com.neaniesoft.vermilion.dbentities.posts.PostRemoteKeyDao
+import com.neaniesoft.vermilion.db.PostQueries
+import com.neaniesoft.vermilion.db.PostRemoteKeyQueries
 import com.neaniesoft.vermilion.posts.data.PostRepository
 import com.neaniesoft.vermilion.posts.data.toPost
 import com.neaniesoft.vermilion.posts.domain.LinkRouter
@@ -28,7 +27,9 @@ import com.neaniesoft.vermilion.ui.videos.direct.VideoDescriptor
 import com.neaniesoft.vermilion.uistate.TabType
 import com.neaniesoft.vermilion.uistate.UiStateProvider
 import com.neaniesoft.vermilion.utils.logger
+import com.squareup.sqldelight.android.paging3.QueryPagingSource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -43,10 +44,9 @@ import javax.inject.Inject
 @HiltViewModel
 class PostsViewModel @Inject constructor(
     private val postRepository: PostRepository,
-    private val postDao: PostDao,
-    private val postRemoteKeyDao: PostRemoteKeyDao,
+    private val postQueries: PostQueries,
+    private val postRemoteKeyQueries: PostRemoteKeyQueries,
     private val postHistoryService: PostHistoryService,
-    private val database: VermilionDatabase,
     private val clock: Clock,
     private val markdownParser: Parser,
     private val uiStateProvider: UiStateProvider,
@@ -71,14 +71,22 @@ class PostsViewModel @Inject constructor(
                 PagingConfig(pageSize = 20),
                 remoteMediator = PostsRemoteMediator(
                     key,
-                    postDao,
-                    postRemoteKeyDao,
+                    postQueries,
+                    postRemoteKeyQueries,
                     postRepository,
-                    database,
                     clock
                 )
             ) {
-                postDao.pagingSource(key)
+                val pagingSource = QueryPagingSource(
+                    countQuery = postQueries.postCount(key),
+                    transacter = postQueries,
+                    dispatcher = Dispatchers.IO,
+                    queryProvider = { limit, offset ->
+                        postQueries.postQuery(query = key, limit = limit, offset = offset)
+                    }
+                )
+
+                pagingSource
             }.flow.map { pagingData ->
                 pagingData.map {
                     it.toPost(markdownParser)

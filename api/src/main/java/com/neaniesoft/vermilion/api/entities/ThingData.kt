@@ -104,7 +104,7 @@ data class MediaMetadataItem(
 data class MediaMetadataImage(
     @JsonProperty("y") val height: Int,
     @JsonProperty("x") val width: Int,
-    @JsonProperty("u") val uri: String
+    @JsonProperty("u") val uri: String?
 )
 
 data class GalleryData(
