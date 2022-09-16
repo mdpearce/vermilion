@@ -2,6 +2,7 @@ package com.neaniesoft.vermilion.posts.ui
 
 import VermilionAppState
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -150,6 +151,7 @@ fun PostsList(
                             onDownVoteClicked = onDownVoteClicked
                         )
                     } else {
+                        Log.d("PostsScreen", "null post!")
                         PostCardPlaceholder()
                     }
                 }

@@ -32,11 +32,6 @@ object Deps {
     const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.10"
     const val HILT_ANDROID_GRADLE_PLUGIN = "com.google.dagger:hilt-android-gradle-plugin:2.43.2"
     const val KOTLINTER_GRADLE_PLUGIN = "org.jmailen.gradle:kotlinter-gradle:3.11.1"
-    const val ROOM_RUNTIME = "androidx.room:room-runtime:2.4.3"
-    const val ROOM_PAGING = "androidx.room:room-paging:2.4.3"
-    const val ROOM_COMPILER = "androidx.room:room-compiler:2.4.3"
-    const val ROOM_KOTLIN = "androidx.room:room-ktx:2.4.3"
-    const val ROOM_TESTING = "androidx.room:room-testing:2.4.3"
     const val APP_AUTH = "net.openid:appauth:0.11.1"
     const val ACCOMPANIST_NAVIGATION_MATERIAL =
         "com.google.accompanist:accompanist-navigation-material:0.25.1"
@@ -65,4 +60,8 @@ object Deps {
     const val ANDROID_YOUTUBE_PLAYER = "com.pierfrancescosoffritti.androidyoutubeplayer:core:11.1.0"
     const val ACCOMPANIST_PAGER = "com.google.accompanist:accompanist-pager:0.25.1"
     const val ACCOMPANIST_PAGER_INDICATORS = "com.google.accompanist:accompanist-pager-indicators:0.25.1"
+    const val SQL_DELIGHT_GRADLE_PLUGIN = "com.squareup.sqldelight:gradle-plugin:1.5.3"
+    const val SQL_DELIGHT_ANDROID_DRIVER = "com.squareup.sqldelight:android-driver:1.5.3"
+    const val SQL_DELIGHT_COROUTINES = "com.squareup.sqldelight:coroutines-extensions-jvm:1.5.3"
+    const val SQL_DELIGHT_PAGING = "com.squareup.sqldelight:android-paging3-extensions:1.5.3"
 }

@@ -2,16 +2,13 @@ package com.neaniesoft.vermilion.postdetails.data
 
 import android.graphics.Color
 import androidx.core.net.toUri
-import androidx.room.withTransaction
 import com.neaniesoft.vermilion.api.entities.CommentData
 import com.neaniesoft.vermilion.api.entities.CommentThing
 import com.neaniesoft.vermilion.api.entities.Link
 import com.neaniesoft.vermilion.api.entities.MoreCommentsData
 import com.neaniesoft.vermilion.api.entities.MoreCommentsThing
 import com.neaniesoft.vermilion.api.entities.ThingData
-import com.neaniesoft.vermilion.db.VermilionDatabase
-import com.neaniesoft.vermilion.dbentities.comments.CommentDao
-import com.neaniesoft.vermilion.dbentities.comments.CommentRecord
+import com.neaniesoft.vermilion.db.CommentQueries
 import com.neaniesoft.vermilion.postdetails.data.http.CommentApiService
 import com.neaniesoft.vermilion.postdetails.data.http.entities.CommentResponse
 import com.neaniesoft.vermilion.postdetails.domain.entities.Comment
@@ -41,8 +38,9 @@ import com.neaniesoft.vermilion.posts.domain.entities.Score
 import com.neaniesoft.vermilion.utils.CoroutinesModule
 import com.neaniesoft.vermilion.utils.formatCompact
 import com.neaniesoft.vermilion.utils.logger
+import com.squareup.sqldelight.runtime.coroutines.asFlow
+import com.squareup.sqldelight.runtime.coroutines.mapToList
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -101,8 +99,7 @@ data class NetworkActivityUpdate(
 @Singleton
 class CommentRepositoryImpl @Inject constructor(
     private val apiService: CommentApiService,
-    private val database: VermilionDatabase,
-    private val dao: CommentDao,
+    private val queries: CommentQueries,
     private val clock: Clock,
     private val markdownParser: Parser,
     private val postRepository: PostRepository,
@@ -135,9 +132,10 @@ class CommentRepositoryImpl @Inject constructor(
             else -> throw IllegalArgumentException("Unexpected vote direction $direction")
         }
         withContext(dispatcher) {
-            database.withTransaction {
-                dao.updateFlags(comment.id.value, flags.joinToString(",") { it.name })
-            }
+            queries.updateFlags(
+                flags = flags.joinToString(",") { it.name },
+                commentId = comment.id.value
+            )
             try {
                 apiService.vote(direction, comment.id.fullName())
             } catch (httpException: HttpException) {
@@ -155,18 +153,18 @@ class CommentRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getCommentsForPost(postId: PostId): Flow<List<CommentKind>> {
-        return dao.flowOfCommentsForPost(postId.value).map { records ->
-            records.map { it.toCommentKind() }
-        }
+        return queries.selectAllForPost(
+            postId = postId.value,
+            mapper = commentMapper
+        ).asFlow().mapToList()
     }
 
     override suspend fun getCommentThread(
         postId: PostId,
         commentId: CommentId
     ): Flow<List<CommentKind>> {
-        return dao.flowOfCommentThread(postId.value, commentId.value).map { records ->
-            records.map { it.toCommentKind() }
-        }
+        return queries.selectCommentThread(postId.value, commentId.value, commentMapper).asFlow()
+            .mapToList()
     }
 
     override suspend fun refreshThread(
@@ -184,24 +182,35 @@ class CommentRepositoryImpl @Inject constructor(
             postRepository.update(postId, post)
         }
 
-        val newCommentRecords: List<CommentRecord> =
-            apiResponse[1].getCommentRecords(postId, threadId)
+        val newCommentRecords: List<com.neaniesoft.vermilion.db.Comment> =
+            apiResponse[1].getComments(postId, threadId)
 
-        database.withTransaction {
-            dao.deleteAllForThread(postId.value, threadId.value)
-            dao.insertAll(newCommentRecords)
-            // newCommentRecords.forEach { record ->
-            //     dao.insertAll(record)
-            //     val parentId = record.parentId
-            //     val parentPath = if (parentId != null) {
-            //         dao.getPathForComment(parentId) + "/"
-            //     } else {
-            //         ""
-            //     }
-            //     logger.debugIfEnabled { "updating path: $parentPath${record.commentId}" }
-            //     val updatedRecord = record.copy(path = "$parentPath${record.commentId}")
-            //     dao.update(updatedRecord)
-            // } // TODO: Get the path construction working
+        queries.transaction {
+            queries.deleteAllForThread(postId.value, threadId.value)
+            newCommentRecords.forEach { record ->
+                queries.insert(
+                    null,
+                    comment_id = record.comment_id,
+                    post_id = record.post_id,
+                    parent_id = record.parent_id,
+                    path = record.path,
+                    body = record.body,
+                    flags = record.flags,
+                    author = record.author,
+                    created_at = record.created_at,
+                    edited_at = record.edited_at,
+                    inserted_at = record.inserted_at,
+                    score = record.score,
+                    link = record.link,
+                    controversial_index = record.controversial_index,
+                    depth = record.depth,
+                    up_votes = record.up_votes,
+                    flair_text = record.flair_text,
+                    flair_background_color = record.flair_background_color,
+                    flair_text_color = record.flair_text_color,
+                    thread_identifier = record.thread_identifier
+                )
+            }
         }
 
         _networkActivityUpdates.emit(NetworkActivityUpdate(networkActivityIdentifier, false))
@@ -212,14 +221,11 @@ class CommentRepositoryImpl @Inject constructor(
         forceRefresh: Boolean,
         networkActivityIdentifier: String
     ) {
-        val lastInsertedAtTime = database.withTransaction {
-            dao.getLastInsertedAtForPost(postId.value)
-        } ?: 0
-        val commentCount = database.withTransaction {
-            dao.commentCountForPost(postId.value)
-        }
+        val lastInsertedAtTime =
+            queries.selectLastInsertedAtForPost(postId.value).executeAsOneOrNull() ?: 0
+        val commentCount = queries.selectCommentCountForPost(postId.value).executeAsOne()
         val cacheIsValid = lastInsertedAtTime >= clock.millis() - CACHE_VALID_DURATION.toMillis()
-        if (forceRefresh || commentCount == 0 || !cacheIsValid) {
+        if (forceRefresh || commentCount == 0L || !cacheIsValid) {
             logger.debugIfEnabled { "Refreshing comments for ${postId.value} (forceRefresh == $forceRefresh)" }
             _networkActivityUpdates.emit(NetworkActivityUpdate(networkActivityIdentifier, true))
             // Fetch new comments
@@ -232,25 +238,36 @@ class CommentRepositoryImpl @Inject constructor(
             if (post != null) {
                 postRepository.update(postId, post)
             }
-            val newCommentRecords: List<CommentRecord> =
-                apiResponse[1].getCommentRecords(postId)
+            val newCommentRecords: List<com.neaniesoft.vermilion.db.Comment> =
+                apiResponse[1].getComments(postId)
 
             // Finally, delete the old entries and insert the new ones and then return the new ones from the DAO
-            database.withTransaction {
-                dao.deleteAllForPost(postId.value)
-                dao.insertAll(newCommentRecords)
-                // newCommentRecords.forEach { record ->
-                //     dao.insertAll(record)
-                //     val parentId = record.parentId
-                //     val parentPath = if (parentId != null) {
-                //         dao.getPathForComment(parentId) + "/"
-                //     } else {
-                //         ""
-                //     }
-                //     logger.debugIfEnabled { "updating path: $parentPath${record.commentId}" }
-                //     val updatedRecord = record.copy(path = "$parentPath${record.commentId}")
-                //     dao.update(updatedRecord)
-                // } // TODO: Get the path construction working
+            queries.transaction {
+                queries.deleteAllForPost(postId.value)
+                newCommentRecords.forEach { record ->
+                    queries.insert(
+                        null,
+                        comment_id = record.comment_id,
+                        post_id = record.post_id,
+                        parent_id = record.parent_id,
+                        path = record.path,
+                        body = record.body,
+                        flags = record.flags,
+                        author = record.author,
+                        created_at = record.created_at,
+                        edited_at = record.edited_at,
+                        inserted_at = record.inserted_at,
+                        score = record.score,
+                        link = record.link,
+                        controversial_index = record.controversial_index,
+                        depth = record.depth,
+                        up_votes = record.up_votes,
+                        flair_text = record.flair_text,
+                        flair_background_color = record.flair_background_color,
+                        flair_text_color = record.flair_text_color,
+                        thread_identifier = record.thread_identifier
+                    )
+                }
             }
             _networkActivityUpdates.emit(NetworkActivityUpdate(networkActivityIdentifier, false))
         } else {
@@ -260,7 +277,7 @@ class CommentRepositoryImpl @Inject constructor(
 
     override suspend fun fetchAndInsertMoreCommentsFor(stub: CommentStub): List<CommentKind> =
         coroutineScope {
-            val moreCommentsResponse = async {
+            val moreCommentsResponse =
                 apiService.moreChildren(
                     "json",
                     stub.children.map { it.value }.joinToString(",") { it },
@@ -268,124 +285,206 @@ class CommentRepositoryImpl @Inject constructor(
                     "t3_${stub.postId.value}",
                     "confidence"
                 )
-            }
 
-            database.withTransaction {
+            queries.transactionWithResult {
                 // First, cache all the existing comment entries in memory
-                val allComments = dao.getAllForPost(stub.postId.value)
+                val allComments = queries.selectAllForPost(stub.postId.value).executeAsList()
                 logger.debugIfEnabled { "Loaded ${allComments.size} records from database" }
 
                 // Then, delete all the entries in the db *after* that
-                val stubId = dao.getIdForComment(stub.id.value)
+                val stubId = queries.selectIdForComment(stub.id.value).executeAsOneOrNull()
                     ?: throw IllegalStateException("Could not find comment with ID ${stub.id.value} in db")
                 logger.debugIfEnabled { "Deleting all from comment stub ID: $stubId" }
-                dao.deleteAllFromId(stubId)
+                queries.deleteAllFromId(stubId)
 
                 // Now, insert the newly fetched comments in place of the stub
-                val moreComments = moreCommentsResponse.await().json.data.things
+                val moreComments = moreCommentsResponse.json.data.things
                 logger.debugIfEnabled { "Loaded ${moreComments.size} new comments from api, inserting into db" }
-                dao.insertAll(
-                    moreComments.map {
-                        it.data.buildCommentRecord(stub.postId)
-                    }
-                )
-
-                logger.debugIfEnabled { "Inserting remaining comments" }
-                // Finally, insert all the comments after the stub to recreate the complete list.
-                val indexOfStub = allComments.indexOfFirst { it.commentId == stub.id.value }
-                if (indexOfStub < allComments.lastIndex) {
-                    dao.insertAll(
-                        allComments.subList(
-                            indexOfStub + 1,
-                            allComments.size - 1
-                        ).map { it.copy(id = 0) }
+                moreComments.map { it.data.buildComment(stub.postId) }.forEach { record ->
+                    queries.insert(
+                        null,
+                        comment_id = record.comment_id,
+                        post_id = record.post_id,
+                        parent_id = record.parent_id,
+                        path = record.path,
+                        body = record.body,
+                        flags = record.flags,
+                        author = record.author,
+                        created_at = record.created_at,
+                        edited_at = record.edited_at,
+                        inserted_at = record.inserted_at,
+                        score = record.score,
+                        link = record.link,
+                        controversial_index = record.controversial_index,
+                        depth = record.depth,
+                        up_votes = record.up_votes,
+                        flair_text = record.flair_text,
+                        flair_background_color = record.flair_background_color,
+                        flair_text_color = record.flair_text_color,
+                        thread_identifier = record.thread_identifier
                     )
                 }
 
-                dao.getAllForPost(stub.postId.value)
-            }.map { it.toCommentKind() }
+                logger.debugIfEnabled { "Inserting remaining comments" }
+                // Finally, insert all the comments after the stub to recreate the complete list.
+                val indexOfStub = allComments.indexOfFirst { it.comment_id == stub.id.value }
+                if (indexOfStub < allComments.lastIndex) {
+                    allComments.subList(
+                        indexOfStub + 1,
+                        allComments.size - 1
+                    ).forEach { record ->
+                        queries.insert(
+                            null,
+                            comment_id = record.comment_id,
+                            post_id = record.post_id,
+                            parent_id = record.parent_id,
+                            path = record.path,
+                            body = record.body,
+                            flags = record.flags,
+                            author = record.author,
+                            created_at = record.created_at,
+                            edited_at = record.edited_at,
+                            inserted_at = record.inserted_at,
+                            score = record.score,
+                            link = record.link,
+                            controversial_index = record.controversial_index,
+                            depth = record.depth,
+                            up_votes = record.up_votes,
+                            flair_text = record.flair_text,
+                            flair_background_color = record.flair_background_color,
+                            flair_text_color = record.flair_text_color,
+                            thread_identifier = record.thread_identifier
+                        )
+                    }
+                }
+
+                queries.selectAllForPost(stub.postId.value, mapper = commentMapper).executeAsList()
+            }
         }
 
     override suspend fun cachedCommentsForPost(postId: PostId): Int {
-        return database.withTransaction {
-            dao.commentCountForPost(postId.value)
-        }
+        return queries.selectCommentCountForPost(postId.value).executeAsOneOrNull()?.toInt() ?: 0
     }
 
     override suspend fun deleteByPost(postId: PostId) {
-        database.withTransaction {
-            dao.deleteAllForPost(postId.value)
-        }
+        queries.deleteAllForPost(postId.value)
     }
 
-    private fun CommentRecord.toCommentKind(): CommentKind {
-        return if (flags == CommentFlags.MORE_COMMENTS_STUB.name) {
-            if (score == 0) {
-                CommentKind.Thread(this.toThreadStub())
+    private val commentMapper: (
+        id: Long,
+        comment_id: String,
+        post_id: String,
+        parent_id: String?,
+        path: String?,
+        body: String,
+        flags: String,
+        author: String,
+        created_at: Long,
+        edited_at: Long,
+        inserted_at: Long,
+        score: Long,
+        link: String,
+        controversial_index: Long,
+        depth: Long,
+        up_votes: Long,
+        flair_text: String?,
+        flair_background_color: Long,
+        flair_text_color: String,
+        thread_identifier: String?
+    ) -> CommentKind = { id: Long,
+        comment_id: String,
+        post_id: String,
+        parent_id: String?,
+        path: String?,
+        body: String,
+        flags: String,
+        author: String,
+        created_at: Long,
+        edited_at: Long,
+        inserted_at: Long,
+        score: Long,
+        link: String,
+        controversial_index: Long,
+        depth: Long,
+        up_votes: Long,
+        flair_text: String?,
+        flair_background_color: Long,
+        flair_text_color: String,
+        thread_identifier: String? ->
+
+        if (flags == CommentFlags.MORE_COMMENTS_STUB.name) {
+            if (score == 0L) {
+                CommentKind.Thread(
+                    ThreadStub(
+                        postId = PostId(post_id),
+                        parentId = CommentId(
+                            requireNotNull(parent_id).replace(
+                                "t1_",
+                                ""
+                            )
+                        ), // lol const
+                        depth = CommentDepth(depth.toInt())
+                    )
+                )
             } else {
-                CommentKind.Stub(this.toCommentStub())
+                CommentKind.Stub(
+                    CommentStub(
+                        postId = PostId(post_id),
+                        id = CommentId(comment_id),
+                        count = MoreCommentsCount(score.toInt()), // TODO stop using score as a proxy field for child count
+                        parentId = parent_id?.let { CommentId(it) },
+                        depth = CommentDepth(depth.toInt()),
+                        children = body.split(",").map { CommentId((it)) }
+                    )
+                )
             }
         } else {
-            CommentKind.Full(this.toComment())
+            CommentKind.Full(
+                Comment(
+                    id = CommentId(comment_id),
+                    content = CommentContent(body),
+                    contentMarkdown = markdownParser.parse(body),
+                    flags = flags.getFlags(),
+                    authorName = AuthorName(author),
+                    createdAt = Instant.ofEpochMilli(created_at),
+                    createdAtDurationString = created_at.formatDuration(),
+                    editedAt = if (edited_at > 0) {
+                        Instant.ofEpochMilli(edited_at)
+                    } else {
+                        null
+                    },
+                    editedAtDurationString = if (edited_at > 0) {
+                        edited_at.formatDuration()
+                    } else {
+                        null
+                    },
+                    score = Score(score.toInt()),
+                    link = link.toUri(),
+                    postId = PostId(post_id),
+                    controversialIndex = ControversialIndex(controversial_index.toInt()),
+                    depth = CommentDepth(depth.toInt()),
+                    upVotes = UpVotesCount(up_votes.toInt()),
+                    parentId = parent_id?.let { CommentId(it) },
+                    commentFlair = flair(
+                        flair_text,
+                        flair_text_color,
+                        flair_background_color.toInt()
+                    )
+                )
+            )
         }
     }
 
-    private fun CommentRecord.toCommentStub(): CommentStub {
-        return CommentStub(
-            postId = PostId(postId),
-            id = CommentId(commentId),
-            count = MoreCommentsCount(score), // TODO stop using score as a proxy field for child count
-            parentId = parentId?.let { CommentId(it) },
-            depth = CommentDepth(depth),
-            children = body.split(",").map { CommentId((it)) }
-        )
-    }
-
-    private fun CommentRecord.toThreadStub(): ThreadStub {
-        return ThreadStub(
-            postId = PostId(postId),
-            parentId = CommentId(requireNotNull(parentId).replace("t1_", "")),
-            depth = CommentDepth(depth)
-        )
-    }
-
-    private fun CommentRecord.toComment(): Comment {
-        return Comment(
-            id = CommentId(commentId),
-            content = CommentContent(body),
-            contentMarkdown = markdownParser.parse(body),
-            flags = getFlags(),
-            authorName = AuthorName(author),
-            createdAt = Instant.ofEpochMilli(createdAt),
-            createdAtDurationString = createdAt.formatDuration(),
-            editedAt = if (editedAt > 0) {
-                Instant.ofEpochMilli(editedAt)
-            } else {
-                null
-            },
-            editedAtDurationString = if (editedAt > 0) {
-                editedAt.formatDuration()
-            } else {
-                null
-            },
-            score = Score(score),
-            link = link.toUri(),
-            postId = PostId(postId),
-            controversialIndex = ControversialIndex(controversialIndex),
-            depth = CommentDepth(depth),
-            upVotes = UpVotesCount(upVotes),
-            parentId = parentId?.let { CommentId(it) },
-            commentFlair = flair()
-        )
-    }
-
-    private fun CommentRecord.flair(): CommentFlair {
-        val text = flairText
-        return if (text.isNullOrEmpty()) {
+    private fun flair(
+        flairText: String?,
+        flairTextColor: String,
+        flairBackgroundColor: Int
+    ): CommentFlair {
+        return if (flairText.isNullOrEmpty()) {
             CommentFlair.NoFlair
         } else {
             CommentFlair.TextFlair(
-                CommentFlairText(text),
+                CommentFlairText(flairText),
                 CommentFlairBackgroundColor(flairBackgroundColor),
                 CommentFlairTextColor.valueOf(flairTextColor.uppercase())
             )
@@ -398,17 +497,17 @@ class CommentRepositoryImpl @Inject constructor(
         )
     }
 
-    private fun CommentRecord.getFlags(): Set<CommentFlags> {
-        return flags.split(",")
+    private fun String.getFlags(): Set<CommentFlags> {
+        return this.split(",")
             .filter { it.isNotEmpty() }
             .map { CommentFlags.valueOf(it) }
             .toSet()
     }
 
-    private fun CommentResponse.getCommentRecords(
+    private fun CommentResponse.getComments(
         postId: PostId,
         threadId: CommentId? = null
-    ): List<CommentRecord> {
+    ): List<com.neaniesoft.vermilion.db.Comment> {
         val comments = this.data.children.mapNotNull {
             when (it) {
                 is CommentThing -> CommentOrStubData.Comment(it.data)
@@ -424,14 +523,14 @@ class CommentRepositoryImpl @Inject constructor(
                     listOf(it.moreComments)
                 }
             }
-        }.map { it.buildCommentRecord(postId, threadId) }
+        }.map { it.buildComment(postId, threadId) }
         return comments
     }
 
-    private fun ThingData.buildCommentRecord(
+    private fun ThingData.buildComment(
         postId: PostId,
         threadId: CommentId? = null
-    ): CommentRecord {
+    ): com.neaniesoft.vermilion.db.Comment {
         return when (this) {
             is CommentData -> this.toCommentRecord(threadId = threadId)
             is MoreCommentsData -> this.toCommentRecord(postId, threadId)
@@ -466,35 +565,35 @@ class CommentRepositoryImpl @Inject constructor(
     private fun MoreCommentsData.toCommentRecord(
         postId: PostId,
         threadId: CommentId? = null
-    ): CommentRecord {
+    ): com.neaniesoft.vermilion.db.Comment {
         val flags = listOf(CommentFlags.MORE_COMMENTS_STUB)
         val now = clock.millis()
 
-        return CommentRecord(
+        return com.neaniesoft.vermilion.db.Comment(
             id = 0,
-            commentId = id,
-            postId = postId.value,
-            parentId = parentId,
+            comment_id = id,
+            post_id = postId.value,
+            parent_id = parentId,
             path = null,
             body = children.joinToString(",") { it }, // TODO use a proper field for storing children.
             flags = flags.joinToString(",") { it.name },
             author = "",
-            createdAt = now,
-            insertedAt = now,
-            editedAt = 0,
-            score = count, // TODO this is pretty gross, using the score field to store the child count. Should probably modify the schema to allow for this new field instead.
+            created_at = now,
+            inserted_at = now,
+            edited_at = 0,
+            score = count.toLong(), // TODO this is pretty gross, using the score field to store the child count. Should probably modify the schema to allow for this new field instead.
             link = "",
-            controversialIndex = 0,
-            depth = depth,
-            upVotes = 0,
-            flairText = null,
-            flairBackgroundColor = 0,
-            flairTextColor = CommentFlairTextColor.DARK.name,
-            threadIdentifier = threadId?.value
+            controversial_index = 0,
+            depth = depth.toLong(),
+            up_votes = 0,
+            flair_text = null,
+            flair_background_color = 0,
+            flair_text_color = CommentFlairTextColor.DARK.name,
+            thread_identifier = threadId?.value
         )
     }
 
-    private fun CommentData.toCommentRecord(threadId: CommentId? = null): CommentRecord {
+    private fun CommentData.toCommentRecord(threadId: CommentId? = null): com.neaniesoft.vermilion.db.Comment {
         val flags = listOfNotNull(
             if (saved) {
                 CommentFlags.SAVED
@@ -544,27 +643,27 @@ class CommentRepositoryImpl @Inject constructor(
             }
         ).joinToString(",") { it.name }
 
-        return CommentRecord(
+        return com.neaniesoft.vermilion.db.Comment(
             id = 0,
-            commentId = id,
-            postId = linkId.replace("t3_", ""),
-            parentId = parentId.takeIf { !it.startsWith("t3_") }?.replace("t1_", ""),
+            comment_id = id,
+            post_id = linkId.replace("t3_", ""),
+            parent_id = parentId.takeIf { !it.startsWith("t3_") }?.replace("t1_", ""),
             path = null,
             body = StringEscapeUtils.unescapeHtml4(body),
             flags = flags,
             author = author,
-            createdAt = createdUtc.toLong(),
-            editedAt = edited.toLong(),
-            insertedAt = clock.millis(),
-            score = score,
+            created_at = createdUtc.toLong(),
+            edited_at = edited.toLong(),
+            inserted_at = clock.millis(),
+            score = score.toLong(),
             link = permalink,
-            controversialIndex = controversiality,
-            depth = depth,
-            upVotes = ups,
-            flairText = authorFlairText,
-            flairBackgroundColor = flairBackgroundColor(),
-            flairTextColor = flairTextColor(),
-            threadIdentifier = threadId?.value
+            controversial_index = controversiality.toLong(),
+            depth = depth.toLong(),
+            up_votes = ups.toLong(),
+            flair_text = authorFlairText,
+            flair_background_color = flairBackgroundColor().toLong(),
+            flair_text_color = flairTextColor(),
+            thread_identifier = threadId?.value
         )
     }
 
