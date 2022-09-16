@@ -3,7 +3,5 @@ plugins {
 }
 
 dependencies {
-    implementation(Deps.ROOM_RUNTIME)
     implementation(Deps.PAGING_RUNTIME)
-    implementation(Deps.ROOM_PAGING)
 }
