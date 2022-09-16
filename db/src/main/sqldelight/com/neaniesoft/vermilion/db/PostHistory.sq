@@ -1,0 +1,11 @@
+CREATE TABLE postHistory (
+`id` INTEGER PRIMARY KEY, `post_id` TEXT NOT NULL, `visited_at` INTEGER NOT NULL
+);
+
+CREATE INDEX postHistory_post_id ON postHistory(post_id);
+
+insert:
+INSERT INTO postHistory VALUES (?, ?, ?);
+
+historyRecordsByDate:
+SELECT * FROM postHistory ORDER BY visited_at DESC;

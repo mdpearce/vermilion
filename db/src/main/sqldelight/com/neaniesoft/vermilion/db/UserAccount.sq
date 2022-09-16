@@ -1,0 +1,12 @@
+CREATE TABLE IF NOT EXISTS userAccount (id TEXT NOT NULL PRIMARY KEY, user_name TEXT NOT NULL);
+
+CREATE INDEX userAccount_user_name ON userAccount(user_name);
+
+selectById:
+SELECT id, user_name FROM userAccount WHERE id=?;
+
+insert:
+INSERT INTO userAccount(id, user_name) VALUES (?, ?);
+
+delete:
+DELETE FROM userAccount WHERE id=?;
