@@ -1,7 +1,7 @@
 object Deps {
-    const val HILT_COMPILER = "com.google.dagger:hilt-compiler:2.43.2"
-    const val HILT_ANDROID = "com.google.dagger:hilt-android:2.43.2"
-    const val HILT_ANDROID_TESTING = "com.google.dagger:hilt-android-testing:2.43.2"
+    const val HILT_COMPILER = "com.google.dagger:hilt-compiler:2.44"
+    const val HILT_ANDROID = "com.google.dagger:hilt-android:2.44"
+    const val HILT_ANDROID_TESTING = "com.google.dagger:hilt-android-testing:2.44"
     const val LIFECYCLE_VIEWMODEL_COMPOSE =
         "androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1"
     const val LIFECYCLE_VIEWMODEL = "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1"
@@ -30,7 +30,7 @@ object Deps {
     const val COMPOSE_UI_TEST_JUNIT4 = "androidx.compose.ui:ui-test-junit4:1.2.1"
     const val ANDROID_GRADLE_PLUGIN = "com.android.tools.build:gradle:7.2.2"
     const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.10"
-    const val HILT_ANDROID_GRADLE_PLUGIN = "com.google.dagger:hilt-android-gradle-plugin:2.43.2"
+    const val HILT_ANDROID_GRADLE_PLUGIN = "com.google.dagger:hilt-android-gradle-plugin:2.44"
     const val KOTLINTER_GRADLE_PLUGIN = "org.jmailen.gradle:kotlinter-gradle:3.11.1"
     const val APP_AUTH = "net.openid:appauth:0.11.1"
     const val ACCOMPANIST_NAVIGATION_MATERIAL =
