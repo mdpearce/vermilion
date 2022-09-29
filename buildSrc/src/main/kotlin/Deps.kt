@@ -37,7 +37,7 @@ object Deps {
         "com.google.accompanist:accompanist-navigation-material:0.25.1"
     const val COIL = "io.coil-kt:coil:2.2.0"
     const val COIL_COMPOSE = "io.coil-kt:coil-compose:2.2.0"
-    const val COMMONS_TEXT = "org.apache.commons:commons-text:1.9"
+    const val COMMONS_TEXT = "org.apache.commons:commons-text:1.10.0"
     const val PAGING_RUNTIME = "androidx.paging:paging-runtime:3.1.1"
     const val PAGING_COMPOSE = "androidx.paging:paging-compose:1.0.0-alpha14"
     const val KOTLIN_RESULT = "com.michael-bull.kotlin-result:kotlin-result:1.1.16"
