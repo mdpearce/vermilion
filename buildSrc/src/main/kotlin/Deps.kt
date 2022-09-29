@@ -55,7 +55,7 @@ object Deps {
     const val ACCOMPANIST_SWIPE_REFRESH = "com.google.accompanist:accompanist-swiperefresh:0.25.1"
     const val EXOPLAYER = "com.google.android.exoplayer:exoplayer:2.18.1"
     const val KOTLINX_SERIALIZATION_GRADLE_PLUGIN =
-        "org.jetbrains.kotlin:kotlin-serialization:1.7.10"
+        "org.jetbrains.kotlin:kotlin-serialization:1.7.20"
     const val KOTLINX_SERIALIZATION_JSON = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0"
     const val ANDROID_YOUTUBE_PLAYER = "com.pierfrancescosoffritti.androidyoutubeplayer:core:11.1.0"
     const val ACCOMPANIST_PAGER = "com.google.accompanist:accompanist-pager:0.25.1"
