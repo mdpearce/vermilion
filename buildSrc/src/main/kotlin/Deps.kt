@@ -63,5 +63,5 @@ object Deps {
     const val SQL_DELIGHT_GRADLE_PLUGIN = "com.squareup.sqldelight:gradle-plugin:1.5.3"
     const val SQL_DELIGHT_ANDROID_DRIVER = "com.squareup.sqldelight:android-driver:1.5.4"
     const val SQL_DELIGHT_COROUTINES = "com.squareup.sqldelight:coroutines-extensions-jvm:1.5.3"
-    const val SQL_DELIGHT_PAGING = "com.squareup.sqldelight:android-paging3-extensions:1.5.3"
+    const val SQL_DELIGHT_PAGING = "com.squareup.sqldelight:android-paging3-extensions:1.5.4"
 }
