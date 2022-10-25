@@ -28,7 +28,7 @@ object Deps {
     const val ANDROIDX_NAVIGATION_COMPOSE = "androidx.navigation:navigation-compose:2.5.1"
     const val ANDROIDX_ACTIVITY_COMPOSE = "androidx.activity:activity-compose:1.5.1"
     const val COMPOSE_UI_TEST_JUNIT4 = "androidx.compose.ui:ui-test-junit4:1.2.1"
-    const val ANDROID_GRADLE_PLUGIN = "com.android.tools.build:gradle:7.3.0"
+    const val ANDROID_GRADLE_PLUGIN = "com.android.tools.build:gradle:7.3.1"
     const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.10"
     const val HILT_ANDROID_GRADLE_PLUGIN = "com.google.dagger:hilt-android-gradle-plugin:2.43.2"
     const val KOTLINTER_GRADLE_PLUGIN = "org.jmailen.gradle:kotlinter-gradle:3.11.1"
