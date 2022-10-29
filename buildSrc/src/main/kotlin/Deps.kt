@@ -24,7 +24,7 @@ object Deps {
     const val MATERIAL = "com.google.android.material:material:1.6.1"
     const val COMPOSE_MATERIAL = "androidx.compose.material:material:1.2.1"
     const val COMPOSE_UI_TOOLING_PREVIEW = "androidx.compose.ui:ui-tooling-preview:1.2.1"
-    const val COMPOSE_UI_TOOLING = "androidx.compose.ui:ui-tooling:1.2.1"
+    const val COMPOSE_UI_TOOLING = "androidx.compose.ui:ui-tooling:1.3.0"
     const val ANDROIDX_NAVIGATION_COMPOSE = "androidx.navigation:navigation-compose:2.5.1"
     const val ANDROIDX_ACTIVITY_COMPOSE = "androidx.activity:activity-compose:1.5.1"
     const val COMPOSE_UI_TEST_JUNIT4 = "androidx.compose.ui:ui-test-junit4:1.2.1"
