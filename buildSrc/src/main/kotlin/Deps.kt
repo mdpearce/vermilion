@@ -34,7 +34,7 @@ object Deps {
     const val KOTLINTER_GRADLE_PLUGIN = "org.jmailen.gradle:kotlinter-gradle:3.11.1"
     const val APP_AUTH = "net.openid:appauth:0.11.1"
     const val ACCOMPANIST_NAVIGATION_MATERIAL =
-        "com.google.accompanist:accompanist-navigation-material:0.25.1"
+        "com.google.accompanist:accompanist-navigation-material:0.27.0"
     const val COIL = "io.coil-kt:coil:2.2.0"
     const val COIL_COMPOSE = "io.coil-kt:coil-compose:2.2.0"
     const val COMMONS_TEXT = "org.apache.commons:commons-text:1.9"
@@ -52,14 +52,14 @@ object Deps {
     const val FIREBASE_CRASHLYTICS = "com.google.firebase:firebase-crashlytics-ktx"
     const val FIREBASE_CRASHLYTICS_GRADLE_PLUGIN =
         "com.google.firebase:firebase-crashlytics-gradle:2.9.1"
-    const val ACCOMPANIST_SWIPE_REFRESH = "com.google.accompanist:accompanist-swiperefresh:0.25.1"
+    const val ACCOMPANIST_SWIPE_REFRESH = "com.google.accompanist:accompanist-swiperefresh:0.27.0"
     const val EXOPLAYER = "com.google.android.exoplayer:exoplayer:2.18.1"
     const val KOTLINX_SERIALIZATION_GRADLE_PLUGIN =
         "org.jetbrains.kotlin:kotlin-serialization:1.7.10"
     const val KOTLINX_SERIALIZATION_JSON = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0"
     const val ANDROID_YOUTUBE_PLAYER = "com.pierfrancescosoffritti.androidyoutubeplayer:core:11.1.0"
-    const val ACCOMPANIST_PAGER = "com.google.accompanist:accompanist-pager:0.25.1"
-    const val ACCOMPANIST_PAGER_INDICATORS = "com.google.accompanist:accompanist-pager-indicators:0.25.1"
+    const val ACCOMPANIST_PAGER = "com.google.accompanist:accompanist-pager:0.27.0"
+    const val ACCOMPANIST_PAGER_INDICATORS = "com.google.accompanist:accompanist-pager-indicators:0.27.0"
     const val SQL_DELIGHT_GRADLE_PLUGIN = "com.squareup.sqldelight:gradle-plugin:1.5.3"
     const val SQL_DELIGHT_ANDROID_DRIVER = "com.squareup.sqldelight:android-driver:1.5.3"
     const val SQL_DELIGHT_COROUTINES = "com.squareup.sqldelight:coroutines-extensions-jvm:1.5.3"
