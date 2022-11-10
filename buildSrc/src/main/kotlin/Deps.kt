@@ -21,7 +21,7 @@ object Deps {
     const val JACKSON_ANNOTATIONS = "com.fasterxml.jackson.core:jackson-annotations:2.13.3"
     const val OKHTTP = "com.squareup.okhttp3:okhttp:4.10.0"
     const val OKHTTP_LOGGING_INTERCEPTOR = "com.squareup.okhttp3:logging-interceptor:4.10.0"
-    const val MATERIAL = "com.google.android.material:material:1.6.1"
+    const val MATERIAL = "com.google.android.material:material:1.7.0"
     const val COMPOSE_MATERIAL = "androidx.compose.material:material:1.2.1"
     const val COMPOSE_UI_TOOLING_PREVIEW = "androidx.compose.ui:ui-tooling-preview:1.2.1"
     const val COMPOSE_UI_TOOLING = "androidx.compose.ui:ui-tooling:1.2.1"
