@@ -22,7 +22,7 @@ buildscript {
 }
 
 plugins {
-    id("com.dipien.releaseshub.gradle.plugin").version("3.1.0")
+    id("com.dipien.releaseshub.gradle.plugin").version("4.0.0")
 }
 
 subprojects {
